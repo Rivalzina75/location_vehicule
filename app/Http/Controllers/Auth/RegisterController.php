@@ -15,7 +15,7 @@ class RegisterController extends Controller
     use RegistersUsers;
 
     // Redirection après inscription (corrigé pour ne pas utiliser RouteServiceProvider)
-    protected $redirectTo = '/home'; 
+    protected $redirectTo = '/dashboard'; 
 
     public function __construct()
     {

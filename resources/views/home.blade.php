@@ -1,23 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+<div class="welcome-container">
+    <h1>Bienvenue chez Machina</h1>
+    <p>Votre solution de location de véhicules, simple et rapide.</p>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    {{ __('You are logged in!') }}
-                </div>
-            </div>
+    @auth
+        <div class_="welcome-buttons" style="margin-top: 2rem;">
+            <a href="{{ route('dashboard') }}" class="btn-welcome btn-connexion">
+                Aller à mon tableau de bord
+            </a>
         </div>
-    </div>
+    @endauth
 </div>
 @endsection
