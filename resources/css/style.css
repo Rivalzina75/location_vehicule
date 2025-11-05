@@ -274,3 +274,27 @@ main.py-4 {
 .auth-links a:hover {
     text-decoration: underline;
 }
+
+/* ========================================= */
+/* 4. Styles pour Formulaire en Grille (Prénom | Nom) */
+/* ========================================= */
+
+/* Élargit la "boîte" blanche UNIQUEMENT pour le formulaire long */
+.auth-container-wide {
+    max-width: 850px;
+    /* Élargi pour 2 colonnes */
+}
+
+/* NOUVEAU: Une "rangée" qui contient 2 champs */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 colonnes de taille égale */
+    gap: 20px;
+    /* Espace ENTRE les colonnes */
+    /* L'espace en bas est géré par .form-group */
+}
+
+/* N.B. Le .form-group normal (pas dans une .form-row) 
+   prendra toujours 100% de la largeur, ce qui est parfait.
+*/
