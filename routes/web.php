@@ -19,5 +19,7 @@ Auth::routes();
 // ÉTAPE 3 : Votre NOUVEAU tableau de bord (protégé)
 // Il pointe vers HomeController, qui pointe vers dashboard.blade.php
 // Nous renommons l'ancienne route /home en /dashboard
+// Ce que vous devez avoir
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])
-    ->name('dashboard'); // Le nom est maintenant 'dashboard'
+    ->middleware('verified') // <-- AJOUTEZ CECI
+    ->name('dashboard');

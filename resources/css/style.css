@@ -1,56 +1,276 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
-
+/* ========================================= */
+/* 1. Styles de Base et Layout (pour app.blade.php) */
+/* ========================================= */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f4f7f6;
+}
+
+#app {
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Styles pour la barre de navigation */
+.navbar {
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    padding: 0 2rem;
+    box-sizing: border-box;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 60px;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+    /* Bleu */
+}
+
+.navbar-nav {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin-left: 1.5rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+/* Contenu Principal (centre les pages) */
+main.py-4 {
+    flex: 1;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-header {
-    width: 100%;
-    background-color: #007bff;
-    color: white;
-    padding: 20px;
+/* ========================================= */
+/* 2. Styles des Pages (Accueil et Dashboard) */
+/* ========================================= */
+
+/* Styles pour la Page d'Accueil (home.blade.php) */
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    font-size: 2em;
+    flex: 1;
 }
 
-.buttons {
-    margin-top: 50px;
+.welcome-container h1 {
+    font-size: 3rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.welcome-container p {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 2.5rem;
+}
+
+.welcome-buttons {
     display: flex;
     gap: 20px;
 }
 
-button {
+/* Boutons de l'accueil */
+.btn-welcome {
     padding: 15px 30px;
-    font-size: 1em;
+    font-size: 1.1rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.inscription {
+.btn-welcome:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-inscription {
     background-color: #28a745;
+    /* Vert */
 }
 
-.connexion {
-    background-color: #ffc107;
+.btn-connexion {
+    background-color: #007bff;
+    /* Bleu */
 }
 
-button:hover {
-    opacity: 0.9;
+/* Styles pour le Dashboard (dashboard.blade.php) */
+.content-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 800px;
+    overflow: hidden;
+    /* Important pour les coins arrondis de l'en-tête */
+}
+
+
+/* ========================================= */
+/* 3. Styles des Formulaires (Login, Register, etc.) */
+/* ========================================= */
+
+/* Conteneur principal (carte blanche) */
+.auth-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+/* En-tête (barre bleue) */
+.auth-header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px 32px;
+    /* Aération */
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Corps du formulaire (zone blanche) */
+.auth-body {
+    padding: 32px;
+}
+
+/* Groupe (Label + Champ) */
+.form-group {
+    margin-bottom: 22px;
+    /* Espace ENTRE chaque groupe */
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    /* Espace ENTRE label et champ */
+}
+
+/* Champ de texte (Input) */
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    /* Bordure visible */
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #e3342f;
+}
+
+/* Message d'erreur de validation */
+.form-group .error-message {
+    color: #e3342f;
+    font-size: 0.875em;
+    margin-top: 6px;
+}
+
+/* Case "Se souvenir de moi" */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-check input {
+    margin-right: 8px;
+}
+
+.form-check label {
+    font-weight: normal;
+    color: #333;
+    margin-bottom: 0;
+}
+
+/* Conteneur du bouton (pour centrer) */
+.form-button-container {
+    text-align: center;
+    margin-top: 30px;
+    /* Espace AU-DESSUS du bouton */
+}
+
+/* Bouton principal (taille corrigée) */
+.btn-primary {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Liens (Mot de passe oublié, etc.) */
+.auth-links {
+    text-align: center;
+    margin-top: 25px;
+    /* Espace AU-DESSUS des liens */
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.auth-links a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
 }
