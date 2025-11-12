@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth; // <-- AJOUTEZ CETTE LIGNE
+use Illuminate\Support\Facades\Auth; // <-- L'IMPORTATION REQUISE
 
 /*
 |--------------------------------------------------------------------------
@@ -9,19 +9,22 @@ use Illuminate\Support\Facades\Auth; // <-- AJOUTEZ CETTE LIGNE
 |--------------------------------------------------------------------------
 */
 
-// ÉTAPE 1 : Votre page d'accueil PUBLIQUE (pointe vers home.blade.php)
+// ÉTAPE 1 : Votre page d'accueil PUBLIQUE
 Route::get('/', function () {
     return view('home');
 });
 
-// ÉTAPE 2 : Les routes d'authentification (Login, Register, etc.)
-// C'est la ligne qui active la vérification d'email
+// ÉTAPE 2 : Les routes d'authentification
+// Active la vérification d'email
 Auth::routes(['verify' => true]);
 
-// ÉTAPE 3 : Votre NOUVEAU tableau de bord (protégé)
-// Il pointe vers HomeController, qui pointe vers dashboard.blade.php
-// Nous renommons l'ancienne route /home en /dashboard
-// Ce que vous devez avoir
+// ÉTAPE 3 : Votre NOUVEAU tableau de bord
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])
-    ->middleware('verified') // Protège la route
+    ->middleware('verified')
     ->name('dashboard');
+
+// ÉTAPE 4 (CORRECTION 404) : Redirige l'ancienne route /home
+// que Laravel cherche (et qui n'existe pas) vers /dashboard
+Route::get('/home', function () {
+    return redirect('/dashboard');
+})->name('home');
