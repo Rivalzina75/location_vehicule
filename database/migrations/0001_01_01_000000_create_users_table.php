@@ -17,10 +17,19 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // -----------------------------------------------------------------
+            // VOS AJOUTS ICI (Machina Point 4)
+            // -----------------------------------------------------------------
+            $table->integer('login_attempts')->default(0); // <-- AJOUTEZ CETTE LIGNE
+            $table->timestamp('blocked_until')->nullable(); // <-- AJOUTEZ CETTE LIGNE
+            // -----------------------------------------------------------------
+
             $table->rememberToken();
             $table->timestamps();
         });
 
+        // Le reste de votre fichier ne change pas
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

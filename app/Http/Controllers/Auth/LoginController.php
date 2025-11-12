@@ -29,7 +29,7 @@ class LoginController extends Controller
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);
-        
+
         // 2. Récupérer l'utilisateur par e-mail
         $user = User::where($this->username(), $request->input($this->username()))->first();
 
@@ -39,7 +39,7 @@ class LoginController extends Controller
         // Vérifie si l'utilisateur est bloqué et si le temps de blocage n'est pas écoulé
         if ($user && $user->blocked_until && Carbon::now()->lessThan($user->blocked_until)) {
             $remainingSeconds = $user->blocked_until->diffInSeconds(Carbon::now());
-            
+
             // Point 4: Afficher le message de blocage
             throw \Illuminate\Validation\ValidationException::withMessages([
                 $this->username() => ["Votre compte est bloqué. Veuillez attendre {$remainingSeconds} secondes avant de réessayer."]
@@ -59,7 +59,7 @@ class LoginController extends Controller
         // Si l'utilisateur est trouvé et non bloqué par la validation initiale
         if ($user) {
             $user->login_attempts++; // Incrémenter le compteur
-            
+
             // Si le nombre d'erreurs atteint ou dépasse 3
             if ($user->login_attempts >= 3) {
                 // Point 4: Calcul du temps d'attente croissant
@@ -67,12 +67,12 @@ class LoginController extends Controller
                 // 4e tentative échouée => 45s (30 + 1 * 15)
                 // 5e tentative échouée => 60s (30 + 2 * 15)
                 $waitSeconds = 30 + (max(0, $user->login_attempts - 3) * 15);
-                
+
                 $user->blocked_until = Carbon::now()->addSeconds($waitSeconds);
-                
+
                 // Message d'erreur spécifique pour le blocage
                 $user->save();
-                
+
                 return redirect()->back()
                     ->withInput($request->only($this->username(), 'remember'))
                     ->withErrors([

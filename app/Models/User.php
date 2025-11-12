@@ -21,15 +21,21 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name',      // Nouveau
-        'last_name',       // Nouveau
+        'first_name',
+        'last_name',
         'email',
         'password',
-        'date_of_birth',   // Nouveau
-        'phone_number',    // Nouveau
-        'address_line1',   // Nouveau
-        'postal_code',     // Nouveau
-        'city',            // Nouveau
+        'date_of_birth',
+        'phone_number',
+        'address_line1',
+        'postal_code',
+        'city',
+
+        // -----------------------------------------------------------------
+        // AJOUTS POUR LA SÉCURITÉ (Machina Point 4)
+        // -----------------------------------------------------------------
+        'login_attempts',
+        'blocked_until',
     ];
 
     /**
@@ -52,16 +58,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            // Indique à Laravel que c'est une date, pour qu'il la gère correctement
-            'date_of_birth' => 'date', 
+            'date_of_birth' => 'date',
+
+            // -----------------------------------------------------------------
+            // AJOUT POUR LA SÉCURITÉ (Machina Point 4)
+            // -----------------------------------------------------------------
+            'blocked_until' => 'datetime', // Indique à Laravel que c'est une date
         ];
     }
 
     /**
-     * NOUVEAU: Mutator pour la date de naissance (Format Français).
-     * Cette fonction est appelée AUTOMATIQUEMENT avant de sauvegarder en BDD.
-     * Elle convertit le format 'JJ/MM/AAAA' (du formulaire) 
-     * en 'YYYY-MM-DD' (pour la BDD).
+     * Mutator pour la date de naissance (Format Français).
      */
     protected function setDateOfBirthAttribute($value)
     {
@@ -71,10 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * NOUVEAU: Accessor pour la date de naissance (Format Français).
-     * Appelée AUTOMATIQUEMENT quand on lit la date depuis la BDD.
-     * Elle convertit 'YYYY-MM-DD' (de la BDD) 
-     * en 'JJ/MM/AAAA' (pour l'affichage).
+     * Accessor pour la date de naissance (Format Français).
      */
     protected function getDateOfBirthAttribute($value)
     {
