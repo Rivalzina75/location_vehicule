@@ -16,6 +16,7 @@
                        name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
                        class="form-control @error('email') is-invalid @enderror">
 
+                {{-- Le message d'erreur standard (ex: "Compte bloqué 30s") s'affiche ici --}}
                 @error('email')
                     <div class="error-message" role="alert">
                         <strong>{{ $message }}</strong>
@@ -43,6 +44,11 @@
                 </label>
             </div>
 
+            @if (session('lockout_time') && session('lockout_time') > 0)
+                <div id="countdown-timer" class="countdown-timer">
+                    Temps restant : <strong id="timer">{{ session('lockout_time') }}</strong> secondes.
+                </div>
+            @endif
             <div class="form-button-container">
                 <button type="submit" class="btn-primary">
                     Se connecter
@@ -65,4 +71,47 @@
         </form>
     </div>
 </div>
+
+@if (session('lockout_time') && session('lockout_time') > 0)
+    <script>
+        let seconds = {{ session('lockout_time') }};
+        const timerElement = document.getElementById('timer');
+        const countdownElement = document.getElementById('countdown-timer');
+        const submitButton = document.querySelector('form button[type="submit"]');
+
+        // Désactiver le bouton et le griser (en utilisant votre style)
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.cursor = 'not-allowed';
+        }
+
+        const interval = setInterval(() => {
+            seconds--; 
+            
+            if (timerElement) {
+                timerElement.textContent = seconds; 
+            }
+
+            if (seconds <= 0) {
+                clearInterval(interval); 
+                
+                // Changer le message de blocage en message de succès
+                if (countdownElement) {
+                    countdownElement.textContent = "Vous pouvez réessayer de vous connecter.";
+                    // Utilise la couleur verte de votre classe .btn-inscription
+                    countdownElement.style.color = '#28a745'; 
+                    countdownElement.style.backgroundColor = '#e9f7ea';
+                }
+                
+                // Réactiver le bouton
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                    submitButton.style.cursor = 'pointer';
+                }
+            }
+        }, 1000); // 1 seconde
+    </script>
+@endif
 @endsection

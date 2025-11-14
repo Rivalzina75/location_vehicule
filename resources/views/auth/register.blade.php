@@ -48,7 +48,8 @@
                     <input id="date_of_birth" type="text" 
                            name="date_of_birth" value="{{ old('date_of_birth') }}" required autocomplete="bday"
                            class="form-control @error('date_of_birth') is-invalid @enderror"
-                           placeholder="JJ/MM/AAAA">
+                           placeholder="JJ/MM/AAAA" 
+                           maxlength="10">
                     @error('date_of_birth')
                         <div class="error-message" role="alert"><strong>{{ $message }}</strong></div>
                     @enderror
@@ -93,7 +94,7 @@
                            class="form-control @error('city') is-invalid @enderror">
                     @error('city')
                         <div class="error-message" role="alert"><strong>{{ $message }}</strong></div>
-                    @enderror
+                    @enderror  {{-- <-- LIGNE CORRIGÉE --}}
                 </div>
             </div>
             
@@ -106,7 +107,7 @@
                            name="password" required autocomplete="new-password"
                            class="form-control @error('password') is-invalid @enderror">
                     @error('password')
-                        <div class="error-message" role="alert"><strong>{{ $message }}</strong></div>
+                        <div class="error-message" role="alert"><strong>{!! $message !!}</strong></div>
                     @enderror
                 </div>
 
@@ -132,4 +133,31 @@
         </form>
     </div>
 </div>
+
+<script>
+    // On cible le champ de la date de naissance
+    const dateInput = document.getElementById('date_of_birth');
+
+    if (dateInput) {
+        // On écoute l'événement 'input' (chaque fois que l'utilisateur tape)
+        dateInput.addEventListener('input', function (e) {
+            
+            // 1. On récupère la valeur et on enlève tout ce qui n'est pas un chiffre
+            let value = e.target.value.replace(/[^\d]/g, '');
+
+            // 2. On reformate la valeur pour ajouter les /
+            // Si l'utilisateur tape '1234' -> '12/34'
+            if (value.length > 2 && value.length <= 4) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            } 
+            // Si l'utilisateur tape '123456' -> '12/34/56'
+            else if (value.length > 4) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4, 8);
+            }
+            
+            // 3. On met à jour la valeur du champ
+            e.target.value = value;
+        });
+    }
+</script>
 @endsection
