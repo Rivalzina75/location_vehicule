@@ -2,66 +2,49 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Closure;
 
-class PasswordRobustness implements Rule
+class PasswordRobustness implements ValidationRule
 {
-    protected $messages = [];
-
     /**
-     * Create a new rule instance.
-     *
-     * @return void
+     * Exécute la règle de validation.
      */
-    public function __construct()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        //
-    }
+        $messages = []; // On prépare un tableau pour les erreurs
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
-        // Réinitialiser les messages à chaque validation
-        $this->messages = [];
-
-        // 1. Longueur minimum 14 caractères
+        // 1. Longueur 14
         if (strlen($value) < 14) {
-            $this->messages[] = 'doit contenir au moins 14 caractères';
+            $messages[] = '- au moins 14 caractères';
         }
-        // 2. Une minuscule
+        // 2. Minuscule
         if (!preg_match('/[a-z]/', $value)) {
-            $this->messages[] = 'doit contenir au moins une minuscule';
+            $messages[] = '- au moins une minuscule';
         }
-        // 3. Une majuscule
+        // 3. Majuscule
         if (!preg_match('/[A-Z]/', $value)) {
-            $this->messages[] = 'doit contenir au moins une majuscule';
+            $messages[] = '- au moins une majuscule';
         }
-        // 4. Un chiffre
+        // 4. Chiffre
         if (!preg_match('/[0-9]/', $value)) {
-            $this->messages[] = 'doit contenir au moins un chiffre';
+            $messages[] = '- au moins un chiffre';
         }
-        // 5. Un caractère spécial
-        if (!preg_match('/[\W_]/', $value)) { // \W (non-mot) ou _ (underscore)
-            $this->messages[] = 'doit contenir au moins un caractère spécial';
+        // 5. Caractère spécial
+        if (!preg_match('/[\W_]/', $value)) {
+            $messages[] = '- au moins un caractère spécial';
         }
 
-        return empty($this->messages);
-    }
+        // Si on a trouvé des erreurs...
+        if (!empty($messages)) {
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        // Retourne la liste détaillée des problèmes (Machina Point 3)
-        return 'Le mot de passe ' . implode(', et ', $this->messages) . '.';
+            // -----------------------------------------------------------------
+            // CORRECTION : On construit un message HTML avec des sauts de ligne
+            // -----------------------------------------------------------------
+            $htmlMessage = 'Il vous manque :<br>' . implode('<br>', $messages);
+
+            // On envoie le message HTML
+            $fail($htmlMessage);
+        }
     }
 }

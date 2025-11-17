@@ -36,11 +36,13 @@ class LoginController extends Controller
         // -------------------------
         // LOGIQUE DE VÉRIFICATION DU BLOCAGE
         // -------------------------
-        // Vérifie si l'utilisateur est bloqué et si le temps de blocage n'est pas écoulé
         if ($user && $user->blocked_until && Carbon::now()->lessThan($user->blocked_until)) {
             $remainingSeconds = $user->blocked_until->diffInSeconds(Carbon::now());
 
-            // Point 4: Afficher le message de blocage
+            // AJOUT POUR LE COMPTEUR JS
+            session()->flash('lockout_time', $remainingSeconds);
+
+            // Point 4: Afficher le message de blocage (qui sera traduit par lang/fr/passwords.php)
             throw \Illuminate\Validation\ValidationException::withMessages([
                 $this->username() => ["Votre compte est bloqué. Veuillez attendre {$remainingSeconds} secondes avant de réessayer."]
             ]);
@@ -50,40 +52,36 @@ class LoginController extends Controller
 
     /**
      * Gère une tentative de connexion échouée.
-     * (Appelé si le mot de passe est incorrect)
      */
     protected function sendFailedLoginResponse(Request $request)
     {
         $user = User::where('email', $request->email)->first();
 
-        // Si l'utilisateur est trouvé et non bloqué par la validation initiale
         if ($user) {
-            $user->login_attempts++; // Incrémenter le compteur
+            $user->login_attempts++;
 
-            // Si le nombre d'erreurs atteint ou dépasse 3
             if ($user->login_attempts >= 3) {
-                // Point 4: Calcul du temps d'attente croissant
-                // 3e tentative échouée => 30s
-                // 4e tentative échouée => 45s (30 + 1 * 15)
-                // 5e tentative échouée => 60s (30 + 2 * 15)
                 $waitSeconds = 30 + (max(0, $user->login_attempts - 3) * 15);
-
                 $user->blocked_until = Carbon::now()->addSeconds($waitSeconds);
 
-                // Message d'erreur spécifique pour le blocage
+                // AJOUT POUR LE COMPTEUR JS
+                session()->flash('lockout_time', $waitSeconds);
+
                 $user->save();
 
+                // Le message d'erreur sera traduit par lang/fr/auth.php
                 return redirect()->back()
                     ->withInput($request->only($this->username(), 'remember'))
                     ->withErrors([
                         $this->username() => "Compte bloqué après tentatives erronées. Veuillez attendre {$waitSeconds} secondes avant de réessayer."
                     ]);
             }
-            // Sauvegarder l'incrémentation des tentatives
             $user->save();
         }
 
-        // Retourne la réponse d'échec de connexion par défaut de Laravel
+        // ---------------------------------------------
+        // CORRECTION : On remet la clé de traduction
+        // ---------------------------------------------
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([
@@ -96,7 +94,6 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        // Si la connexion réussit, réinitialiser le compteur de tentatives (Point 4)
         $user->login_attempts = 0;
         $user->blocked_until = null;
         $user->save();

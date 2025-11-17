@@ -143,6 +143,70 @@ main {
 }
 
 /* ===================================
+   AJOUT : SÉLECTEUR DE LANGUE DROPDOWN
+   =================================== */
+.lang-switcher {
+    position: relative; /* Important pour le dropdown */
+}
+
+.lang-toggle {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: inherit;
+    font-size: inherit; /* Utilise la même taille que .nav-link */
+    font-weight: 500; /* Utilise le même poids que .nav-link */
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+}
+
+.lang-toggle:hover {
+    color: var(--bg-white);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-toggle .arrow-down {
+    font-size: 0.7em;
+    margin-left: 5px;
+}
+
+.lang-dropdown {
+    display: none; /* Caché par défaut, le JS le montrera */
+    position: absolute;
+    top: 100%; /* Juste en dessous du bouton */
+    right: 0; /* Aligné à droite */
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    list-style: none;
+    min-width: 150px; /* Largeur minimum */
+    overflow: hidden;
+    z-index: 1001;
+    margin-top: 5px; /* Petit espace */
+    padding: var(--spacing-xs) 0; /* Espacement intérieur */
+}
+
+.lang-dropdown li {
+    margin: 0;
+}
+
+.lang-dropdown .nav-link {
+    color: var(--text-primary); /* Texte sombre sur fond blanc */
+    padding: var(--spacing-xs) var(--spacing-md); /* Moins d'espace que la nav principale */
+    width: 100%;
+    font-weight: 500;
+}
+
+.lang-dropdown .nav-link:hover {
+    background: var(--bg-light); /* Fond gris clair au survol */
+    color: var(--accent-color);
+}
+
+/* ===================================
    WELCOME PAGE (Home)
    =================================== */
 

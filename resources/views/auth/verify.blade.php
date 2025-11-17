@@ -1,28 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Verify Your Email Address') }}</div>
+<div class="auth-container">
+    <div class="auth-header">
+        {{ __('Vérifiez votre adresse e-mail') }}
+    </div>
 
-                <div class="card-body">
-                    @if (session('resent'))
-                        <div class="alert alert-success" role="alert">
-                            {{ __('A fresh verification link has been sent to your email address.') }}
-                        </div>
-                    @endif
-
-                    {{ __('Before proceeding, please check your email for a verification link.') }}
-                    {{ __('If you did not receive the email') }},
-                    <form class="d-inline" method="POST" action="{{ route('verification.resend') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-link p-0 m-0 align-baseline">{{ __('click here to request another') }}</button>.
-                    </form>
-                </div>
+    <div class="auth-body">
+        @if (session('resent'))
+            <div class="alert alert-success" role="alert">
+                {{ __('Un nouveau lien de vérification a été envoyé à votre adresse e-mail.') }}
             </div>
-        </div>
+        @endif
+
+        <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary);">
+            {{ __('Avant de continuer, veuillez vérifier votre boîte de réception pour un lien de vérification.') }}
+            <br><br>
+            {{ __('Si vous n\'avez pas reçu l\'e-mail') }} :
+        </p>
+        
+        <form method="POST" action="{{ route('verification.resend') }}">
+            @csrf
+            <div class="form-button-container" style="margin-top: 0;">
+                <button type="submit" class="btn-primary">
+                    {{ __('Cliquez ici pour en recevoir un autre') }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

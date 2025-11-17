@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-// IMPORTANT: Importer Carbon pour la gestion des dates
+// IMPORTATIONS
 use Carbon\Carbon;
-// IMPORTANT: Importer MustVerifyEmail pour l'étape C (vérification d'email)
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// Nous ajoutons "implements MustVerifyEmail" (pour l'étape C)
+// --- AJOUT 1 : Importer nos 2 e-mails personnalisés ---
+use App\Notifications\VerifyEmailFrench;
+use App\Notifications\CustomResetPasswordNotification;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
     /**
      * Les attributs qui peuvent être assignés en masse.
-     *
-     * @var array<int, string>
      */
     protected $fillable = [
         'first_name',
@@ -30,18 +30,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'address_line1',
         'postal_code',
         'city',
-
-        // -----------------------------------------------------------------
-        // AJOUTS POUR LA SÉCURITÉ (Machina Point 4)
-        // -----------------------------------------------------------------
         'login_attempts',
         'blocked_until',
     ];
 
     /**
      * Les attributs qui doivent être cachés lors de la sérialisation.
-     *
-     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -50,8 +44,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Obtenir les attributs qui doivent être castés.
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -59,11 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'date_of_birth' => 'date',
-
-            // -----------------------------------------------------------------
-            // AJOUT POUR LA SÉCURITÉ (Machina Point 4)
-            // -----------------------------------------------------------------
-            'blocked_until' => 'datetime', // Indique à Laravel que c'est une date
+            'blocked_until' => 'datetime',
         ];
     }
 
@@ -85,5 +73,24 @@ class User extends Authenticatable implements MustVerifyEmail
         if ($value) {
             return Carbon::parse($value)->format('d/m/Y');
         }
+    }
+
+    /**
+     * --- UTILISATION 1 : Force Laravel à utiliser notre e-mail de VÉRIFICATION ---
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailFrench);
+    }
+
+    /**
+     * --- UTILISATION 2 : Force Laravel à utiliser notre e-mail de RÉINITIALISATION ---
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
     }
 }

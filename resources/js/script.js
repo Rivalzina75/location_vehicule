@@ -15,9 +15,44 @@ document.addEventListener('DOMContentLoaded', function() {
     initPasswordToggle();
     initSmoothAnimations();
     initAutoFormatting();
+    initLangSwitcher(); // <-- AJOUT POUR LE DROPDOWN DE LANGUE
 
     console.log('✓ Machina scripts loaded successfully');
 });
+
+// ===================================
+// SÉLECTEUR DE LANGUE (NOUVELLE FONCTION)
+// ===================================
+function initLangSwitcher() {
+    const toggleBtn = document.getElementById('lang-toggle-btn');
+    const dropdownMenu = document.getElementById('lang-dropdown-menu');
+
+    // S'assurer que les éléments existent
+    if (!toggleBtn || !dropdownMenu) {
+        return;
+    }
+
+    // Ouvre/Ferme le dropdown au clic sur le bouton
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); // Empêche le clic de se propager à 'document'
+        
+        // Vérifie si le menu est caché
+        const isHidden = dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '';
+        
+        // Affiche ou cache le menu
+        dropdownMenu.style.display = isHidden ? 'block' : 'none';
+    });
+
+    // Ferme le dropdown si on clique n'importe où ailleurs sur la page
+    document.addEventListener('click', function() {
+        dropdownMenu.style.display = 'none';
+    });
+
+    // Empêche le dropdown de se fermer si on clique à l'intérieur
+    dropdownMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+}
 
 // ===================================
 // Validation de formulaire en temps réel
