@@ -1553,3 +1553,37 @@ hr {
         width: 100%;
     }
 }
+
+/*
+========================================
+ARRIÈRE-PLAN POUR PAGES D'AUTH
+========================================
+*/
+
+/* 1. Applique l'image de fond si la classe est présente */
+body.auth-page {
+    /* L'image est maintenant dans resources/images/auth-bg.jpg */
+    background-image: url('../images/auth-bg.jpg'); /* <-- CHEMIN CORRIGÉ (avec ..) */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* L'image reste fixe au scroll */
+}
+
+/* 2. Ajoute une superposition sombre pour la lisibilité */
+body.auth-page::before {
+    content: '';
+    position: fixed; /* Couvre tout l'écran */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(211, 211, 211, 0.4); /* Superposition noire */
+    z-index: -1; /* Se place derrière le contenu */
+}
+
+/* 3. S'assure que le contenu principal est au-dessus */
+body.auth-page #app {
+    position: relative;
+    z-index: 1;
+}

@@ -7,7 +7,7 @@
     <title>{{ config('app.name', 'Laravel') }} - Machina</title>
     @vite(['resources/css/style.css', 'resources/js/script.js'])
 </head>
-<body>
+<body class="@if(Request::is('login') || Request::is('register') || Request::is('password/*') || Request::is('email/verify')) auth-page @endif">
     <div id="app">
         <nav class="navbar">
             <div class="navbar-container">
