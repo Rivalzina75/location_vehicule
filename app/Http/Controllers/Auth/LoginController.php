@@ -73,7 +73,7 @@ class LoginController extends Controller
                 return redirect()->back()
                     ->withInput($request->only($this->username(), 'remember'))
                     ->withErrors([
-                        $this->username() => "Compte bloqué après tentatives erronées. Veuillez attendre {$waitSeconds} secondes avant de réessayer."
+                        $this->username() => __('throttle_message', ['seconds' => $waitSeconds])
                     ]);
             }
             $user->save();

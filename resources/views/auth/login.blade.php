@@ -43,8 +43,8 @@
 
             @if (session('lockout_time') && session('lockout_time') > 0)
                 <div id="countdown-timer" class="countdown-timer">
-                    {{-- On garde le texte en dur ici car c'est un message technique --}}
-                    Temps restant : <strong id="timer">{{ session('lockout_time') }}</strong> secondes.
+                {{-- La phrase entière est maintenant gérée par Laravel --}}
+                    {{ __('countdown_message', ['seconds' => session('lockout_time')]) }}
                 </div>
             @endif
             <div class="form-button-container">
@@ -70,39 +70,61 @@
     </div>
 </div>
 
+    {{-- SCRIPT DU COMPTEUR (À placer à la fin de login.blade.php) --}}
 @if (session('lockout_time') && session('lockout_time') > 0)
     <script>
-        // ... (votre script de compteur reste ici, il n'a pas besoin de traduction)
-        let seconds = {{ session('lockout_time') }};
-        const timerElement = document.getElementById('timer');
-        const countdownElement = document.getElementById('countdown-timer');
-        const submitButton = document.querySelector('form button[type="submit"]');
+        document.addEventListener('DOMContentLoaded', function() {
+            // On récupère le temps initial
+            let seconds = {{ session('lockout_time') }};
+            
+            const countdownElement = document.getElementById('countdown-timer');
+            const submitButton = document.querySelector('form button[type="submit"]');
 
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.style.opacity = '0.5';
-            submitButton.style.cursor = 'not-allowed';
-        }
+            // --- C'EST ICI QUE ÇA CHANGE ---
+            // On prépare les phrases traduites (Laravel remplace les clés par le texte)
+            // 'XX' est notre repère pour savoir où mettre le chiffre
+            let messageTemplate = "{{ __('countdown_message', ['seconds' => 'XX']) }}";
+            let completeMessage = "{{ __('lockout_complete') }}";
 
-        const interval = setInterval(() => {
-            seconds--; 
-            if (timerElement) {
-                timerElement.textContent = seconds; 
+            // Désactivation du bouton
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.5';
+                submitButton.style.cursor = 'not-allowed';
             }
-            if (seconds <= 0) {
-                clearInterval(interval); 
-                if (countdownElement) {
-                    countdownElement.textContent = "Vous pouvez réessayer de vous connecter.";
-                    countdownElement.style.color = '#28a745'; 
-                    countdownElement.style.backgroundColor = '#e9f7ea';
+
+            const interval = setInterval(() => {
+                seconds--; 
+                
+                // Mise à jour du texte pendant le décompte
+                if (countdownElement && seconds > 0) {
+                    // On remplace 'XX' par le vrai nombre de secondes
+                    countdownElement.textContent = messageTemplate.replace('XX', seconds);
                 }
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.style.opacity = '1';
-                    submitButton.style.cursor = 'pointer';
+
+                // Quand c'est fini
+                if (seconds <= 0) {
+                    clearInterval(interval); 
+                    
+                    if (countdownElement) {
+                        // On affiche le message de fin traduit
+                        countdownElement.textContent = completeMessage;
+                        
+                        // Style vert (succès)
+                        countdownElement.style.color = '#28a745'; 
+                        countdownElement.style.backgroundColor = '#e9f7ea';
+                    }
+                    
+                    // Réactivation du bouton
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.style.opacity = '1';
+                        submitButton.style.cursor = 'pointer';
+                    }
+                    
                 }
-            }
-        }, 1000);
+            }, 1000);
+        });
     </script>
 @endif
 @endsection

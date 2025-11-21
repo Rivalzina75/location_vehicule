@@ -35,5 +35,7 @@
     "Réinitialisation de votre mot de passe": "Réinitialisation de votre mot de passe",
     "Vous recevez cet e-mail car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.": "Vous recevez cet e-mail car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.",
     "Ce lien de réinitialisation expirera dans :count minutes.": "Ce lien de réinitialisation expirera dans :count minutes.",
-    "Si vous n'avez pas demandé de réinitialisation, aucune autre action n'est requise.": "Si vous n'avez pas demandé de réinitialisation, aucune autre action n'est requise."
+    "throttle_message": "Compte bloqué... veuillez attendre :seconds secondes.",
+    "countdown_message": "Temps restant : :seconds secondes.",
+    "lockout_complete": "Vous pouvez maintenant réessayer de vous connecter."
 }
