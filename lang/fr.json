@@ -9,7 +9,6 @@
     "Mot de passe oublié ?": "Mot de passe oublié ?",
     "Créer un compte": "Créer un compte",
     "Bienvenue chez Machina": "Bienvenue chez Machina",
-    "Votre solution de location de véhicules, simple et rapide.": "Votre solution de location de véhicules, simple et rapide.",
     "Aller à mon tableau de bord": "Aller à mon tableau de bord",
     "Inscription": "Inscription",
     "Prénom": "Prénom",
@@ -54,5 +53,14 @@
     "Excellent": "Excellent",
 
     "Entrez votre adresse email": "Entrez votre adresse email",
-    "Entrez votre mot de passe": "Entrez votre mot de passe"
+    "Entrez votre mot de passe": "Entrez votre mot de passe",
+
+    "Location de véhicules": "Location de véhicules",
+    "Bienvenue chez": "Bienvenue chez",
+    "Votre solution de location de véhicules, simple et rapide. Des voitures, motos, scooters et utilitaires pour tous vos besoins.": "Votre solution de location de véhicules, simple et rapide. Des voitures, motos, scooters et utilitaires pour tous vos besoins.",
+    "Véhicules": "Véhicules",
+    "Clients satisfaits": "Clients satisfaits",
+    "Support": "Support",
+    "Commencer maintenant": "Commencer maintenant"
+
 }

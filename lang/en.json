@@ -9,7 +9,6 @@
     "Mot de passe oublié ?": "Forgot Your Password?",
     "Créer un compte": "Create an account",
     "Bienvenue chez Machina": "Welcome to Machina",
-    "Votre solution de location de véhicules, simple et rapide.": "Your simple and fast vehicle rental solution.",
     "Aller à mon tableau de bord": "Go to my dashboard",
     "Inscription": "Register",
     "Prénom": "First Name",
@@ -54,5 +53,14 @@
     "Excellent": "Excellent",
     
     "Entrez votre adresse email": "Enter your email address",
-    "Entrez votre mot de passe": "Enter your password"
+    "Entrez votre mot de passe": "Enter your password",
+
+    "Location de véhicules": "Vehicle rental",
+    "Bienvenue chez": "Welcome to",
+    "Votre solution de location de véhicules, simple et rapide. Des voitures, motos, scooters et utilitaires pour tous vos besoins.": "Your vehicle rental solution, simple and fast. Cars, motorcycles, scooters, and utility vehicles for all your needs.",
+    "Véhicules": "Vehicles",
+    "Clients satisfaits": "Satisfied Customers",
+    "Support": "Support",
+    "Commencer maintenant": "Get Started Now"
+    
 }
