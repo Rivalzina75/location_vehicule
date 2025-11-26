@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 // --- AJOUT 1 : Importer nos 2 e-mails personnalisés ---
-use App\Notifications\VerifyEmailFrench;
+use App\Notifications\VerifyEmail; // <-- MODIFIÉ (C'était VerifyEmailFrench)
 use App\Notifications\CustomResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -80,7 +80,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new VerifyEmailFrench);
+        // Utilise la nouvelle classe standardisée
+        $this->notify(new VerifyEmail); // <-- MODIFIÉ
     }
 
     /**
