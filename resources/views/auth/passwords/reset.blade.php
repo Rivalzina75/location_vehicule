@@ -7,7 +7,7 @@
     </div>
 
     <div class="auth-body">
-        <form method="POST" action="{{ route('password.update') }}" id="registerForm">
+        <form method="POST" action="{{ route('password.update') }}" id="resetPasswordForm">
             @csrf
 
             <input type="hidden" name="token" value="{{ $token }}">
@@ -31,13 +31,14 @@
 
             <div class="form-group">
                 <label for="password">{{ __('Nouveau mot de passe') }}</label>
-                <input id="password" type="password" 
-                       name="password" 
-                       required 
-                       autocomplete="new-password"
-                       placeholder="Min. 14 caractères"
-                       class="form-control @error('password') is-invalid @enderror">
-
+                <div class="password-wrapper">
+                    <input id="password" type="password" 
+                           name="password" 
+                           required 
+                           autocomplete="new-password"
+                           placeholder="{{ __('Min. 14 caractères') }}"
+                           class="form-control @error('password') is-invalid @enderror">
+                </div>
                 @error('password')
                     <div class="error-message" role="alert">
                         <strong>{!! $message !!}</strong>
@@ -47,12 +48,14 @@
 
             <div class="form-group">
                 <label for="password-confirm">{{ __('Confirmer le nouveau mot de passe') }}</label>
-                <input id="password-confirm" type="password" 
-                       name="password_confirmation" 
-                       required 
-                       autocomplete="new-password"
-                       placeholder="Confirmez votre mot de passe"
-                       class="form-control">
+                <div class="password-wrapper">
+                    <input id="password-confirm" type="password" 
+                           name="password_confirmation" 
+                           required 
+                           autocomplete="new-password"
+                           placeholder="{{ __('Confirmez votre mot de passe') }}"
+                           class="form-control">
+                </div>
             </div>
 
             <div class="form-button-container">

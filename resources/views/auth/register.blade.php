@@ -60,7 +60,7 @@
             <!-- Date de naissance & Téléphone -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="date_of_birth">{{ __('Date de naissance') }}</label>
+                    <label for="date_of_birth">{{ __('Date de naissance') }} *</label>
                     <input id="date_of_birth" type="text" 
                            name="date_of_birth" 
                            value="{{ old('date_of_birth') }}" 
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="phone_number">{{ __('Numéro de téléphone') }}</label>
+                    <label for="phone_number">{{ __('Numéro de téléphone') }} *</label>
                     <input id="phone_number" type="text" 
                            name="phone_number" 
                            value="{{ old('phone_number') }}" 
@@ -89,7 +89,7 @@
 
             <!-- Adresse -->
             <div class="form-group">
-                <label for="address_line1">{{ __('Adresse') }}</label>
+                <label for="address_line1">{{ __('Adresse') }} *</label>
                 <input id="address_line1" type="text" 
                        name="address_line1" 
                        value="{{ old('address_line1') }}" 
@@ -104,7 +104,7 @@
             <!-- Code postal & Ville -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="postal_code">{{ __('Code postal') }}</label>
+                    <label for="postal_code">{{ __('Code postal') }} *</label>
                     <input id="postal_code" type="text" 
                            name="postal_code" 
                            value="{{ old('postal_code') }}" 
@@ -118,7 +118,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="city">{{ __('Ville') }}</label>
+                    <label for="city">{{ __('Ville') }} *</label>
                     <input id="city" type="text" 
                            name="city" 
                            value="{{ old('city') }}" 
@@ -142,7 +142,7 @@
                                name="password" 
                                required 
                                autocomplete="new-password"
-                               placeholder="Min. 14 caractères"
+                               placeholder="{{ __('Min. 14 caractères') }}"
                                class="form-control @error('password') is-invalid @enderror">
                     </div>
                     @error('password')
@@ -157,7 +157,7 @@
                                name="password_confirmation" 
                                required 
                                autocomplete="new-password"
-                               placeholder="Confirmez votre mot de passe"
+                               placeholder="{{ __('Confirmez votre mot de passe') }}"
                                class="form-control">
                     </div>
                 </div>

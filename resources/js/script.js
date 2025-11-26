@@ -53,17 +53,19 @@ function initLoginLockout() {
 
 /**
  * Registration form validation with password strength checking
+ * Works on both register and password reset pages
  */
 function initRegisterValidation() {
-    const registerForm = document.getElementById('registerForm');
-    if (!registerForm) return;
+    // Support both register form and reset password form
+    const form = document.getElementById('registerForm') || document.getElementById('resetPasswordForm');
+    if (!form) return;
 
-    const passwordInput = registerForm.querySelector('input[name="password"]');
-    const passwordConfirm = registerForm.querySelector('input[name="password_confirmation"]');
+    const passwordInput = form.querySelector('input[name="password"]');
+    const passwordConfirm = form.querySelector('input[name="password_confirmation"]');
     
     if (!passwordInput) return;
 
-    // Create password strength indicator
+    // Create password strength indicator on the password field
     createPasswordStrengthUI(passwordInput);
 
     // Live validation on input
@@ -93,7 +95,7 @@ function initRegisterValidation() {
     }
 
     // Validate everything on form submit
-    registerForm.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
         const result = checkPasswordRequirements(passwordInput.value);
         const passwordsMatch = !passwordConfirm || passwordInput.value === passwordConfirm.value;
         
@@ -110,12 +112,12 @@ function initRegisterValidation() {
             e.preventDefault();
             hasError = true;
             passwordConfirm.classList.add('is-invalid');
-            showFieldError(passwordConfirm, 'Les mots de passe ne correspondent pas.');
+            showFieldError(passwordConfirm, getTranslation('passwords_no_match'));
         }
         
         if (hasError) {
             // Scroll to first error
-            const firstError = registerForm.querySelector('.is-invalid');
+            const firstError = form.querySelector('.is-invalid');
             if (firstError) {
                 firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 firstError.focus();
@@ -125,13 +127,53 @@ function initRegisterValidation() {
 }
 
 /**
+ * Get translation based on current page language
+ */
+function getTranslation(key) {
+    const lang = document.documentElement.lang || 'en';
+    const translations = {
+        'fr': {
+            'passwords_no_match': 'Les mots de passe ne correspondent pas.',
+            'missing': 'Il vous manque :',
+            'min_chars': '14 caractères min.',
+            'uppercase': 'Une majuscule',
+            'lowercase': 'Une minuscule', 
+            'number': 'Un chiffre',
+            'special': 'Caractère spécial',
+            'weak': 'Faible',
+            'medium': 'Moyen',
+            'strong': 'Fort',
+            'excellent': 'Excellent'
+        },
+        'en': {
+            'passwords_no_match': 'Passwords do not match.',
+            'missing': 'Missing:',
+            'min_chars': '14 characters min.',
+            'uppercase': 'One uppercase',
+            'lowercase': 'One lowercase',
+            'number': 'One number',
+            'special': 'Special character',
+            'weak': 'Weak',
+            'medium': 'Medium',
+            'strong': 'Strong',
+            'excellent': 'Excellent'
+        }
+    };
+    
+    const currentLang = lang.startsWith('fr') ? 'fr' : 'en';
+    return translations[currentLang][key] || translations['en'][key];
+}
+
+/**
  * Creates the password strength UI elements
  */
 function createPasswordStrengthUI(input) {
+    // Find the form-group container (go up from wrapper)
     const wrapper = input.closest('.password-wrapper') || input.parentElement;
+    const formGroup = wrapper.closest('.form-group') || wrapper.parentElement;
     
-    // Check if already exists
-    if (wrapper.parentElement.querySelector('.password-strength')) return;
+    // Check if already exists in this form-group
+    if (formGroup.querySelector('.password-strength')) return;
     
     // Create strength bar container
     const strengthContainer = document.createElement('div');
@@ -148,19 +190,19 @@ function createPasswordStrengthUI(input) {
     requirementsDiv.className = 'password-requirements';
     requirementsDiv.style.display = 'none';
     requirementsDiv.innerHTML = `
-        <p>⚠️ Il vous manque :</p>
+        <p>⚠ ${getTranslation('missing')}</p>
         <ul>
-            <li data-req="length">14 caractères minimum</li>
-            <li data-req="uppercase">Une lettre majuscule</li>
-            <li data-req="lowercase">Une lettre minuscule</li>
-            <li data-req="number">Un chiffre</li>
-            <li data-req="special">Un caractère spécial (@$!%*#?&)</li>
+            <li data-req="length">${getTranslation('min_chars')}</li>
+            <li data-req="uppercase">${getTranslation('uppercase')}</li>
+            <li data-req="lowercase">${getTranslation('lowercase')}</li>
+            <li data-req="number">${getTranslation('number')}</li>
+            <li data-req="special">${getTranslation('special')}</li>
         </ul>
     `;
     
-    // Insert after the password wrapper
-    wrapper.parentElement.appendChild(strengthContainer);
-    wrapper.parentElement.appendChild(requirementsDiv);
+    // Insert after the password wrapper, inside the form-group
+    wrapper.after(strengthContainer);
+    strengthContainer.after(requirementsDiv);
 }
 
 /**
@@ -193,10 +235,10 @@ function checkPasswordRequirements(value) {
 function updatePasswordStrength(input) {
     const value = input.value;
     const wrapper = input.closest('.password-wrapper') || input.parentElement;
-    const container = wrapper.parentElement;
+    const formGroup = wrapper.closest('.form-group') || wrapper.parentElement;
     
-    const strengthContainer = container.querySelector('.password-strength');
-    const requirementsDiv = container.querySelector('.password-requirements');
+    const strengthContainer = formGroup.querySelector('.password-strength');
+    const requirementsDiv = formGroup.querySelector('.password-requirements');
     
     if (!strengthContainer || !requirementsDiv) return;
     
@@ -213,20 +255,20 @@ function updatePasswordStrength(input) {
     
     const result = checkPasswordRequirements(value);
     
-    // Update strength bar
+    // Update strength bar with translated labels
     let color, label;
     if (result.percentage <= 40) {
         color = '#ff4757';
-        label = 'Faible';
+        label = getTranslation('weak');
     } else if (result.percentage <= 60) {
         color = '#ffa502';
-        label = 'Moyen';
+        label = getTranslation('medium');
     } else if (result.percentage <= 80) {
         color = '#2ed573';
-        label = 'Fort';
+        label = getTranslation('strong');
     } else {
         color = '#00d9a5';
-        label = 'Excellent';
+        label = getTranslation('excellent');
     }
     
     fill.style.width = result.percentage + '%';
@@ -295,13 +337,45 @@ function showFieldError(field, message) {
     errorDiv.className = 'error-message dynamic-error';
     errorDiv.innerHTML = `<strong>${message}</strong>`;
     field.classList.add('is-invalid');
-    field.parentElement.appendChild(errorDiv);
+    
+    // Find the right place to insert the error
+    // If field is in a password-wrapper, insert after the wrapper
+    const wrapper = field.closest('.password-wrapper');
+    if (wrapper) {
+        wrapper.insertAdjacentElement('afterend', errorDiv);
+    } else {
+        field.insertAdjacentElement('afterend', errorDiv);
+    }
 }
 
 /**
  * Clears error message for a field
  */
 function clearFieldError(field) {
+    // Check for error after the field
+    let errorElement = field.nextElementSibling;
+    while (errorElement) {
+        if (errorElement.classList.contains('dynamic-error')) {
+            errorElement.remove();
+            return;
+        }
+        errorElement = errorElement.nextElementSibling;
+    }
+    
+    // Check for error after the wrapper
+    const wrapper = field.closest('.password-wrapper');
+    if (wrapper) {
+        errorElement = wrapper.nextElementSibling;
+        while (errorElement) {
+            if (errorElement.classList.contains('dynamic-error')) {
+                errorElement.remove();
+                return;
+            }
+            errorElement = errorElement.nextElementSibling;
+        }
+    }
+    
+    // Fallback: check in parent
     const existingError = field.parentElement.querySelector('.dynamic-error');
     if (existingError) existingError.remove();
 }
@@ -317,20 +391,23 @@ function initPasswordToggle() {
     const passwordFields = document.querySelectorAll('input[type="password"]');
     
     passwordFields.forEach(field => {
-        // Skip if already has a toggle
+        // Skip if already has a toggle button
         if (field.dataset.toggleInitialized) return;
         field.dataset.toggleInitialized = 'true';
         
-        // Get or create wrapper
-        let wrapper = field.parentElement;
+        // Check if field is already in a password-wrapper
+        let wrapper = field.closest('.password-wrapper');
         
-        // Only wrap if not already in a password-wrapper
-        if (!wrapper.classList.contains('password-wrapper')) {
+        // If not in a wrapper, create one
+        if (!wrapper) {
             wrapper = document.createElement('div');
             wrapper.className = 'password-wrapper';
             field.parentNode.insertBefore(wrapper, field);
             wrapper.appendChild(field);
         }
+        
+        // Check if toggle button already exists in wrapper
+        if (wrapper.querySelector('.password-toggle-btn')) return;
         
         // Create toggle button with SVG icons
         const toggleBtn = document.createElement('button');
@@ -349,6 +426,7 @@ function initPasswordToggle() {
         
         toggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             if (field.type === 'password') {
                 field.type = 'text';
                 this.innerHTML = eyeClosedSVG;

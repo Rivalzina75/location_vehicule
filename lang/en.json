@@ -37,5 +37,22 @@
     "Ce lien de réinitialisation expirera dans :count minutes.": "This password reset link will expire in :count minutes.",
     "throttle_message": "Account blocked... please wait :seconds seconds.",
     "countdown_message": "Time remaining: :seconds seconds.",
-    "lockout_complete": "You can now try to log in again."
+    "lockout_complete": "You can now try to log in again.",
+    
+    "Min. 14 caractères": "Min. 14 characters",
+    "Confirmez votre mot de passe": "Confirm your password",
+    "Les mots de passe ne correspondent pas.": "Passwords do not match.",
+    "Il vous manque :": "Missing:",
+    "14 caractères minimum": "14 characters minimum",
+    "Une lettre majuscule": "One uppercase letter",
+    "Une lettre minuscule": "One lowercase letter",
+    "Un chiffre": "One number",
+    "Un caractère spécial": "One special character",
+    "Faible": "Weak",
+    "Moyen": "Medium",
+    "Fort": "Strong",
+    "Excellent": "Excellent",
+    
+    "Entrez votre adresse email": "Enter your email address",
+    "Entrez votre mot de passe": "Enter your password"
 }

@@ -41,17 +41,12 @@ class RegisterController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'date_of_birth' => ['nullable', 'date_format:d/m/Y'],
-            'phone_number' => ['nullable', 'regex:/^0[1-9]([ .-]?[0-9]{2}){4}$/'],
-            'address_line1' => ['nullable', 'string', 'max:255'],
-            'postal_code' => ['nullable', 'string', 'max:10'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'password' => [
-                'required',
-                'string',
-                new PasswordRobustness,
-                'confirmed'
-            ],
+            'date_of_birth' => ['required', 'date_format:d/m/Y'],
+            'phone_number' => ['required', 'regex:/^0[1-9]([ .-]?[0-9]{2}){4}$/'],
+            'address_line1' => ['required', 'string', 'max:255'],
+            'postal_code' => ['required', 'string', 'max:10'],
+            'city' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', new PasswordRobustness, 'confirmed'],
         ]);
     }
 
@@ -64,11 +59,11 @@ class RegisterController extends Controller
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
-            'date_of_birth' => $data['date_of_birth'] ?? null,
-            'phone_number' => $data['phone_number'] ?? null,
-            'address_line1' => $data['address_line1'] ?? null,
-            'postal_code' => $data['postal_code'] ?? null,
-            'city' => $data['city'] ?? null,
+            'date_of_birth' => $data['date_of_birth'],
+            'phone_number' => $data['phone_number'],
+            'address_line1' => $data['address_line1'],
+            'postal_code' => $data['postal_code'],
+            'city' => $data['city'],
             'password' => Hash::make($data['password']),
         ]);
     }

@@ -268,12 +268,15 @@ body.auth-page main {
    =================================== */
 .password-wrapper {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
 }
 
 .password-wrapper .form-control {
     padding-right: 50px;
+    width: 100%;
+    flex: 1;
 }
 
 .password-toggle-btn {
@@ -284,7 +287,7 @@ body.auth-page main {
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 0 4px;
     z-index: 10;
     line-height: 1;
     color: var(--text-light);
@@ -292,31 +295,37 @@ body.auth-page main {
     display: flex;
     align-items: center;
     justify-content: center;
+    height: auto;
 }
 
 .password-toggle-btn:hover {
     color: var(--accent);
 }
 
+.password-toggle-btn:focus {
+    outline: none;
+}
+
 .password-toggle-btn svg {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
 }
 
 /* ===================================
    PASSWORD STRENGTH INDICATOR
    =================================== */
 .password-strength {
-    margin-top: 10px;
-    font-size: 13px;
+    margin-top: 6px;
+    font-size: 12px;
 }
 
 .password-strength .strength-bar {
-    height: 6px;
+    height: 5px;
     background: var(--border);
     border-radius: 3px;
     overflow: hidden;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .password-strength .strength-fill {
@@ -328,51 +337,56 @@ body.auth-page main {
 
 .password-strength .strength-text {
     font-weight: 600;
-    font-size: 12px;
+    font-size: 11px;
 }
 
-/* Password Requirements List */
+/* Password Requirements List - Compact */
 .password-requirements {
     background: linear-gradient(135deg, #fff5f5, #ffe8e8);
     border: 1px solid #ffcdd2;
-    border-left: 4px solid var(--danger);
-    border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-md);
-    margin-top: var(--space-sm);
+    border-left: 3px solid var(--danger);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-top: 6px;
     animation: slideDown 0.3s ease;
 }
 
 .password-requirements p {
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 4px;
     font-weight: 600;
     color: var(--danger);
-    font-size: var(--font-size-sm);
+    font-size: 11px;
 }
 
 .password-requirements ul {
     margin: 0;
     padding-left: 0;
     list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 8px;
 }
 
 .password-requirements li {
-    font-size: var(--font-size-sm);
+    font-size: 11px;
     color: var(--danger);
-    padding: 3px 0;
+    padding: 1px 0;
     position: relative;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .password-requirements li::before {
     content: '✗';
-    margin-right: 8px;
+    margin-right: 4px;
     font-weight: bold;
+    font-size: 10px;
 }
 
 .password-requirements li.valid {
     color: var(--success);
     text-decoration: line-through;
-    opacity: 0.6;
+    opacity: 0.7;
 }
 
 .password-requirements li.valid::before {
@@ -436,7 +450,7 @@ body.auth-page main {
    FORMS
    =================================== */
 .form-group {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .form-row {
@@ -447,7 +461,7 @@ body.auth-page main {
 
 label {
     display: block;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-xs);
     font-weight: 600;
     color: var(--text-primary);
     font-size: var(--font-size-sm);
@@ -455,7 +469,7 @@ label {
 
 .form-control {
     width: 100%;
-    padding: 0.875rem var(--space-md);
+    padding: 0.75rem var(--space-md);
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
@@ -488,7 +502,7 @@ label {
 .error-message {
     color: var(--danger);
     font-size: var(--font-size-sm);
-    margin-top: var(--space-sm);
+    margin-top: var(--space-xs);
     display: flex;
     align-items: center;
     gap: var(--space-xs);
@@ -507,7 +521,7 @@ label {
 
 /* Checkboxes */
 .form-check {
-    margin: var(--space-lg) 0;
+    margin: var(--space-md) 0;
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -527,6 +541,13 @@ label {
     font-weight: 500;
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
+}
+
+/* Separator - Compact */
+hr {
+    margin: var(--space-sm) 0;
+    border: 0;
+    border-top: 1px solid var(--border);
 }
 
 /* ===================================
@@ -1601,7 +1622,7 @@ label {
 
 /* Separator */
 hr {
-    margin: var(--space-sm) 0;
+    margin: var(--space-xl) 0;
     border: 0;
     border-top: 1px solid var(--border);
 }
@@ -1632,6 +1653,532 @@ hr {
 }
 
 /* ===================================
+   HOME PAGE - HERO SECTION
+   =================================== */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../images/auth-bg.jpg') center/cover no-repeat fixed;
+    padding: var(--space-2xl) var(--space-md);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.85), rgba(15,52,96,0.9));
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 900px;
+    animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    color: #fff;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: var(--space-md);
+    line-height: 1.2;
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: rgba(255,255,255,0.8);
+    margin-bottom: var(--space-xl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2xl);
+}
+
+.btn-hero {
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-hero {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+}
+
+.btn-primary-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+}
+
+.btn-outline-hero {
+    background: transparent;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.btn-outline-hero:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: #fff;
+}
+
+.hero-stats {
+    display: flex;
+    gap: var(--space-2xl);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.stat-label {
+    color: rgba(255,255,255,0.7);
+    font-size: var(--font-size-sm);
+}
+
+/* ===================================
+   HOME PAGE - SECTIONS COMMON
+   =================================== */
+.section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+}
+
+.section-header-home {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.section-header-home h2 {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.section-header-home p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+}
+
+/* ===================================
+   HOME PAGE - VEHICLES SECTION
+   =================================== */
+.vehicles-section {
+    padding: var(--space-2xl) 0;
+    background: var(--bg-white);
+}
+
+.vehicle-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.vehicle-type-card {
+    background: var(--bg-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+}
+
+.vehicle-type-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.vehicle-type-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.vehicle-type-card h3 {
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.vehicle-type-card p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-md);
+    line-height: 1.5;
+}
+
+.vehicle-price {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+}
+
+.vehicle-price strong {
+    font-size: var(--font-size-lg);
+}
+
+/* ===================================
+   HOME PAGE - HOW IT WORKS
+   =================================== */
+.how-it-works-section {
+    padding: var(--space-2xl) 0;
+    background: var(--bg-light);
+}
+
+.steps-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.step-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    max-width: 280px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+}
+
+.step-number {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+}
+
+.step-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+}
+
+.step-card h3 {
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.step-card p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.step-connector {
+    color: var(--accent);
+    opacity: 0.5;
+}
+
+/* ===================================
+   HOME PAGE - FEATURES
+   =================================== */
+.features-section {
+    padding: var(--space-2xl) 0;
+    background: var(--bg-white);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.feature-card {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    background: var(--bg-light);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.feature-card h3 {
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+/* ===================================
+   HOME PAGE - PRICING
+   =================================== */
+.pricing-section {
+    padding: var(--space-2xl) 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.pricing-section .section-header-home h2,
+.pricing-section .section-header-home p {
+    color: #fff;
+}
+
+.pricing-section .section-header-home p {
+    opacity: 0.8;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.pricing-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+}
+
+.pricing-featured {
+    border: 2px solid var(--accent);
+    transform: scale(1.05);
+}
+
+.pricing-featured:hover {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.pricing-header h3 {
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.pricing-desc {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.pricing-features ul {
+    list-style: none;
+    text-align: left;
+}
+
+.pricing-features li {
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    border-bottom: 1px solid var(--border);
+}
+
+.pricing-features li:last-child {
+    border-bottom: none;
+}
+
+/* ===================================
+   HOME PAGE - CTA
+   =================================== */
+.cta-section {
+    padding: var(--space-2xl) var(--space-md);
+    background: var(--bg-light);
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.cta-content p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+}
+
+.btn-cta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: #fff;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+}
+
+.btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+}
+
+/* ===================================
+   HOME PAGE - FOOTER
+   =================================== */
+.home-footer {
+    background: var(--primary);
+    color: #fff;
+    padding: var(--space-2xl) var(--space-md) var(--space-md);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-logo {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.footer-brand p {
+    color: rgba(255,255,255,0.6);
+    margin-top: var(--space-sm);
+    font-size: var(--font-size-sm);
+}
+
+.footer-links {
+    display: flex;
+    gap: var(--space-2xl);
+}
+
+.footer-column h4 {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-md);
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer-column a,
+.footer-column p {
+    display: block;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-sm);
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: var(--accent);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: var(--space-lg);
+}
+
+.footer-bottom p {
+    color: rgba(255,255,255,0.5);
+    font-size: var(--font-size-sm);
+}
+
+/* ===================================
    RESPONSIVE DESIGN
    =================================== */
 
@@ -1653,6 +2200,15 @@ hr {
     .navbar-container {
         flex-wrap: wrap;
         gap: var(--space-sm);
+        padding: var(--space-sm);
+    }
+    
+    .navbar-brand {
+        font-size: var(--font-size-lg);
+    }
+    
+    .navbar-brand::before {
+        font-size: 1.2rem;
     }
     
     .navbar-nav {
@@ -1667,28 +2223,131 @@ hr {
         font-size: var(--font-size-xs);
     }
     
+    /* Home Page Hero */
+    .hero-section {
+        min-height: auto;
+        padding: 100px var(--space-md) var(--space-2xl);
+    }
+    
+    .hero-stats {
+        gap: var(--space-lg);
+    }
+    
+    .stat-number {
+        font-size: var(--font-size-2xl);
+    }
+    
+    /* Home Page Steps */
+    .steps-grid {
+        flex-direction: column;
+    }
+    
+    .step-connector {
+        transform: rotate(90deg);
+    }
+    
+    .step-card {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    /* Home Page Pricing */
+    .pricing-featured {
+        transform: scale(1);
+    }
+    
+    .pricing-featured:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* Home Page Footer */
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-links {
+        justify-content: center;
+    }
+    
     /* Auth Pages */
     body.auth-page main {
         padding: var(--space-md);
+        min-height: calc(100vh - 60px);
     }
     
-    .auth-container,
-    .auth-container-wide {
+    .auth-container {
         max-width: 100%;
         border-radius: var(--radius-lg);
+        margin: 0;
+    }
+    
+    .auth-container-wide {
+        max-width: 100%;
     }
     
     .auth-header {
-        padding: var(--space-lg);
-        font-size: var(--font-size-xl);
+        padding: var(--space-md) var(--space-md);
+        font-size: var(--font-size-lg);
     }
     
     .auth-body {
-        padding: var(--space-lg);
+        padding: var(--space-lg) var(--space-md);
     }
     
     .form-row {
         grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .form-group {
+        margin-bottom: var(--space-sm);
+    }
+    
+    label {
+        font-size: var(--font-size-xs);
+        margin-bottom: 4px;
+    }
+    
+    .form-control {
+        padding: 0.65rem var(--space-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .btn-primary {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-sm);
+    }
+    
+    .form-button-container {
+        margin-top: var(--space-md);
+    }
+    
+    /* Password requirements compact on mobile */
+    .password-requirements {
+        padding: 6px 10px;
+    }
+    
+    .password-requirements ul {
+        grid-template-columns: 1fr;
+        gap: 1px;
+    }
+    
+    .password-requirements li {
+        font-size: 10px;
+    }
+    
+    .password-requirements p {
+        font-size: 10px;
+    }
+    
+    .password-strength .strength-text {
+        font-size: 10px;
+    }
+    
+    /* HR spacing mobile */
+    hr {
+        margin: var(--space-xs) 0;
     }
     
     /* Dashboard Sidebar */
@@ -1773,7 +2432,11 @@ hr {
     }
     
     .welcome-container h1 {
-        font-size: var(--font-size-2xl);
+        font-size: var(--font-size-xl);
+    }
+    
+    .welcome-container p {
+        font-size: var(--font-size-sm);
     }
 }
 
@@ -1782,14 +2445,34 @@ hr {
     :root {
         --font-size-3xl: 1.5rem;
         --font-size-2xl: 1.25rem;
+        --font-size-xl: 1.1rem;
     }
     
-    .navbar-brand {
-        font-size: var(--font-size-lg);
+    body.auth-page main {
+        padding: var(--space-sm);
     }
     
-    .navbar-brand::before {
-        font-size: 1.2rem;
+    .auth-header {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-base);
+    }
+    
+    .auth-body {
+        padding: var(--space-md) var(--space-sm);
+    }
+    
+    .form-control {
+        padding: 0.6rem var(--space-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .password-toggle-btn {
+        right: 8px;
+    }
+    
+    .password-toggle-btn svg {
+        width: 18px;
+        height: 18px;
     }
     
     .actions-grid {
@@ -1826,6 +2509,21 @@ hr {
     
     .condition-checkboxes {
         grid-template-columns: 1fr;
+    }
+    
+    /* Countdown timer */
+    .countdown-timer {
+        font-size: var(--font-size-sm);
+        padding: var(--space-sm);
+    }
+    
+    /* Auth links */
+    .auth-links {
+        font-size: var(--font-size-xs);
+    }
+    
+    .auth-links a {
+        font-size: var(--font-size-xs);
     }
 }
 

@@ -37,5 +37,22 @@
     "Ce lien de réinitialisation expirera dans :count minutes.": "Ce lien de réinitialisation expirera dans :count minutes.",
     "throttle_message": "Compte bloqué... veuillez attendre :seconds secondes.",
     "countdown_message": "Temps restant : :seconds secondes.",
-    "lockout_complete": "Vous pouvez maintenant réessayer de vous connecter."
+    "lockout_complete": "Vous pouvez maintenant réessayer de vous connecter.",
+    
+    "Min. 14 caractères": "Min. 14 caractères",
+    "Confirmez votre mot de passe": "Confirmez votre mot de passe",
+    "Les mots de passe ne correspondent pas.": "Les mots de passe ne correspondent pas.",
+    "Il vous manque :": "Il vous manque :",
+    "14 caractères minimum": "14 caractères minimum",
+    "Une lettre majuscule": "Une lettre majuscule",
+    "Une lettre minuscule": "Une lettre minuscule",
+    "Un chiffre": "Un chiffre",
+    "Un caractère spécial": "Un caractère spécial",
+    "Faible": "Faible",
+    "Moyen": "Moyen",
+    "Fort": "Fort",
+    "Excellent": "Excellent",
+
+    "Entrez votre adresse email": "Entrez votre adresse email",
+    "Entrez votre mot de passe": "Entrez votre mot de passe"
 }
