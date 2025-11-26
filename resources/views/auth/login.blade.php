@@ -7,13 +7,18 @@
     </div>
 
     <div class="auth-body">
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" id="loginForm">
             @csrf
 
             <div class="form-group">
                 <label for="email">{{ __('Adresse Email') }}</label>
                 <input id="email" type="email" 
-                       name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
+                       name="email" 
+                       value="{{ old('email') }}" 
+                       required 
+                       autocomplete="email" 
+                       autofocus
+                       placeholder="votre@email.com"
                        class="form-control @error('email') is-invalid @enderror">
                 @error('email')
                     <div class="error-message" role="alert">
@@ -25,7 +30,10 @@
             <div class="form-group">
                 <label for="password">{{ __('Mot de passe') }}</label>
                 <input id="password" type="password" 
-                       name="password" required autocomplete="current-password"
+                       name="password" 
+                       required 
+                       autocomplete="current-password"
+                       placeholder="••••••••••••••"
                        class="form-control @error('password') is-invalid @enderror">
                 @error('password')
                     <div class="error-message" role="alert">
@@ -43,12 +51,12 @@
 
             @if (session('lockout_time') && session('lockout_time') > 0)
                 <div id="countdown-timer" class="countdown-timer">
-                {{-- La phrase entière est maintenant gérée par Laravel --}}
                     {{ __('countdown_message', ['seconds' => session('lockout_time')]) }}
                 </div>
             @endif
+
             <div class="form-button-container">
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" id="login-btn">
                     {{ __('Se connecter') }}
                 </button>
             </div>
@@ -70,61 +78,47 @@
     </div>
 </div>
 
-    {{-- SCRIPT DU COMPTEUR (À placer à la fin de login.blade.php) --}}
 @if (session('lockout_time') && session('lockout_time') > 0)
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // On récupère le temps initial
-            let seconds = {{ session('lockout_time') }};
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let seconds = {{ session('lockout_time') }};
+        const countdownElement = document.getElementById('countdown-timer');
+        const submitButton = document.getElementById('login-btn');
+
+        let messageTemplate = "{{ __('countdown_message', ['seconds' => 'XX']) }}";
+        let completeMessage = "{{ __('lockout_complete') }}";
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.cursor = 'not-allowed';
+        }
+
+        const interval = setInterval(() => {
+            seconds--;
             
-            const countdownElement = document.getElementById('countdown-timer');
-            const submitButton = document.querySelector('form button[type="submit"]');
-
-            // --- C'EST ICI QUE ÇA CHANGE ---
-            // On prépare les phrases traduites (Laravel remplace les clés par le texte)
-            // 'XX' est notre repère pour savoir où mettre le chiffre
-            let messageTemplate = "{{ __('countdown_message', ['seconds' => 'XX']) }}";
-            let completeMessage = "{{ __('lockout_complete') }}";
-
-            // Désactivation du bouton
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.style.opacity = '0.5';
-                submitButton.style.cursor = 'not-allowed';
+            if (countdownElement && seconds > 0) {
+                countdownElement.textContent = messageTemplate.replace('XX', seconds);
             }
 
-            const interval = setInterval(() => {
-                seconds--; 
+            if (seconds <= 0) {
+                clearInterval(interval);
                 
-                // Mise à jour du texte pendant le décompte
-                if (countdownElement && seconds > 0) {
-                    // On remplace 'XX' par le vrai nombre de secondes
-                    countdownElement.textContent = messageTemplate.replace('XX', seconds);
+                if (countdownElement) {
+                    countdownElement.textContent = completeMessage;
+                    countdownElement.style.color = '#00d9a5';
+                    countdownElement.style.backgroundColor = '#e6fff9';
+                    countdownElement.style.borderColor = '#00d9a5';
                 }
-
-                // Quand c'est fini
-                if (seconds <= 0) {
-                    clearInterval(interval); 
-                    
-                    if (countdownElement) {
-                        // On affiche le message de fin traduit
-                        countdownElement.textContent = completeMessage;
-                        
-                        // Style vert (succès)
-                        countdownElement.style.color = '#28a745'; 
-                        countdownElement.style.backgroundColor = '#e9f7ea';
-                    }
-                    
-                    // Réactivation du bouton
-                    if (submitButton) {
-                        submitButton.disabled = false;
-                        submitButton.style.opacity = '1';
-                        submitButton.style.cursor = 'pointer';
-                    }
-                    
+                
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.style.opacity = '1';
+                    submitButton.style.cursor = 'pointer';
                 }
-            }, 1000);
-        });
-    </script>
+            }
+        }, 1000);
+    });
+</script>
 @endif
 @endsection

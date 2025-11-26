@@ -14,22 +14,22 @@
                 <span class="icon">🏠</span> Accueil
             </a>
             <a href="#catalogue" class="sidebar-link" data-section="catalogue">
-                <span class="icon">🚙</span> Catalogue de Véhicules
+                <span class="icon">🚙</span> Catalogue
             </a>
             <a href="#reservation" class="sidebar-link" data-section="reservation">
-                <span class="icon">📝</span> Nouvelle Réservation
+                <span class="icon">📝</span> Réserver
             </a>
             <a href="#mes-reservations" class="sidebar-link" data-section="mes-reservations">
                 <span class="icon">📋</span> Mes Réservations
             </a>
             <a href="#documents" class="sidebar-link" data-section="documents">
-                <span class="icon">📄</span> Mes Documents
+                <span class="icon">📄</span> Documents
             </a>
             <a href="#inspection" class="sidebar-link" data-section="inspection">
-                <span class="icon">📸</span> Inspection Véhicule
+                <span class="icon">📸</span> Inspection
             </a>
             <a href="#profil" class="sidebar-link" data-section="profil">
-                <span class="icon">👤</span> Mon Profil
+                <span class="icon">👤</span> Profil
             </a>
         </nav>
 
@@ -43,7 +43,7 @@
     <!-- MAIN CONTENT -->
     <main class="dashboard-main">
 
-        <!-- SECTION ACCUEIL -->
+        <!-- ==================== SECTION ACCUEIL ==================== -->
         <section id="accueil" class="dashboard-section active">
             <div class="section-header">
                 <h1>Bienvenue {{ Auth::user()->first_name }} !</h1>
@@ -90,21 +90,21 @@
                     </button>
                     <button class="action-btn" onclick="navigateTo('reservation')">
                         <span class="action-icon">📝</span>
-                        <span class="action-text">Réserver maintenant</span>
+                        <span class="action-text">Réserver</span>
                     </button>
                     <button class="action-btn" onclick="navigateTo('documents')">
                         <span class="action-icon">📄</span>
-                        <span class="action-text">Gérer mes documents</span>
+                        <span class="action-text">Mes documents</span>
                     </button>
                     <button class="action-btn" onclick="navigateTo('inspection')">
                         <span class="action-icon">📸</span>
-                        <span class="action-text">Inspection véhicule</span>
+                        <span class="action-text">Inspection</span>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION CATALOGUE -->
+        <!-- ==================== SECTION CATALOGUE ==================== -->
         <section id="catalogue" class="dashboard-section">
             <div class="section-header">
                 <h1>Catalogue de Véhicules</h1>
@@ -138,9 +138,9 @@
                         <h3>Peugeot 508</h3>
                         <p class="vehicle-type">Berline</p>
                         <div class="vehicle-features">
-                            <span>✓ 5 places</span>
-                            <span>✓ Climatisation</span>
-                            <span>✓ GPS</span>
+                            <span>5 places</span>
+                            <span>Climatisation</span>
+                            <span>GPS</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -167,9 +167,9 @@
                         <h3>Renault Kadjar</h3>
                         <p class="vehicle-type">SUV</p>
                         <div class="vehicle-features">
-                            <span>✓ 5 places</span>
-                            <span>✓ 4x4</span>
-                            <span>✓ Coffre XXL</span>
+                            <span>5 places</span>
+                            <span>4x4</span>
+                            <span>Coffre XXL</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -196,9 +196,9 @@
                         <h3>Yamaha MT-07</h3>
                         <p class="vehicle-type">Moto</p>
                         <div class="vehicle-features">
-                            <span>✓ 2 casques</span>
-                            <span>✓ Permis A</span>
-                            <span>✓ 700cc</span>
+                            <span>2 casques</span>
+                            <span>Permis A</span>
+                            <span>700cc</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -225,9 +225,9 @@
                         <h3>Piaggio Liberty</h3>
                         <p class="vehicle-type">Scooter</p>
                         <div class="vehicle-features">
-                            <span>✓ 1 casque</span>
-                            <span>✓ Permis B</span>
-                            <span>✓ 125cc</span>
+                            <span>1 casque</span>
+                            <span>Permis B</span>
+                            <span>125cc</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -254,9 +254,9 @@
                         <h3>Renault Master</h3>
                         <p class="vehicle-type">Camionnette</p>
                         <div class="vehicle-features">
-                            <span>✓ 3 places</span>
-                            <span>✓ 12m³</span>
-                            <span>✓ Hayon</span>
+                            <span>3 places</span>
+                            <span>12m³</span>
+                            <span>Hayon</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -283,9 +283,9 @@
                         <h3>Mercedes Actros</h3>
                         <p class="vehicle-type">Camion</p>
                         <div class="vehicle-features">
-                            <span>✓ Permis C</span>
-                            <span>✓ 20 tonnes</span>
-                            <span>✓ Grue</span>
+                            <span>Permis C</span>
+                            <span>20 tonnes</span>
+                            <span>Grue</span>
                         </div>
                         <div class="vehicle-pricing">
                             <div class="price-item">
@@ -307,7 +307,7 @@
             </div>
         </section>
 
-        <!-- SECTION NOUVELLE RÉSERVATION -->
+        <!-- ==================== SECTION RÉSERVATION ==================== -->
         <section id="reservation" class="dashboard-section">
             <div class="section-header">
                 <h1>Nouvelle Réservation</h1>
@@ -317,7 +317,7 @@
             <form class="reservation-form" id="reservationForm">
                 @csrf
 
-                <!-- Étape 1: Choix du véhicule -->
+                <!-- Étape 1 -->
                 <div class="form-step active" data-step="1">
                     <h2 class="step-title">1. Choix du véhicule</h2>
 
@@ -335,14 +335,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="vehicle_model">Modèle du véhicule *</label>
-                        <input type="text" id="vehicle_model" name="vehicle_model" class="form-control" readonly>
+                        <label for="vehicle_model">Modèle du véhicule</label>
+                        <input type="text" id="vehicle_model" name="vehicle_model" class="form-control" readonly placeholder="Sélectionné automatiquement">
                     </div>
 
-                    <button type="button" class="btn-next" onclick="nextStep(2)">Suivant →</button>
+                    <button type="button" class="btn-next btn-primary" onclick="nextStep(2)">Suivant →</button>
                 </div>
 
-                <!-- Étape 2: Durée et type de contrat -->
+                <!-- Étape 2 -->
                 <div class="form-step" data-step="2">
                     <h2 class="step-title">2. Durée de location</h2>
 
@@ -382,7 +382,7 @@
                     </div>
                 </div>
 
-                <!-- Étape 3: Options supplémentaires -->
+                <!-- Étape 3 -->
                 <div class="form-step" data-step="3">
                     <h2 class="step-title">3. Options supplémentaires</h2>
 
@@ -411,7 +411,7 @@
                     </div>
                 </div>
 
-                <!-- Étape 4: Documents -->
+                <!-- Étape 4 -->
                 <div class="form-step" data-step="4">
                     <h2 class="step-title">4. Documents requis</h2>
 
@@ -428,7 +428,7 @@
                         <div class="document-item">
                             <div class="document-icon">💳</div>
                             <div class="document-info">
-                                <h4>Empreinte de carte de crédit</h4>
+                                <h4>Empreinte de carte</h4>
                                 <p>Pour la caution (non débitée)</p>
                                 <input type="file" name="carte_credit" accept="image/*,.pdf" class="file-input">
                             </div>
@@ -437,8 +437,8 @@
                         <div class="document-item">
                             <div class="document-icon">📇</div>
                             <div class="document-info">
-                                <h4>Carte d'identité ou Passeport</h4>
-                                <p>Document d'identité en cours de validité</p>
+                                <h4>Pièce d'identité</h4>
+                                <p>CNI ou Passeport en cours de validité</p>
                                 <input type="file" name="identite" accept="image/*,.pdf" class="file-input">
                             </div>
                         </div>
@@ -450,9 +450,9 @@
                     </div>
                 </div>
 
-                <!-- Étape 5: Récapitulatif -->
+                <!-- Étape 5 -->
                 <div class="form-step" data-step="5">
-                    <h2 class="step-title">5. Récapitulatif de votre réservation</h2>
+                    <h2 class="step-title">5. Récapitulatif</h2>
 
                     <div class="reservation-summary">
                         <div class="summary-item">
@@ -490,13 +490,13 @@
 
                     <div class="form-navigation">
                         <button type="button" class="btn-prev" onclick="prevStep(4)">← Précédent</button>
-                        <button type="submit" class="btn-submit">Confirmer la réservation</button>
+                        <button type="submit" class="btn-submit">✓ Confirmer la réservation</button>
                     </div>
                 </div>
             </form>
         </section>
 
-        <!-- SECTION MES RÉSERVATIONS -->
+        <!-- ==================== SECTION MES RÉSERVATIONS ==================== -->
         <section id="mes-reservations" class="dashboard-section">
             <div class="section-header">
                 <h1>Mes Réservations</h1>
@@ -505,7 +505,7 @@
 
             <div class="reservations-list">
                 <!-- Réservation active -->
-                <div class="reservation-card active">
+                <div class="reservation-card">
                     <div class="reservation-header">
                         <span class="reservation-status status-active">En cours</span>
                         <span class="reservation-id">#RES-2024-001</span>
@@ -519,28 +519,20 @@
                             </div>
                         </div>
                         <div class="reservation-details">
-                            <div class="detail-item">
-                                <strong>Début :</strong> 10/11/2025
-                            </div>
-                            <div class="detail-item">
-                                <strong>Fin :</strong> 17/11/2025
-                            </div>
-                            <div class="detail-item">
-                                <strong>Kilométrage départ :</strong> 45,230 km
-                            </div>
-                            <div class="detail-item">
-                                <strong>Total :</strong> 315€
-                            </div>
+                            <div class="detail-item"><strong>Début :</strong> 10/11/2025</div>
+                            <div class="detail-item"><strong>Fin :</strong> 17/11/2025</div>
+                            <div class="detail-item"><strong>Kilométrage :</strong> 45,230 km</div>
+                            <div class="detail-item"><strong>Total :</strong> 315€</div>
                         </div>
                         <div class="reservation-actions">
-                            <button class="btn-action" onclick="alert('Voir les détails')">Détails</button>
+                            <button class="btn-action" onclick="showNotification('Détails de la réservation', 'info')">Détails</button>
                             <button class="btn-action" onclick="navigateTo('inspection')">Inspection retour</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Réservation à venir -->
-                <div class="reservation-card upcoming">
+                <div class="reservation-card">
                     <div class="reservation-header">
                         <span class="reservation-status status-upcoming">À venir</span>
                         <span class="reservation-id">#RES-2024-002</span>
@@ -554,25 +546,19 @@
                             </div>
                         </div>
                         <div class="reservation-details">
-                            <div class="detail-item">
-                                <strong>Début :</strong> 20/11/2025
-                            </div>
-                            <div class="detail-item">
-                                <strong>Fin :</strong> 22/11/2025
-                            </div>
-                            <div class="detail-item">
-                                <strong>Total :</strong> 100€
-                            </div>
+                            <div class="detail-item"><strong>Début :</strong> 20/11/2025</div>
+                            <div class="detail-item"><strong>Fin :</strong> 22/11/2025</div>
+                            <div class="detail-item"><strong>Total :</strong> 100€</div>
                         </div>
                         <div class="reservation-actions">
-                            <button class="btn-action" onclick="alert('Modifier')">Modifier</button>
-                            <button class="btn-action btn-danger" onclick="alert('Annuler')">Annuler</button>
+                            <button class="btn-action" onclick="showNotification('Modification en cours...', 'info')">Modifier</button>
+                            <button class="btn-action btn-danger" onclick="showNotification('Annulation demandée', 'warning')">Annuler</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Réservation terminée -->
-                <div class="reservation-card completed">
+                <div class="reservation-card">
                     <div class="reservation-header">
                         <span class="reservation-status status-completed">Terminée</span>
                         <span class="reservation-id">#RES-2024-000</span>
@@ -586,26 +572,20 @@
                             </div>
                         </div>
                         <div class="reservation-details">
-                            <div class="detail-item">
-                                <strong>Période :</strong> 01/11/2025 - 05/11/2025
-                            </div>
-                            <div class="detail-item">
-                                <strong>Kilométrage :</strong> 32,100 km → 32,350 km
-                            </div>
-                            <div class="detail-item">
-                                <strong>Total :</strong> 260€
-                            </div>
+                            <div class="detail-item"><strong>Période :</strong> 01/11 - 05/11/2025</div>
+                            <div class="detail-item"><strong>Km :</strong> 32,100 → 32,350</div>
+                            <div class="detail-item"><strong>Total :</strong> 260€</div>
                         </div>
                         <div class="reservation-actions">
-                            <button class="btn-action" onclick="alert('Télécharger facture')">Facture</button>
-                            <button class="btn-action" onclick="alert('Laisser un avis')">Avis</button>
+                            <button class="btn-action" onclick="showNotification('Téléchargement de la facture...', 'success')">Facture</button>
+                            <button class="btn-action" onclick="showNotification('Merci pour votre avis !', 'success')">Avis</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION DOCUMENTS -->
+        <!-- ==================== SECTION DOCUMENTS ==================== -->
         <section id="documents" class="dashboard-section">
             <div class="section-header">
                 <h1>Mes Documents</h1>
@@ -639,14 +619,14 @@
             </div>
 
             <div class="upload-section">
-                <h2>Ajouter un nouveau document</h2>
+                <h2>Ajouter un document</h2>
                 <form class="upload-form">
                     <div class="form-group">
                         <label for="doc_type">Type de document</label>
                         <select id="doc_type" class="form-control">
                             <option value="">-- Sélectionnez --</option>
                             <option value="permis">Permis de conduire</option>
-                            <option value="identite">Carte d'identité / Passeport</option>
+                            <option value="identite">Pièce d'identité</option>
                             <option value="carte">Carte de crédit</option>
                         </select>
                     </div>
@@ -659,7 +639,7 @@
             </div>
         </section>
 
-        <!-- SECTION INSPECTION -->
+        <!-- ==================== SECTION INSPECTION ==================== -->
         <section id="inspection" class="dashboard-section">
             <div class="section-header">
                 <h1>Inspection du Véhicule</h1>
@@ -668,10 +648,10 @@
 
             <div class="inspection-type-selector">
                 <button class="inspection-type-btn active" onclick="selectInspectionType('depart')">
-                    Inspection de départ
+                    🚀 Départ
                 </button>
                 <button class="inspection-type-btn" onclick="selectInspectionType('retour')">
-                    Inspection de retour
+                    🏁 Retour
                 </button>
             </div>
 
@@ -679,7 +659,7 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="reservation_select">Sélectionner une réservation *</label>
+                    <label for="reservation_select">Réservation *</label>
                     <select id="reservation_select" name="reservation_id" class="form-control" required>
                         <option value="">-- Sélectionnez --</option>
                         <option value="1">#RES-2024-001 - Peugeot 508</option>
@@ -687,25 +667,26 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="km_counter">Relevé kilométrique *</label>
-                    <input type="number" id="km_counter" name="km_counter" class="form-control" placeholder="Ex: 45230" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="km_counter">Kilométrage *</label>
+                        <input type="number" id="km_counter" name="km_counter" class="form-control" placeholder="Ex: 45230" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fuel_level">Niveau carburant *</label>
+                        <select id="fuel_level" name="fuel_level" class="form-control" required>
+                            <option value="">-- Sélectionnez --</option>
+                            <option value="empty">Vide</option>
+                            <option value="quarter">1/4</option>
+                            <option value="half">1/2</option>
+                            <option value="three-quarters">3/4</option>
+                            <option value="full">Plein</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="fuel_level">Niveau de carburant *</label>
-                    <select id="fuel_level" name="fuel_level" class="form-control" required>
-                        <option value="">-- Sélectionnez --</option>
-                        <option value="empty">Vide</option>
-                        <option value="quarter">1/4</option>
-                        <option value="half">1/2</option>
-                        <option value="three-quarters">3/4</option>
-                        <option value="full">Plein</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>État général du véhicule</label>
+                    <label>État général</label>
                     <div class="condition-checkboxes">
                         <label class="checkbox-label">
                             <input type="checkbox" name="condition[]" value="propre">
@@ -713,7 +694,7 @@
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" name="condition[]" value="rayures">
-                            <span>Rayures visibles</span>
+                            <span>Rayures</span>
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" name="condition[]" value="bosses">
@@ -721,13 +702,13 @@
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" name="condition[]" value="impact">
-                            <span>Impact pare-brise</span>
+                            <span>Impact</span>
                         </label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Photos du véhicule (minimum 4 - Avant, Arrière, Côté gauche, Côté droit)</label>
+                    <label>Photos du véhicule (min. 4)</label>
                     <div class="photo-upload-grid">
                         <div class="photo-upload-item">
                             <label for="photo_avant" class="photo-upload-label">
@@ -738,7 +719,6 @@
                             </label>
                             <input type="file" id="photo_avant" name="photos[]" accept="image/*" class="photo-input" capture="environment">
                         </div>
-
                         <div class="photo-upload-item">
                             <label for="photo_arriere" class="photo-upload-label">
                                 <div class="photo-placeholder">
@@ -748,61 +728,38 @@
                             </label>
                             <input type="file" id="photo_arriere" name="photos[]" accept="image/*" class="photo-input" capture="environment">
                         </div>
-
                         <div class="photo-upload-item">
                             <label for="photo_gauche" class="photo-upload-label">
                                 <div class="photo-placeholder">
                                     <span class="photo-icon">📸</span>
-                                    <span>Côté gauche</span>
+                                    <span>Gauche</span>
                                 </div>
                             </label>
                             <input type="file" id="photo_gauche" name="photos[]" accept="image/*" class="photo-input" capture="environment">
                         </div>
-
                         <div class="photo-upload-item">
                             <label for="photo_droit" class="photo-upload-label">
                                 <div class="photo-placeholder">
                                     <span class="photo-icon">📸</span>
-                                    <span>Côté droit</span>
+                                    <span>Droit</span>
                                 </div>
                             </label>
                             <input type="file" id="photo_droit" name="photos[]" accept="image/*" class="photo-input" capture="environment">
-                        </div>
-
-                        <div class="photo-upload-item">
-                            <label for="photo_tableau" class="photo-upload-label">
-                                <div class="photo-placeholder">
-                                    <span class="photo-icon">📸</span>
-                                    <span>Tableau de bord</span>
-                                </div>
-                            </label>
-                            <input type="file" id="photo_tableau" name="photos[]" accept="image/*" class="photo-input" capture="environment">
-                        </div>
-
-                        <div class="photo-upload-item">
-                            <label for="photo_autre" class="photo-upload-label">
-                                <div class="photo-placeholder">
-                                    <span class="photo-icon">📸</span>
-                                    <span>Autre</span>
-                                </div>
-                            </label>
-                            <input type="file" id="photo_autre" name="photos[]" accept="image/*" class="photo-input" capture="environment">
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="notes">Notes et observations</label>
-                    <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Ajoutez vos commentaires ici..."></textarea>
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Commentaires..."></textarea>
                 </div>
 
                 <div class="penalty-info">
                     <h3>⚠️ Pénalités de retard</h3>
                     <ul>
-                        <li>Retard de 1 à 2 heures : +20€</li>
-                        <li>Retard de 2 à 6 heures : +50€</li>
-                        <li>Retard de plus de 6 heures : Facturation d'une journée supplémentaire</li>
-                        <li>Véhicule non rendu : Déclaration de vol après 48h</li>
+                        <li>1-2 heures : +20€</li>
+                        <li>2-6 heures : +50€</li>
+                        <li>+6 heures : journée supplémentaire</li>
                     </ul>
                 </div>
 
@@ -810,7 +767,7 @@
             </form>
         </section>
 
-        <!-- SECTION PROFIL -->
+        <!-- ==================== SECTION PROFIL ==================== -->
         <section id="profil" class="dashboard-section">
             <div class="section-header">
                 <h1>Mon Profil</h1>
@@ -865,7 +822,7 @@
 
                 <hr>
 
-                <h3>Changer le mot de passe</h3>
+                <h3 style="margin-bottom: 1rem; color: var(--primary);">Changer le mot de passe</h3>
 
                 <div class="form-group">
                     <label for="current_password">Mot de passe actuel</label>
@@ -878,7 +835,7 @@
                         <input type="password" id="new_password" name="new_password" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="confirm_password">Confirmer le mot de passe</label>
+                        <label for="confirm_password">Confirmer</label>
                         <input type="password" id="confirm_password" name="new_password_confirmation" class="form-control">
                     </div>
                 </div>
@@ -889,156 +846,4 @@
 
     </main>
 </div>
-
-<script>
-// Navigation entre les sections
-function navigateTo(section) {
-    // Masquer toutes les sections
-    document.querySelectorAll('.dashboard-section').forEach(s => {
-        s.classList.remove('active');
-    });
-
-    // Retirer la classe active de tous les liens
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.classList.remove('active');
-    });
-
-    // Afficher la section demandée
-    document.getElementById(section).classList.add('active');
-
-    // Activer le lien correspondant
-    document.querySelector(`[data-section="${section}"]`).classList.add('active');
-
-    // Scroll vers le haut
-    document.querySelector('.dashboard-main').scrollTop = 0;
-}
-
-// Event listeners pour la navigation
-document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const section = this.getAttribute('data-section');
-        navigateTo(section);
-    });
-});
-
-// Sélection de véhicule depuis le catalogue
-function selectVehicle(model, type) {
-    document.getElementById('vehicle_type').value = type;
-    document.getElementById('vehicle_model').value = model;
-    navigateTo('reservation');
-}
-
-// Navigation entre les étapes du formulaire
-let currentStep = 1;
-
-function nextStep(step) {
-    // Validation basique
-    const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-    const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
-    let valid = true;
-
-    inputs.forEach(input => {
-        if (!input.value) {
-            input.classList.add('is-invalid');
-            valid = false;
-        } else {
-            input.classList.remove('is-invalid');
-        }
-    });
-
-    if (!valid) {
-        alert('Veuillez remplir tous les champs requis');
-        return;
-    }
-
-    // Cacher l'étape actuelle
-    currentStepEl.classList.remove('active');
-
-    // Afficher la nouvelle étape
-    document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-    currentStep = step;
-
-    // Scroll vers le haut
-    document.querySelector('.dashboard-main').scrollTop = 0;
-
-    // Mettre à jour le récapitulatif si on arrive à l'étape 5
-    if (step === 5) {
-        updateSummary();
-    }
-}
-
-function prevStep(step) {
-    document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
-    document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-    currentStep = step;
-    document.querySelector('.dashboard-main').scrollTop = 0;
-}
-
-function updateSummary() {
-    const vehicle = document.getElementById('vehicle_model').value || '-';
-    const contractType = document.getElementById('contract_type').value === 'pro' ? 'Contrat professionnel' : 'Location simple';
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-    const tarifType = document.getElementById('tarif_type').value;
-    const childSeat = document.getElementById('child_seat').checked;
-    const insurance = document.getElementById('insurance').checked;
-
-    document.getElementById('summary-vehicle').textContent = vehicle;
-    document.getElementById('summary-contract').textContent = contractType;
-    document.getElementById('summary-period').textContent = `${startDate} → ${endDate}`;
-    document.getElementById('summary-tarif').textContent = tarifType || '-';
-
-    let options = [];
-    if (childSeat) options.push('Siège enfant');
-    if (insurance) options.push('Assurance tous risques');
-    document.getElementById('summary-options').textContent = options.length > 0 ? options.join(', ') : 'Aucune';
-
-    // Calcul approximatif (à personnaliser selon vos tarifs)
-    document.getElementById('summary-total').textContent = '350€ (estimation)';
-}
-
-// Filtrage du catalogue
-document.getElementById('type-filter')?.addEventListener('change', function() {
-    const selectedType = this.value;
-    document.querySelectorAll('.vehicle-card').forEach(card => {
-        if (!selectedType || card.getAttribute('data-type') === selectedType) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-});
-
-// Type d'inspection
-function selectInspectionType(type) {
-    document.querySelectorAll('.inspection-type-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-}
-
-// Prévisualisation des photos
-document.querySelectorAll('.photo-input').forEach(input => {
-    input.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const label = input.previousElementSibling || input.parentElement.querySelector('label');
-                const placeholder = label.querySelector('.photo-placeholder');
-                placeholder.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-});
-
-// Soumission du formulaire de réservation
-document.getElementById('reservationForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Réservation envoyée ! (À connecter avec votre backend Laravel)');
-    // Ici, vous ajouterez l'envoi AJAX vers votre contrôleur Laravel
-});
-</script>
 @endsection
