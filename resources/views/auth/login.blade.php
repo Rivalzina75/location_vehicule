@@ -10,6 +10,12 @@
         <form method="POST" action="{{ route('login') }}" id="loginForm">
             @csrf
 
+            {{-- Hidden data for JavaScript lockout countdown --}}
+            <input type="hidden" id="lockout-until" value="{{ session('lockout_until', 0) }}">
+            <input type="hidden" id="lockout-translations" 
+                   data-countdown="{{ __('countdown_message') }}" 
+                   data-complete="{{ __('lockout_complete') }}">
+
             <div class="form-group">
                 <label for="email">{{ __('Adresse Email') }}</label>
                 <input id="email" type="email" 
@@ -18,13 +24,16 @@
                        required 
                        autocomplete="email" 
                        autofocus
-                       placeholder="votre@email.com"
-                       class="form-control @error('email') is-invalid @enderror">
-                @error('email')
-                    <div class="error-message" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </div>
-                @enderror
+                       placeholder="{{ __('Entrez votre adresse email') }}"
+                       class="form-control @if(session('lockout_until') || $errors->has('email')) is-invalid @endif">
+                {{-- Only show error if NOT in lockout mode --}}
+                @if(!session('lockout_until') && $errors->has('email'))
+                    @error('email')
+                        <div class="error-message" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </div>
+                    @enderror
+                @endif
             </div>
 
             <div class="form-group">
@@ -33,7 +42,7 @@
                        name="password" 
                        required 
                        autocomplete="current-password"
-                       placeholder="••••••••••••••"
+                       placeholder="{{ __('Entrez votre mot de passe') }}"
                        class="form-control @error('password') is-invalid @enderror">
                 @error('password')
                     <div class="error-message" role="alert">
@@ -49,11 +58,8 @@
                 </label>
             </div>
 
-            @if (session('lockout_time') && session('lockout_time') > 0)
-                <div id="countdown-timer" class="countdown-timer">
-                    {{ __('countdown_message', ['seconds' => session('lockout_time')]) }}
-                </div>
-            @endif
+            {{-- Countdown timer - managed by JavaScript --}}
+            <div id="countdown-timer" class="countdown-timer" style="display: none;"></div>
 
             <div class="form-button-container">
                 <button type="submit" class="btn-primary" id="login-btn">
@@ -77,48 +83,4 @@
         </form>
     </div>
 </div>
-
-@if (session('lockout_time') && session('lockout_time') > 0)
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let seconds = {{ session('lockout_time') }};
-        const countdownElement = document.getElementById('countdown-timer');
-        const submitButton = document.getElementById('login-btn');
-
-        let messageTemplate = "{{ __('countdown_message', ['seconds' => 'XX']) }}";
-        let completeMessage = "{{ __('lockout_complete') }}";
-
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.style.opacity = '0.5';
-            submitButton.style.cursor = 'not-allowed';
-        }
-
-        const interval = setInterval(() => {
-            seconds--;
-            
-            if (countdownElement && seconds > 0) {
-                countdownElement.textContent = messageTemplate.replace('XX', seconds);
-            }
-
-            if (seconds <= 0) {
-                clearInterval(interval);
-                
-                if (countdownElement) {
-                    countdownElement.textContent = completeMessage;
-                    countdownElement.style.color = '#00d9a5';
-                    countdownElement.style.backgroundColor = '#e6fff9';
-                    countdownElement.style.borderColor = '#00d9a5';
-                }
-                
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.style.opacity = '1';
-                    submitButton.style.cursor = 'pointer';
-                }
-            }
-        }, 1000);
-    });
-</script>
-@endif
 @endsection

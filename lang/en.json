@@ -20,23 +20,30 @@
     "Ville": "City",
     "Confirmer le mot de passe": "Confirm Password",
     "Déjà un compte ? Se connecter": "Already have an account? Login",
+    
     "Réinitialiser le mot de passe": "Reset Password",
     "Envoyer le lien de réinitialisation": "Send Password Reset Link",
+    "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.": "Enter your email address and we will send you a link to reset your password.",
+    "Retour à la connexion": "Back to login",
+    
     "Changer le mot de passe": "Change Password",
     "Nouveau mot de passe": "New Password",
     "Confirmer le nouveau mot de passe": "Confirm New Password",
+    
     "Vérifiez votre adresse e-mail": "Verify Your Email Address",
     "Un nouveau lien de vérification a été envoyé à votre adresse e-mail.": "A fresh verification link has been sent to your email address.",
     "Avant de continuer, veuillez vérifier votre boîte de réception pour un lien de vérification.": "Before proceeding, please check your email for a verification link.",
     "Si vous n'avez pas reçu l'e-mail": "If you did not receive the email",
     "Cliquez ici pour en recevoir un autre": "Click here to request another",
     "Veuillez confirmer votre mot de passe avant de continuer.": "Please confirm your password before continuing.",
+    
     "Réinitialisation de votre mot de passe": "Reset Your Password",
     "Vous recevez cet e-mail car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.": "You are receiving this email because we received a password reset request for your account.",
     "Ce lien de réinitialisation expirera dans :count minutes.": "This password reset link will expire in :count minutes.",
-    "throttle_message": "Account blocked... please wait :seconds seconds.",
+    
+    "lockout_message": "Account blocked. Please wait.",
     "countdown_message": "Time remaining: :seconds seconds.",
-    "lockout_complete": "You can now try to log in again.",
+    "lockout_complete": "You can now try again.",
     
     "Min. 14 caractères": "Min. 14 characters",
     "Confirmez votre mot de passe": "Confirm your password",
@@ -51,16 +58,15 @@
     "Moyen": "Medium",
     "Fort": "Strong",
     "Excellent": "Excellent",
-    
+
     "Entrez votre adresse email": "Enter your email address",
     "Entrez votre mot de passe": "Enter your password",
 
-    "Location de véhicules": "Vehicle rental",
+    "Location de véhicules": "Vehicle Rental",
     "Bienvenue chez": "Welcome to",
     "Votre solution de location de véhicules, simple et rapide. Des voitures, motos, scooters et utilitaires pour tous vos besoins.": "Your vehicle rental solution, simple and fast. Cars, motorcycles, scooters, and utility vehicles for all your needs.",
     "Véhicules": "Vehicles",
     "Clients satisfaits": "Satisfied Customers",
     "Support": "Support",
     "Commencer maintenant": "Get Started Now"
-    
 }

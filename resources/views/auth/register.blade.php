@@ -50,7 +50,7 @@
                        value="{{ old('email') }}" 
                        required 
                        autocomplete="email"
-                       placeholder="jean.dupont@email.com"
+                       placeholder="{{ __('Entrez votre adresse email') }}"
                        class="form-control @error('email') is-invalid @enderror">
                 @error('email')
                     <div class="error-message" role="alert"><strong>{{ $message }}</strong></div>
@@ -64,6 +64,7 @@
                     <input id="date_of_birth" type="text" 
                            name="date_of_birth" 
                            value="{{ old('date_of_birth') }}" 
+                           required
                            autocomplete="bday"
                            class="form-control @error('date_of_birth') is-invalid @enderror"
                            placeholder="JJ/MM/AAAA" 
@@ -78,6 +79,7 @@
                     <input id="phone_number" type="text" 
                            name="phone_number" 
                            value="{{ old('phone_number') }}" 
+                           required
                            autocomplete="tel"
                            placeholder="06 12 34 56 78"
                            class="form-control @error('phone_number') is-invalid @enderror">
@@ -93,6 +95,7 @@
                 <input id="address_line1" type="text" 
                        name="address_line1" 
                        value="{{ old('address_line1') }}" 
+                       required
                        autocomplete="address-line1"
                        placeholder="123 Rue de la République"
                        class="form-control @error('address_line1') is-invalid @enderror">
@@ -108,6 +111,7 @@
                     <input id="postal_code" type="text" 
                            name="postal_code" 
                            value="{{ old('postal_code') }}" 
+                           required
                            autocomplete="postal-code"
                            placeholder="75001"
                            maxlength="5"
@@ -122,6 +126,7 @@
                     <input id="city" type="text" 
                            name="city" 
                            value="{{ old('city') }}" 
+                           required
                            autocomplete="address-level2"
                            placeholder="Paris"
                            class="form-control @error('city') is-invalid @enderror">

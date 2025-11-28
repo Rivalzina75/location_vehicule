@@ -20,6 +20,7 @@
                        required 
                        autocomplete="email" 
                        autofocus
+                       placeholder="{{ __('Entrez votre adresse email') }}"
                        class="form-control @error('email') is-invalid @enderror">
 
                 @error('email')
@@ -62,6 +63,12 @@
                 <button type="submit" class="btn-primary">
                     {{ __('Réinitialiser le mot de passe') }}
                 </button>
+            </div>
+
+            <div class="auth-links">
+                <a href="{{ route('login') }}">
+                    ← {{ __('Retour à la connexion') }}
+                </a>
             </div>
         </form>
     </div>

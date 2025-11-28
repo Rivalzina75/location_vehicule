@@ -14,7 +14,7 @@
         @endif
 
         <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
-            Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+            {{ __('Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.') }}
         </p>
 
         <form method="POST" action="{{ route('password.email') }}">
@@ -28,7 +28,7 @@
                        required 
                        autocomplete="email" 
                        autofocus
-                       placeholder="votre@email.com"
+                       placeholder="{{ __('Entrez votre adresse email') }}"
                        class="form-control @error('email') is-invalid @enderror">
 
                 @error('email')
@@ -46,7 +46,7 @@
 
             <div class="auth-links">
                 <a href="{{ route('login') }}">
-                    ← Retour à la connexion
+                    ← {{ __('Retour à la connexion') }}
                 </a>
             </div>
         </form>

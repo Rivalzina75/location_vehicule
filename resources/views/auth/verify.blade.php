@@ -37,7 +37,7 @@
         <div class="auth-links" style="margin-top: 2rem;">
             <a href="{{ route('logout') }}" 
                onclick="event.preventDefault(); document.getElementById('logout-form-verify').submit();">
-                ← Se déconnecter
+                ← {{ __('Déconnexion') }}
             </a>
             <form id="logout-form-verify" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf

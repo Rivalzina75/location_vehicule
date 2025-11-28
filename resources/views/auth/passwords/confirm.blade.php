@@ -17,7 +17,10 @@
             <div class="form-group">
                 <label for="password">{{ __('Mot de passe') }}</label>
                 <input id="password" type="password" 
-                       name="password" required autocomplete="current-password"
+                       name="password" 
+                       required 
+                       autocomplete="current-password"
+                       placeholder="{{ __('Entrez votre mot de passe') }}"
                        class="form-control @error('password') is-invalid @enderror">
 
                 @error('password')
