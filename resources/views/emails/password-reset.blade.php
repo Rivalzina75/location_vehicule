@@ -1,27 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Réinitialisation de mot de passe - Machina</title>
-    <!--[if mso]>
-    <noscript>
-        <xml>
-            <o:OfficeDocumentSettings>
-                <o:PixelsPerInch>96</o:PixelsPerInch>
-            </o:OfficeDocumentSettings>
-        </xml>
-    </noscript>
-    <![endif]-->
+    <title>{{ __('Réinitialisation de votre mot de passe') }} - Machina</title>
     <style type="text/css">
-        /* Reset styles */
         body, table, td, p, a, li { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
         body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
         
-        /* Mobile styles */
         @media only screen and (max-width: 600px) {
             .email-container { width: 100% !important; max-width: 100% !important; }
             .mobile-padding { padding: 20px 15px !important; }
@@ -40,12 +29,10 @@
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fa; -webkit-font-smoothing: antialiased;">
     
-    <!-- Wrapper Table -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f7fa;">
         <tr>
             <td align="center" style="padding: 20px 10px;">
                 
-                <!-- Main Container -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);">
                     
                     <!-- Header -->
@@ -75,37 +62,33 @@
                     <tr>
                         <td class="mobile-padding" style="padding: 30px 25px;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                <!-- Icon -->
                                 <tr>
                                     <td align="center" style="padding-bottom: 15px;">
                                         <span class="mobile-icon" style="font-size: 45px;">🔐</span>
                                     </td>
                                 </tr>
                                 
-                                <!-- Title -->
                                 <tr>
                                     <td align="center" style="padding-bottom: 12px;">
-                                        <h2 class="mobile-title" style="margin: 0; font-size: 22px; font-weight: 700; color: #1a1a2e;">Réinitialisation de mot de passe</h2>
+                                        <h2 class="mobile-title" style="margin: 0; font-size: 22px; font-weight: 700; color: #1a1a2e;">{{ __('Réinitialisation de votre mot de passe') }}</h2>
                                     </td>
                                 </tr>
                                 
-                                <!-- Message -->
                                 <tr>
                                     <td class="mobile-text-size" style="padding-bottom: 20px;">
                                         <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #555555; text-align: center;">
-                                            Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.
+                                            {{ __('Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.') }}
                                         </p>
                                     </td>
                                 </tr>
                                 
-                                <!-- Warning Box -->
                                 <tr>
                                     <td style="padding-bottom: 20px;">
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
                                                 <td class="mobile-warning" style="background: linear-gradient(135deg, #fff8e1, #ffecb3); border-left: 3px solid #ff9800; border-radius: 6px; padding: 12px 15px; text-align: center;">
                                                     <p class="mobile-warning-text" style="margin: 0; font-size: 13px; color: #e65100;">
-                                                        ⏱️ Expire dans <strong>{{ $count }} min</strong>
+                                                        ⏱️ {{ __('Ce lien de réinitialisation expirera dans :count minutes.', ['count' => $count]) }}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -113,14 +96,13 @@
                                     </td>
                                 </tr>
                                 
-                                <!-- CTA Button -->
                                 <tr>
                                     <td align="center" style="padding-bottom: 20px;">
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                                             <tr>
                                                 <td style="border-radius: 8px; background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%); box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);">
                                                     <a href="{{ $url }}" target="_blank" class="mobile-button" style="display: inline-block; padding: 14px 30px; font-size: 14px; font-weight: 600; color: #ffffff; text-decoration: none; letter-spacing: 0.5px;">
-                                                        🔑 Changer mon mot de passe
+                                                        🔑 {{ __('Changer le mot de passe') }}
                                                     </a>
                                                 </td>
                                             </tr>
@@ -128,11 +110,10 @@
                                     </td>
                                 </tr>
                                 
-                                <!-- Secondary Info -->
                                 <tr>
                                     <td style="padding: 12px 15px; background-color: #f8fafc; border-radius: 6px;">
                                         <p class="mobile-text-size" style="margin: 0; font-size: 12px; line-height: 1.5; color: #6c757d; text-align: center;">
-                                            Pas vous ? Ignorez cet email.
+                                            {{ __('Si vous n\'avez pas demandé de réinitialisation, ignorez cet email.') }}
                                         </p>
                                     </td>
                                 </tr>
@@ -147,7 +128,7 @@
                                 <tr>
                                     <td style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
                                         <p class="mobile-fallback" style="margin: 0 0 5px; font-size: 10px; color: #94a3b8; text-align: center;">
-                                            Lien de secours :
+                                            {{ __('Lien de secours :') }}
                                         </p>
                                         <p class="mobile-fallback" style="margin: 0; font-size: 9px; word-break: break-all; text-align: center;">
                                             <a href="{{ $url }}" style="color: #e94560;">{{ $url }}</a>

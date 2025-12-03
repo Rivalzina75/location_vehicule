@@ -967,3 +967,203 @@ if (document.querySelector('.auth-container') || document.getElementById('loginF
     }
     window.scrollTo(0, 0);
 }
+
+/**
+ * MACHINA PROFESSIONAL DASHBOARD
+ * JavaScript pour le nouveau dashboard
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    initProfessionalDashboard();
+});
+
+/**
+ * Initialize Professional Dashboard
+ */
+function initProfessionalDashboard() {
+    const dashboardWrapper = document.querySelector('.dashboard-wrapper-pro');
+    if (!dashboardWrapper) return;
+    
+    // Initialize menu navigation
+    initDashboardMenu();
+    
+    // Initialize mobile menu
+    initMobileMenu();
+    
+    // Initialize animations
+    initDashboardAnimations();
+    
+    console.log('✨ Professional Dashboard Initialized');
+}
+
+/**
+ * Dashboard Menu Navigation
+ */
+function initDashboardMenu() {
+    const menuItems = document.querySelectorAll('.menu-item[data-page]');
+    
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            navigateTo(page);
+        });
+    });
+}
+
+/**
+ * Navigate to a specific page
+ */
+window.navigateTo = function(page) {
+    // Remove active from all menu items
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Hide all pages
+    document.querySelectorAll('.page-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Activate clicked menu item
+    const activeMenuItem = document.querySelector(`[data-page="${page}"]`);
+    if (activeMenuItem) {
+        activeMenuItem.classList.add('active');
+    }
+    
+    // Show target page
+    const targetPage = document.getElementById(page);
+    if (targetPage) {
+        targetPage.classList.add('active');
+    }
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Close mobile menu if open
+    closeMobileMenu();
+};
+
+/**
+ * Mobile Menu Toggle
+ */
+function initMobileMenu() {
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar-pro');
+    
+    if (!mobileToggle || !sidebar) return;
+    
+    mobileToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+}
+
+/**
+ * Close Mobile Menu
+ */
+function closeMobileMenu() {
+    const sidebar = document.querySelector('.sidebar-pro');
+    if (sidebar && window.innerWidth <= 768) {
+        sidebar.classList.remove('open');
+    }
+}
+
+/**
+ * Dashboard Animations
+ */
+function initDashboardAnimations() {
+    // Animate stat cards on load
+    const statCards = document.querySelectorAll('.stat-card-pro');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.4s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Add hover effect to action cards
+    const actionCards = document.querySelectorAll('.action-card-pro');
+    actionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+/**
+ * Show Notification (reuse existing function)
+ */
+if (typeof showNotification === 'undefined') {
+    window.showNotification = function(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.textContent = message;
+        
+        const colors = {
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6'
+        };
+        
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            max-width: 320px;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+}
+
+// Add slideInRight animation if not exists
+if (!document.getElementById('toast-animation-styles')) {
+    const style = document.createElement('style');
+    style.id = 'toast-animation-styles';
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
