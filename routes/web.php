@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\HomeController;
-
-// --- AJOUT DES NOUVEAUX CONTRÔLEURS POUR LE DASHBOARD ---
+use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\InspectionController;
@@ -13,92 +12,88 @@ use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| ROUTES PUBLIQUES
 |--------------------------------------------------------------------------
-|
-| C'est ici que vous pouvez enregistrer les routes web pour votre application.
-|
 */
 
-// =========================================================================
-// ROUTES PUBLIQUES (Accessibles par tous)
-// =========================================================================
-
-// --- SÉLECTEUR DE LANGUE ---
-// Doit être accessible pour que même les invités puissent changer la langue
-Route::get('lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
-
-// --- PAGE D'ACCUEIL (VITRINE) ---
+// Page d'accueil
 Route::get('/', function () {
     return view('home');
-});
-
-// --- ROUTES D'AUTHENTIFICATION ---
-// Gère /login, /register, /password/reset, etc.
-// L'option 'verify' => true active les routes de vérification d'e-mail.
-Auth::routes(['verify' => true]);
-
-// --- CORRECTION DU 404 APRÈS VÉRIFICATION E-MAIL ---
-// Redirige l'ancienne route /home (que Laravel cherche) vers /dashboard
-Route::get('/home', function () {
-    return redirect('/dashboard');
 })->name('home');
 
+// Sélecteur de langue
+Route::get('lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
 
-// =========================================================================
-// ROUTES PROTÉGÉES (Nécessite d'être connecté ET vérifié)
-// =========================================================================
+// Routes d'authentification
+Auth::routes(['verify' => true]);
 
-// Tout ce qui est dans ce groupe est protégé.
+// Redirection /home vers /dashboard
+Route::get('/home', function () {
+    return redirect('/dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| ROUTES PROTÉGÉES (Auth + Verified)
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // --- PAGE PRINCIPALE DU DASHBOARD ---
-    // C'est la route qui charge votre fichier dashboard.blade.php
+    // ========== DASHBOARD ==========
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-    // --- PROFIL UTILISATEUR (Section 7) ---
-    // Route pour la mise à jour du profil
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // ========== CATALOGUE ==========
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
 
-    // --- GESTION DES RÉSERVATIONS (Sections 3 & 4) ---
-    // On groupe les routes qui commencent par /reservations
-    Route::prefix('reservations')->name('reservations.')->group(function () {
+        // Liste des véhicules
+        Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue');
 
-        // GET /reservations (Pour lister les réservations dans "Mes Réservations")
-        Route::get('/', [ReservationController::class, 'index'])->name('index');
+        // Détails d'un véhicule
+        Route::get('/catalogue/{id}', [CatalogueController::class, 'show'])->name('catalogue.show');
 
-        // POST /reservations (Pour le formulaire "Nouvelle Réservation")
-        Route::post('/', [ReservationController::class, 'store'])->name('store');
+        // ========== RÉSERVATIONS ==========
 
-        // GET /reservations/{id} (Pour voir les détails d'une réservation)
-        Route::get('/{id}', [ReservationController::class, 'show'])->name('show');
+        // Liste des réservations
+        Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
 
-        // PUT /reservations/{id} (Pour modifier une réservation)
-        Route::put('/{id}', [ReservationController::class, 'update'])->name('update');
+        // Créer une réservation (formulaire)
+        Route::get('/reservation/create', [ReservationController::class, 'create'])->name('reservation.create');
 
-        // DELETE /reservations/{id} (Pour annuler une réservation)
-        Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('destroy');
+        // Enregistrer une réservation
+        Route::post('/reservation', [ReservationController::class, 'store'])->name('reservation.store');
+
+        // Détails d'une réservation
+        Route::get('/reservation/{id}', [ReservationController::class, 'show'])->name('reservation.show');
+
+        // Annuler une réservation
+        Route::delete('/reservation/{id}', [ReservationController::class, 'destroy'])->name('reservation.destroy');
+
+        // ========== DOCUMENTS ==========
+
+        // Liste des documents
+        Route::get('/documents', [DocumentController::class, 'index'])->name('documents');
+
+        // Uploader un document
+        Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
+
+        // Supprimer un document
+        Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        // ========== INSPECTION ==========
+
+        // Page d'inspection
+        Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection');
+
+        // Inspection de départ
+        Route::post('/inspection/start/{reservation}', [InspectionController::class, 'storeStart'])->name('inspection.start');
+
+        // Inspection de retour
+        Route::post('/inspection/end/{reservation}', [InspectionController::class, 'storeEnd'])->name('inspection.end');
+
+        // ========== PROFIL ==========
+
+        // Mettre à jour le profil
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     });
-
-    // --- GESTION DES DOCUMENTS (Section 5) ---
-    // On groupe les routes qui commencent par /documents
-    Route::prefix('documents')->name('documents.')->group(function () {
-
-        // GET /documents (Pour lister les documents)
-        Route::get('/', [DocumentController::class, 'index'])->name('index');
-
-        // POST /documents (Pour uploader un nouveau document)
-        Route::post('/', [DocumentController::class, 'store'])->name('store');
-    });
-
-    // --- GESTION DES INSPECTIONS (Section 6) ---
-    // On groupe les routes qui commencent par /inspections
-    Route::prefix('inspections')->name('inspections.')->group(function () {
-
-        // POST /inspections (Pour enregistrer une nouvelle inspection)
-        Route::post('/', [InspectionController::class, 'store'])->name('store');
-
-        // GET /inspections/{reservation_id} (Pour voir les inspections d'une réservation)
-        Route::get('/{reservation_id}', [InspectionController::class, 'show'])->name('show');
-    });
-}); // <-- Fin du groupe de routes protégées
+});
