@@ -2,49 +2,46 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class PasswordRobustness implements ValidationRule
 {
     /**
-     * Exécute la règle de validation.
+     * Run the validation rule.
+     *
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $messages = []; // On prépare un tableau pour les erreurs
-
-        // 1. Longueur 14
+        // 1. Longueur minimale (14 caractères)
         if (strlen($value) < 14) {
-            $messages[] = '- au moins 14 caractères';
+            $fail(__('validation.password_min_length')); // Utilise la clé de traduction
+            return;
         }
-        // 2. Minuscule
-        if (!preg_match('/[a-z]/', $value)) {
-            $messages[] = '- au moins une minuscule';
-        }
-        // 3. Majuscule
+
+        // 2. Doit contenir une majuscule
         if (!preg_match('/[A-Z]/', $value)) {
-            $messages[] = '- au moins une majuscule';
+            $fail(__('validation.password_uppercase'));
+            return;
         }
-        // 4. Chiffre
+
+        // 3. Doit contenir une minuscule
+        if (!preg_match('/[a-z]/', $value)) {
+            $fail(__('validation.password_lowercase'));
+            return;
+        }
+
+        // 4. Doit contenir un chiffre
         if (!preg_match('/[0-9]/', $value)) {
-            $messages[] = '- au moins un chiffre';
-        }
-        // 5. Caractère spécial
-        if (!preg_match('/[\W_]/', $value)) {
-            $messages[] = '- au moins un caractère spécial';
+            $fail(__('validation.password_number'));
+            return;
         }
 
-        // Si on a trouvé des erreurs...
-        if (!empty($messages)) {
-
-            // -----------------------------------------------------------------
-            // CORRECTION : On construit un message HTML avec des sauts de ligne
-            // -----------------------------------------------------------------
-            $htmlMessage = 'Il vous manque :<br>' . implode('<br>', $messages);
-
-            // On envoie le message HTML
-            $fail($htmlMessage);
+        // 5. Doit contenir un caractère spécial
+        if (!preg_match('/[@$!%*#?&\W_]/', $value)) {
+            $fail(__('validation.password_special'));
+            return;
         }
     }
 }

@@ -9,24 +9,25 @@ import './bootstrap';
 // MAIN INITIALIZATION
 // ===================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Core security modules
     initLoginLockout();
     initLockoutCountdown();
     initRegisterValidation();
     initFormValidation();
-    
+
     // UI Enhancements
     initPasswordToggle();
     initAutoFormatting();
     initLangSwitcher();
     initAlerts();
     initRippleEffect();
-    
+    initForgotPasswordTransfer();
+
     // Dashboard specific
     initDashboard();
     initSidebarToggle();
-    
+
     console.log('%c🚗 MACHINA - Scripts Loaded', 'color: #e94560; font-weight: bold; font-size: 14px;');
 });
 
@@ -40,11 +41,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function initLoginLockout() {
     const loginForm = document.getElementById('loginForm');
     if (!loginForm) return;
-    
+
     const lastErrorTime = parseInt(localStorage.getItem('lastErrorTime') || '0');
     const now = Date.now();
     const FIVE_MINUTES = 300000;
-    
+
     if (lastErrorTime > 0 && (now - lastErrorTime > FIVE_MINUTES)) {
         localStorage.removeItem('loginAttempts');
         localStorage.removeItem('lockoutEnd');
@@ -59,43 +60,43 @@ function initLoginLockout() {
 function initLockoutCountdown() {
     const lockoutInput = document.getElementById('lockout-until');
     if (!lockoutInput) return;
-    
+
     const lockoutUntil = parseInt(lockoutInput.value) || 0;
     const currentTime = Math.floor(Date.now() / 1000);
-    
+
     // No active lockout
     if (lockoutUntil <= 0 || lockoutUntil <= currentTime) return;
-    
+
     // Get translations from data attributes
     const translationsEl = document.getElementById('lockout-translations');
     const translations = {
         countdown: translationsEl?.dataset.countdown || 'Time remaining: :seconds seconds.',
         complete: translationsEl?.dataset.complete || 'You can now try again.'
     };
-    
+
     const countdownElement = document.getElementById('countdown-timer');
     const submitButton = document.getElementById('login-btn');
     const emailInput = document.getElementById('email');
-    
+
     if (!countdownElement) return;
-    
+
     let remainingSeconds = lockoutUntil - currentTime;
-    
+
     // Show countdown
     countdownElement.style.display = 'block';
-    
+
     // Add error class to email field
     if (emailInput) {
         emailInput.classList.add('is-invalid');
     }
-    
+
     // Disable submit button
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.style.opacity = '0.5';
         submitButton.style.cursor = 'not-allowed';
     }
-    
+
     // Update countdown display
     function updateCountdown() {
         if (remainingSeconds > 0) {
@@ -108,29 +109,29 @@ function initLockoutCountdown() {
             countdownElement.style.color = '#00d9a5';
             countdownElement.style.backgroundColor = '#e6fff9';
             countdownElement.style.borderColor = '#00d9a5';
-            
+
             // Re-enable button
             if (submitButton) {
                 submitButton.disabled = false;
                 submitButton.style.opacity = '1';
                 submitButton.style.cursor = 'pointer';
             }
-            
+
             // Remove error class from email
             if (emailInput) {
                 emailInput.classList.remove('is-invalid');
             }
         }
     }
-    
+
     // Initial update
     updateCountdown();
-    
+
     // Start countdown interval
     const interval = setInterval(() => {
         remainingSeconds--;
         updateCountdown();
-        
+
         if (remainingSeconds <= 0) {
             clearInterval(interval);
         }
@@ -147,55 +148,55 @@ function initRegisterValidation() {
 
     const passwordInput = form.querySelector('input[name="password"]');
     const passwordConfirm = form.querySelector('input[name="password_confirmation"]');
-    
+
     if (!passwordInput) return;
 
     // Create password strength indicator
     createPasswordStrengthUI(passwordInput);
 
     // Live validation on input
-    passwordInput.addEventListener('input', function() {
+    passwordInput.addEventListener('input', function () {
         updatePasswordStrength(this);
         if (passwordConfirm) {
             clearFieldError(passwordConfirm);
             passwordConfirm.classList.remove('is-invalid');
         }
     });
-    
-    passwordInput.addEventListener('focus', function() {
+
+    passwordInput.addEventListener('focus', function () {
         if (this.value.length > 0) {
             updatePasswordStrength(this);
         }
     });
-    
+
     if (passwordConfirm) {
-        passwordConfirm.addEventListener('input', function() {
+        passwordConfirm.addEventListener('input', function () {
             clearFieldError(this);
             this.classList.remove('is-invalid');
         });
     }
 
     // Validate on form submit
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         const result = checkPasswordRequirements(passwordInput.value);
         const passwordsMatch = !passwordConfirm || passwordInput.value === passwordConfirm.value;
-        
+
         let hasError = false;
-        
+
         if (!result.valid) {
             e.preventDefault();
             hasError = true;
             updatePasswordStrength(passwordInput);
             passwordInput.classList.add('is-invalid');
         }
-        
+
         if (!passwordsMatch) {
             e.preventDefault();
             hasError = true;
             passwordConfirm.classList.add('is-invalid');
             showFieldError(passwordConfirm, getTranslation('passwords_no_match'));
         }
-        
+
         if (hasError) {
             const firstError = form.querySelector('.is-invalid');
             if (firstError) {
@@ -217,7 +218,7 @@ function getTranslation(key) {
             'missing': 'Il vous manque :',
             'min_chars': '14 caractères min.',
             'uppercase': 'Une majuscule',
-            'lowercase': 'Une minuscule', 
+            'lowercase': 'Une minuscule',
             'number': 'Un chiffre',
             'special': 'Caractère spécial',
             'weak': 'Faible',
@@ -239,7 +240,7 @@ function getTranslation(key) {
             'excellent': 'Excellent'
         }
     };
-    
+
     const currentLang = lang.startsWith('fr') ? 'fr' : 'en';
     return translations[currentLang][key] || translations['en'][key];
 }
@@ -250,9 +251,9 @@ function getTranslation(key) {
 function createPasswordStrengthUI(input) {
     const wrapper = input.closest('.password-wrapper') || input.parentElement;
     const formGroup = wrapper.closest('.form-group') || wrapper.parentElement;
-    
+
     if (formGroup.querySelector('.password-strength')) return;
-    
+
     const strengthContainer = document.createElement('div');
     strengthContainer.className = 'password-strength';
     strengthContainer.innerHTML = `
@@ -261,7 +262,7 @@ function createPasswordStrengthUI(input) {
         </div>
         <span class="strength-text"></span>
     `;
-    
+
     const requirementsDiv = document.createElement('div');
     requirementsDiv.className = 'password-requirements';
     requirementsDiv.style.display = 'none';
@@ -275,7 +276,7 @@ function createPasswordStrengthUI(input) {
             <li data-req="special">${getTranslation('special')}</li>
         </ul>
     `;
-    
+
     wrapper.after(strengthContainer);
     strengthContainer.after(requirementsDiv);
 }
@@ -291,10 +292,10 @@ function checkPasswordRequirements(value) {
         number: /[0-9]/.test(value),
         special: /[@$!%*#?&\W_]/.test(value)
     };
-    
+
     const passed = Object.values(requirements).filter(Boolean).length;
     const total = Object.keys(requirements).length;
-    
+
     return {
         requirements,
         passed,
@@ -311,15 +312,15 @@ function updatePasswordStrength(input) {
     const value = input.value;
     const wrapper = input.closest('.password-wrapper') || input.parentElement;
     const formGroup = wrapper.closest('.form-group') || wrapper.parentElement;
-    
+
     const strengthContainer = formGroup.querySelector('.password-strength');
     const requirementsDiv = formGroup.querySelector('.password-requirements');
-    
+
     if (!strengthContainer || !requirementsDiv) return;
-    
+
     const fill = strengthContainer.querySelector('.strength-fill');
     const text = strengthContainer.querySelector('.strength-text');
-    
+
     if (value.length === 0) {
         fill.style.width = '0%';
         text.textContent = '';
@@ -327,9 +328,9 @@ function updatePasswordStrength(input) {
         input.classList.remove('is-invalid');
         return;
     }
-    
+
     const result = checkPasswordRequirements(value);
-    
+
     let color, label;
     if (result.percentage <= 40) {
         color = '#ff4757';
@@ -344,18 +345,18 @@ function updatePasswordStrength(input) {
         color = '#00d9a5';
         label = getTranslation('excellent');
     }
-    
+
     fill.style.width = result.percentage + '%';
     fill.style.background = color;
     text.textContent = label;
     text.style.color = color;
-    
+
     const items = requirementsDiv.querySelectorAll('li');
     items.forEach(item => {
         const req = item.dataset.req;
         item.classList.toggle('valid', result.requirements[req]);
     });
-    
+
     requirementsDiv.style.display = result.valid ? 'none' : 'block';
     if (result.valid) input.classList.remove('is-invalid');
 }
@@ -369,20 +370,20 @@ function updatePasswordStrength(input) {
  */
 function initFormValidation() {
     const forms = document.querySelectorAll('form');
-    
+
     forms.forEach(form => {
         const inputs = form.querySelectorAll('input[required], select[required]');
-        
+
         inputs.forEach(input => {
-            input.addEventListener('blur', function() {
+            input.addEventListener('blur', function () {
                 if (this.value.trim() === '') {
                     this.classList.add('is-invalid');
                 } else {
                     this.classList.remove('is-invalid');
                 }
             });
-            
-            input.addEventListener('input', function() {
+
+            input.addEventListener('input', function () {
                 if (this.classList.contains('is-invalid') && this.value.trim() !== '') {
                     this.classList.remove('is-invalid');
                 }
@@ -396,12 +397,12 @@ function initFormValidation() {
  */
 function showFieldError(field, message) {
     clearFieldError(field);
-    
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message dynamic-error';
     errorDiv.innerHTML = `<strong>${message}</strong>`;
     field.classList.add('is-invalid');
-    
+
     const wrapper = field.closest('.password-wrapper');
     if (wrapper) {
         wrapper.insertAdjacentElement('afterend', errorDiv);
@@ -422,7 +423,7 @@ function clearFieldError(field) {
         }
         errorElement = errorElement.nextElementSibling;
     }
-    
+
     const wrapper = field.closest('.password-wrapper');
     if (wrapper) {
         errorElement = wrapper.nextElementSibling;
@@ -434,7 +435,7 @@ function clearFieldError(field) {
             errorElement = errorElement.nextElementSibling;
         }
     }
-    
+
     const existingError = field.parentElement.querySelector('.dynamic-error');
     if (existingError) existingError.remove();
 }
@@ -448,34 +449,34 @@ function clearFieldError(field) {
  */
 function initPasswordToggle() {
     const passwordFields = document.querySelectorAll('input[type="password"]');
-    
+
     passwordFields.forEach(field => {
         if (field.dataset.toggleInitialized) return;
         field.dataset.toggleInitialized = 'true';
-        
+
         let wrapper = field.closest('.password-wrapper');
-        
+
         if (!wrapper) {
             wrapper = document.createElement('div');
             wrapper.className = 'password-wrapper';
             field.parentNode.insertBefore(wrapper, field);
             wrapper.appendChild(field);
         }
-        
+
         if (wrapper.querySelector('.password-toggle-btn')) return;
-        
+
         const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'password-toggle-btn';
         toggleBtn.setAttribute('aria-label', 'Toggle password visibility');
         toggleBtn.setAttribute('tabindex', '-1');
-        
+
         const eyeOpenSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
         const eyeClosedSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
-        
+
         toggleBtn.innerHTML = eyeOpenSVG;
-        
-        toggleBtn.addEventListener('click', function(e) {
+
+        toggleBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             if (field.type === 'password') {
@@ -487,7 +488,7 @@ function initPasswordToggle() {
             }
             field.focus();
         });
-        
+
         wrapper.appendChild(toggleBtn);
     });
 }
@@ -496,39 +497,49 @@ function initPasswordToggle() {
  * Initialize auto-formatting for phone and postal code
  */
 function initAutoFormatting() {
-    // Phone number (French format)
-    const phoneInput = document.querySelector('#phone_number, #telephone, #profile_phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/[^\d]/g, '');
-            if (value.length > 0) {
-                let formatted = value.match(/.{1,2}/g)?.join(' ') || value;
-                e.target.value = formatted.substring(0, 14);
-            }
+    // Formatage Téléphone (Supporte 06... et +33...)
+    const phoneInputs = document.querySelectorAll('input[name="phone_number"], input[name="telephone"]');
+
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            let v = e.target.value;
+
+            // Si ça commence par +, on garde le +, sinon on nettoie tout sauf les chiffres
+            const hasPlus = v.startsWith('+');
+            v = v.replace(/[^\d]/g, '');
+
+            // Si on avait un +, on le remet au début
+            if (hasPlus) v = '+' + v;
+
+            // Petit formatage visuel (espaces tous les 2 chiffres après l'indicatif ou le 0)
+            // Note : C'est une version simplifiée pour ne pas buguer avec le +33
+            if (v.length > 15) v = v.substring(0, 15); // Limite longueur
+
+            e.target.value = v;
         });
-    }
-    
-    // Postal code (French - 5 digits)
-    const postalInput = document.querySelector('#postal_code, #profile_postal');
-    if (postalInput) {
-        postalInput.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/[^\d]/g, '').substring(0, 5);
-        });
-    }
-    
-    // Date of birth (DD/MM/YYYY)
-    const dateInput = document.querySelector('#date_of_birth, #profile_dob');
-    if (dateInput) {
-        dateInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/[^\d]/g, '');
-            if (value.length > 2 && value.length <= 4) {
-                value = value.substring(0, 2) + '/' + value.substring(2);
-            } else if (value.length > 4) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4, 8);
-            }
-            e.target.value = value;
-        });
-    }
+    });
+}
+
+// Postal code (French - 5 digits)
+const postalInput = document.querySelector('#postal_code, #profile_postal');
+if (postalInput) {
+    postalInput.addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^\d]/g, '').substring(0, 5);
+    });
+}
+
+// Date of birth (DD/MM/YYYY)
+const dateInput = document.querySelector('#date_of_birth, #profile_dob');
+if (dateInput) {
+    dateInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/[^\d]/g, '');
+        if (value.length > 2 && value.length <= 4) {
+            value = value.substring(0, 2) + '/' + value.substring(2);
+        } else if (value.length > 4) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4, 8);
+        }
+        e.target.value = value;
+    });
 }
 
 /**
@@ -537,19 +548,19 @@ function initAutoFormatting() {
 function initLangSwitcher() {
     const toggleBtn = document.getElementById('lang-toggle-btn');
     const dropdownMenu = document.getElementById('lang-dropdown-menu');
-    
+
     if (!toggleBtn || !dropdownMenu) return;
 
-    toggleBtn.addEventListener('click', function(e) {
+    toggleBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         const isHidden = dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '';
         dropdownMenu.style.display = isHidden ? 'block' : 'none';
     });
-    
+
     document.addEventListener('click', () => {
         dropdownMenu.style.display = 'none';
     });
-    
+
     dropdownMenu.addEventListener('click', (e) => e.stopPropagation());
 }
 
@@ -577,7 +588,7 @@ function initAlerts() {
         closeBtn.onclick = () => dismissAlert(alert);
         alert.style.position = 'relative';
         alert.appendChild(closeBtn);
-        
+
         setTimeout(() => dismissAlert(alert), 5000);
     });
 }
@@ -587,12 +598,12 @@ function initAlerts() {
  */
 function dismissAlert(alert) {
     if (!alert || alert.classList.contains('dismissing')) return;
-    
+
     alert.classList.add('dismissing');
     alert.style.transition = 'opacity 0.3s, transform 0.3s';
     alert.style.opacity = '0';
     alert.style.transform = 'translateY(-10px)';
-    
+
     setTimeout(() => alert.remove(), 300);
 }
 
@@ -618,27 +629,47 @@ function initRippleEffect() {
         `;
         document.head.appendChild(style);
     }
-    
-    document.addEventListener('click', function(e) {
+
+    document.addEventListener('click', function (e) {
         const button = e.target.closest('.btn-primary, .btn-welcome, .btn-reserve, .btn-action');
         if (!button) return;
-        
+
         const ripple = document.createElement('span');
         ripple.className = 'ripple';
-        
+
         const rect = button.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
-        
+
         ripple.style.width = ripple.style.height = size + 'px';
         ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
         ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-        
+
         button.style.position = 'relative';
         button.style.overflow = 'hidden';
         button.appendChild(ripple);
-        
+
         setTimeout(() => ripple.remove(), 600);
     });
+}
+
+/**
+ * Transfère l'email saisi dans le login vers la page mot de passe oublié
+ */
+function initForgotPasswordTransfer() {
+    const loginEmailInput = document.getElementById('email');
+    const forgotLink = document.getElementById('forgot-password-link'); // Assurez-vous d'avoir mis cet ID dans le HTML
+
+    if (loginEmailInput && forgotLink) {
+        forgotLink.addEventListener('click', function (e) {
+            if (loginEmailInput.value) {
+                e.preventDefault();
+                // On ajoute l'email en paramètre GET de l'URL
+                const url = new URL(this.href);
+                url.searchParams.set('email', loginEmailInput.value);
+                window.location.href = url.toString();
+            }
+        });
+    }
 }
 
 // ===================================
@@ -651,7 +682,7 @@ function initRippleEffect() {
 function initDashboard() {
     const dashboardWrapper = document.querySelector('.dashboard-wrapper');
     if (!dashboardWrapper) return;
-    
+
     initDashboardNavigation();
     initVehicleFilter();
     initReservationForm();
@@ -664,13 +695,13 @@ function initDashboard() {
  */
 function initDashboardNavigation() {
     const sidebarLinks = document.querySelectorAll('.sidebar-link[data-section]');
-    
+
     sidebarLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
             const section = this.getAttribute('data-section');
             navigateTo(section);
-            
+
             const sidebar = document.querySelector('.dashboard-sidebar');
             if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
@@ -682,25 +713,25 @@ function initDashboardNavigation() {
 /**
  * Navigate to a dashboard section
  */
-window.navigateTo = function(section) {
+window.navigateTo = function (section) {
     document.querySelectorAll('.dashboard-section').forEach(s => {
         s.classList.remove('active');
     });
-    
+
     document.querySelectorAll('.sidebar-link').forEach(link => {
         link.classList.remove('active');
     });
-    
+
     const targetSection = document.getElementById(section);
     if (targetSection) {
         targetSection.classList.add('active');
     }
-    
+
     const targetLink = document.querySelector(`[data-section="${section}"]`);
     if (targetLink) {
         targetLink.classList.add('active');
     }
-    
+
     const main = document.querySelector('.dashboard-main');
     if (main) main.scrollTop = 0;
 };
@@ -708,13 +739,13 @@ window.navigateTo = function(section) {
 /**
  * Select vehicle from catalog
  */
-window.selectVehicle = function(model, type) {
+window.selectVehicle = function (model, type) {
     const vehicleType = document.getElementById('vehicle_type');
     const vehicleModel = document.getElementById('vehicle_model');
-    
+
     if (vehicleType) vehicleType.value = type;
     if (vehicleModel) vehicleModel.value = model;
-    
+
     navigateTo('reservation');
 };
 
@@ -723,11 +754,11 @@ window.selectVehicle = function(model, type) {
  */
 function initVehicleFilter() {
     const typeFilter = document.getElementById('type-filter');
-    
+
     if (typeFilter) {
-        typeFilter.addEventListener('change', function() {
+        typeFilter.addEventListener('change', function () {
             const selectedType = this.value;
-            
+
             document.querySelectorAll('.vehicle-card').forEach(card => {
                 if (!selectedType || card.getAttribute('data-type') === selectedType) {
                     card.style.display = 'block';
@@ -745,14 +776,14 @@ function initVehicleFilter() {
 function initReservationForm() {
     const form = document.getElementById('reservationForm');
     if (!form) return;
-    
+
     let currentStep = 1;
-    
-    window.nextStep = function(step) {
+
+    window.nextStep = function (step) {
         const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
         const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
         let valid = true;
-        
+
         inputs.forEach(input => {
             if (!input.value && input.type !== 'checkbox') {
                 input.classList.add('is-invalid');
@@ -763,29 +794,29 @@ function initReservationForm() {
                 input.classList.remove('is-invalid');
             }
         });
-        
+
         if (!valid) {
             showNotification('Veuillez remplir tous les champs requis', 'warning');
             return;
         }
-        
+
         currentStepEl.classList.remove('active');
         document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
         currentStep = step;
-        
+
         document.querySelector('.dashboard-main').scrollTop = 0;
-        
+
         if (step === 5) updateReservationSummary();
     };
-    
-    window.prevStep = function(step) {
+
+    window.prevStep = function (step) {
         document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
         document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
         currentStep = step;
         document.querySelector('.dashboard-main').scrollTop = 0;
     };
-    
-    form.addEventListener('submit', function(e) {
+
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
         showNotification('Réservation envoyée avec succès !', 'success');
     });
@@ -804,17 +835,17 @@ function updateReservationSummary() {
     const tarifType = tarifSelect?.options[tarifSelect.selectedIndex]?.text || '-';
     const childSeat = document.getElementById('child_seat')?.checked;
     const insurance = document.getElementById('insurance')?.checked;
-    
+
     const setElementText = (id, text) => {
         const el = document.getElementById(id);
         if (el) el.textContent = text;
     };
-    
+
     setElementText('summary-vehicle', vehicle);
     setElementText('summary-contract', contractType);
     setElementText('summary-period', `${startDate} → ${endDate}`);
     setElementText('summary-tarif', tarifType);
-    
+
     const options = [];
     if (childSeat) options.push('Siège enfant');
     if (insurance) options.push('Assurance tous risques');
@@ -827,12 +858,12 @@ function updateReservationSummary() {
  */
 function initPhotoUpload() {
     document.querySelectorAll('.photo-input').forEach(input => {
-        input.addEventListener('change', function(e) {
+        input.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const label = input.closest('.photo-upload-item').querySelector('.photo-placeholder');
                 if (label) {
                     label.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
@@ -847,7 +878,7 @@ function initPhotoUpload() {
  * Initialize inspection type toggle
  */
 function initInspectionToggle() {
-    window.selectInspectionType = function(type) {
+    window.selectInspectionType = function (type) {
         document.querySelectorAll('.inspection-type-btn').forEach(btn => {
             btn.classList.remove('active');
         });
@@ -861,25 +892,25 @@ function initInspectionToggle() {
 function initSidebarToggle() {
     const sidebar = document.querySelector('.dashboard-sidebar');
     if (!sidebar) return;
-    
+
     if (!document.querySelector('.sidebar-toggle')) {
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'sidebar-toggle';
         toggleBtn.innerHTML = '☰';
         toggleBtn.setAttribute('aria-label', 'Toggle sidebar');
-        
-        toggleBtn.addEventListener('click', function() {
+
+        toggleBtn.addEventListener('click', function () {
             sidebar.classList.toggle('open');
             this.innerHTML = sidebar.classList.contains('open') ? '✕' : '☰';
         });
-        
+
         document.body.appendChild(toggleBtn);
     }
-    
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768 && 
-            sidebar.classList.contains('open') && 
-            !sidebar.contains(e.target) && 
+
+    document.addEventListener('click', function (e) {
+        if (window.innerWidth <= 768 &&
+            sidebar.classList.contains('open') &&
+            !sidebar.contains(e.target) &&
             !e.target.classList.contains('sidebar-toggle')) {
             sidebar.classList.remove('open');
             document.querySelector('.sidebar-toggle').innerHTML = '☰';
@@ -896,18 +927,18 @@ function initSidebarToggle() {
  */
 function showNotification(message, type = 'info') {
     document.querySelectorAll('.notification-toast').forEach(n => n.remove());
-    
+
     const toast = document.createElement('div');
     toast.className = `notification-toast notification-${type}`;
     toast.textContent = message;
-    
+
     const colors = {
         success: '#00d9a5',
         warning: '#ffc107',
         danger: '#ff4757',
         info: '#3498db'
     };
-    
+
     toast.style.cssText = `
         position: fixed;
         bottom: 100px;
@@ -921,7 +952,7 @@ function showNotification(message, type = 'info') {
         z-index: 10000;
         animation: slideInRight 0.3s ease;
     `;
-    
+
     if (!document.getElementById('notification-styles')) {
         const style = document.createElement('style');
         style.id = 'notification-styles';
@@ -933,9 +964,9 @@ function showNotification(message, type = 'info') {
         `;
         document.head.appendChild(style);
     }
-    
+
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';
@@ -973,7 +1004,7 @@ if (document.querySelector('.auth-container') || document.getElementById('loginF
  * JavaScript pour le nouveau dashboard
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initProfessionalDashboard();
 });
 
@@ -983,16 +1014,16 @@ document.addEventListener('DOMContentLoaded', function() {
 function initProfessionalDashboard() {
     const dashboardWrapper = document.querySelector('.dashboard-wrapper-pro');
     if (!dashboardWrapper) return;
-    
+
     // Initialize menu navigation
     initDashboardMenu();
-    
+
     // Initialize mobile menu
     initMobileMenu();
-    
+
     // Initialize animations
     initDashboardAnimations();
-    
+
     console.log('✨ Professional Dashboard Initialized');
 }
 
@@ -1001,9 +1032,9 @@ function initProfessionalDashboard() {
  */
 function initDashboardMenu() {
     const menuItems = document.querySelectorAll('.menu-item[data-page]');
-    
+
     menuItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             e.preventDefault();
             const page = this.getAttribute('data-page');
             navigateTo(page);
@@ -1014,32 +1045,32 @@ function initDashboardMenu() {
 /**
  * Navigate to a specific page
  */
-window.navigateTo = function(page) {
+window.navigateTo = function (page) {
     // Remove active from all menu items
     document.querySelectorAll('.menu-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     // Hide all pages
     document.querySelectorAll('.page-content').forEach(content => {
         content.classList.remove('active');
     });
-    
+
     // Activate clicked menu item
     const activeMenuItem = document.querySelector(`[data-page="${page}"]`);
     if (activeMenuItem) {
         activeMenuItem.classList.add('active');
     }
-    
+
     // Show target page
     const targetPage = document.getElementById(page);
     if (targetPage) {
         targetPage.classList.add('active');
     }
-    
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Close mobile menu if open
     closeMobileMenu();
 };
@@ -1050,15 +1081,15 @@ window.navigateTo = function(page) {
 function initMobileMenu() {
     const mobileToggle = document.getElementById('mobileMenuToggle');
     const sidebar = document.querySelector('.sidebar-pro');
-    
+
     if (!mobileToggle || !sidebar) return;
-    
-    mobileToggle.addEventListener('click', function() {
+
+    mobileToggle.addEventListener('click', function () {
         sidebar.classList.toggle('open');
     });
-    
+
     // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (window.innerWidth <= 768) {
             if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
                 sidebar.classList.remove('open');
@@ -1086,22 +1117,22 @@ function initDashboardAnimations() {
     statCards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
-        
+
         setTimeout(() => {
             card.style.transition = 'all 0.4s ease';
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }, index * 100);
     });
-    
+
     // Add hover effect to action cards
     const actionCards = document.querySelectorAll('.action-card-pro');
     actionCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
+        card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-4px) scale(1.02)';
         });
-        
-        card.addEventListener('mouseleave', function() {
+
+        card.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(0) scale(1)';
         });
     });
@@ -1111,18 +1142,18 @@ function initDashboardAnimations() {
  * Show Notification (reuse existing function)
  */
 if (typeof showNotification === 'undefined') {
-    window.showNotification = function(message, type = 'info') {
+    window.showNotification = function (message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast-notification toast-${type}`;
         toast.textContent = message;
-        
+
         const colors = {
             success: '#10b981',
             warning: '#f59e0b',
             danger: '#ef4444',
             info: '#3b82f6'
         };
-        
+
         toast.style.cssText = `
             position: fixed;
             bottom: 24px;
@@ -1137,9 +1168,9 @@ if (typeof showNotification === 'undefined') {
             animation: slideInRight 0.3s ease;
             max-width: 320px;
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(100%)';

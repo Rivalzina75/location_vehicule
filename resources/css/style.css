@@ -227,7 +227,7 @@ body {
    AUTH PAGES (Layout & Centrage)
    =================================== */
 body.auth-page {
-    background-image: url('../images/auth-bg.jpg');
+    background-image: url('/images/auth-bg.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -266,14 +266,22 @@ body.auth-page #app {
 /* Centrage du formulaire */
 body.auth-page main {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    padding: var(--space-lg);
+    flex-direction: column;
     width: 100%;
+    min-height: 100vh; /* Prend toute la hauteur */
+    /* Espacement vital pour le Header fixe (70px + 30px de marge) */
+    padding-top: 100px; 
+    padding-bottom: 40px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+    box-sizing: border-box;
 }
 
 .auth-container {
+    margin: auto; 
+    
+    /* ... Vos autres styles (gardez-les) ... */
     background: var(--bg-white);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl), var(--shadow-glow);
@@ -281,9 +289,7 @@ body.auth-page main {
     width: 100%;
     max-width: 440px;
     animation: slideUp 0.5s ease;
-    margin: auto;
 }
-
 .auth-container-wide {
     max-width: 700px;
 }
@@ -504,11 +510,15 @@ label {
 /* Error Messages */
 .error-message {
     color: var(--danger);
-    font-size: var(--font-size-sm);
-    margin-top: var(--space-xs);
+    font-size: 0.8rem; /* Un peu plus petit pour gagner de la place */
+    margin-top: 4px;
+    
     display: flex;
-    align-items: center;
-    gap: var(--space-xs);
+    align-items: flex-start; /* IMPORTANT : Aligne l'icône en haut, pas au milieu */
+    text-align: left;
+    gap: 6px;
+    
+    line-height: 1.4; /* Meilleure lecture sur 2 lignes */
     animation: shake 0.3s ease;
 }
 
@@ -1420,6 +1430,13 @@ hr {
     transition: all 0.2s ease;
 }
 
+.support-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
 .support-btn:hover {
     background: #e94560;
     border-color: #e94560;
@@ -1513,6 +1530,8 @@ hr {
     font-size: var(--font-size-base);
     text-decoration: none;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-primary-hero {

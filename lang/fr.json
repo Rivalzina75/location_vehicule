@@ -124,5 +124,11 @@
     "Appeler": "Appeler",
     "Catalogue de véhicules": "Catalogue de véhicules",
     "Contenu à venir...": "Contenu à venir...",
-    "Mon profil": "Mon profil"
+    "Mon profil": "Mon profil",
+
+    "Le format de date doit être JJ/MM/AAAA.": "Le format de date doit être JJ/MM/AAAA.",
+    "Le numéro de téléphone n'est pas au bon format.": "Le format du numéro n'est pas correcte.",
+    "Le code postal doit contenir 5 chiffres.": "Le code postal doit contenir 5 chiffres.",
+    "La date de naissance doit être dans le passé.": "La date de naissance doit être dans le passé.",
+    "Le nom de la ville ne doit contenir que des lettres, des espaces ou des tirets.": "Le nom de la ville ne doit contenir que des lettres, des espaces ou des tirets."
 }

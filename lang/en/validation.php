@@ -194,6 +194,16 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'first_name' => 'first name',
+        'last_name' => 'last name',
+        'email' => 'email',
+        'password' => 'password',
+        'date_of_birth' => 'date of birth',
+        'phone_number' => 'phone number',
+        'address_line1' => 'address line1',
+        'postal code' => 'code postal',
+        'city' => 'city',
+        'password_confirmation' => 'password confirmation',
+    ],
 ];
