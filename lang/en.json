@@ -129,5 +129,7 @@
     "Le format de date doit être JJ/MM/AAAA.": "The date format must be DD/MM/YYYY.",
     "Le numéro de téléphone n'est pas au bon format.": "The phone number is not in the correct format.",
     "Le code postal doit contenir 5 chiffres.": "The postal code must contain 5 digits.",
-    "Le nom de la ville ne doit contenir que des lettres, des espaces ou des tirets.": "The city name may only contain letters, spaces, or hyphens."
+    "Le nom de la ville ne doit contenir que des lettres, des espaces ou des tirets.": "The city name may only contain letters, spaces, or hyphens.",
+
+    "Bienvenue chez Machina - Vérification": "Welcome to Machina - Verification"
 }

@@ -1,6 +1,6 @@
 /**
- * MACHINA - Scripts JavaScript
- * Version 3.0 - Nettoyé et Optimisé
+ * MACHINA - Scripts JavaScript (Optimisé)
+ * Version 3.1 - Nettoyé et allégé
  */
 
 import './bootstrap';
@@ -23,10 +23,12 @@ document.addEventListener('DOMContentLoaded', function () {
     initAlerts();
     initRippleEffect();
     initForgotPasswordTransfer();
+    initPageTransitions();
+    initThemeToggle();
+    initLogoutModal();
 
-    // Dashboard specific
-    initDashboard();
-    initSidebarToggle();
+    // Dashboard
+    initMobileDashboard();
 
     console.log('%c🚗 MACHINA - Scripts Loaded', 'color: #e94560; font-weight: bold; font-size: 14px;');
 });
@@ -55,7 +57,6 @@ function initLoginLockout() {
 
 /**
  * Initialize lockout countdown timer
- * Reads data from hidden inputs injected by Blade template
  */
 function initLockoutCountdown() {
     const lockoutInput = document.getElementById('lockout-until');
@@ -64,10 +65,8 @@ function initLockoutCountdown() {
     const lockoutUntil = parseInt(lockoutInput.value) || 0;
     const currentTime = Math.floor(Date.now() / 1000);
 
-    // No active lockout
     if (lockoutUntil <= 0 || lockoutUntil <= currentTime) return;
 
-    // Get translations from data attributes
     const translationsEl = document.getElementById('lockout-translations');
     const translations = {
         countdown: translationsEl?.dataset.countdown || 'Time remaining: :seconds seconds.',
@@ -82,22 +81,16 @@ function initLockoutCountdown() {
 
     let remainingSeconds = lockoutUntil - currentTime;
 
-    // Show countdown
     countdownElement.style.display = 'block';
 
-    // Add error class to email field
-    if (emailInput) {
-        emailInput.classList.add('is-invalid');
-    }
+    if (emailInput) emailInput.classList.add('is-invalid');
 
-    // Disable submit button
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.style.opacity = '0.5';
         submitButton.style.cursor = 'not-allowed';
     }
 
-    // Update countdown display
     function updateCountdown() {
         if (remainingSeconds > 0) {
             const message = translations.countdown.replace(':seconds', Math.floor(remainingSeconds));
@@ -110,24 +103,18 @@ function initLockoutCountdown() {
             countdownElement.style.backgroundColor = '#e6fff9';
             countdownElement.style.borderColor = '#00d9a5';
 
-            // Re-enable button
             if (submitButton) {
                 submitButton.disabled = false;
                 submitButton.style.opacity = '1';
                 submitButton.style.cursor = 'pointer';
             }
 
-            // Remove error class from email
-            if (emailInput) {
-                emailInput.classList.remove('is-invalid');
-            }
+            if (emailInput) emailInput.classList.remove('is-invalid');
         }
     }
 
-    // Initial update
     updateCountdown();
 
-    // Start countdown interval
     const interval = setInterval(() => {
         remainingSeconds--;
         updateCountdown();
@@ -140,7 +127,6 @@ function initLockoutCountdown() {
 
 /**
  * Registration form validation with password strength checking
- * Works on both register and password reset pages
  */
 function initRegisterValidation() {
     const form = document.getElementById('registerForm') || document.getElementById('resetPasswordForm');
@@ -151,10 +137,8 @@ function initRegisterValidation() {
 
     if (!passwordInput) return;
 
-    // Create password strength indicator
     createPasswordStrengthUI(passwordInput);
 
-    // Live validation on input
     passwordInput.addEventListener('input', function () {
         updatePasswordStrength(this);
         if (passwordConfirm) {
@@ -176,7 +160,6 @@ function initRegisterValidation() {
         });
     }
 
-    // Validate on form submit
     form.addEventListener('submit', function (e) {
         const result = checkPasswordRequirements(passwordInput.value);
         const passwordsMatch = !passwordConfirm || passwordInput.value === passwordConfirm.value;
@@ -444,6 +427,132 @@ function clearFieldError(field) {
 // UI ENHANCEMENTS
 // ===================================
 
+// Page transitions with hierarchy
+function initPageTransitions() {
+    const menuItems = document.querySelectorAll('.menu-item[data-page-index]');
+    const currentPage = document.querySelector('.page-transition[data-page-index]');
+
+    if (!currentPage) return;
+
+    const currentIndex = parseInt(currentPage.dataset.pageIndex);
+
+    // Store current page index in sessionStorage
+    sessionStorage.setItem('currentPageIndex', currentIndex);
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href) return;
+
+            // Allow new tab / modifier clicks
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || this.target === '_blank') {
+                return;
+            }
+
+            e.preventDefault();
+            const targetIndex = parseInt(this.dataset.pageIndex);
+            const previousIndex = parseInt(sessionStorage.getItem('currentPageIndex') || '0');
+
+            // Determine slide direction based on hierarchy
+            if (targetIndex > previousIndex) {
+                sessionStorage.setItem('slideDirection', 'forward');
+            } else if (targetIndex < previousIndex) {
+                sessionStorage.setItem('slideDirection', 'backward');
+            }
+
+            // Update stored index
+            sessionStorage.setItem('currentPageIndex', targetIndex);
+
+            // Play exit animation before navigation
+            currentPage.classList.remove('slide-in-left', 'slide-in-right');
+            if (targetIndex > previousIndex) {
+                currentPage.classList.add('slide-out-left');
+            } else if (targetIndex < previousIndex) {
+                currentPage.classList.add('slide-out-right');
+            }
+
+            setTimeout(() => {
+                window.location.href = href;
+            }, 280);
+        });
+    });
+
+    // Apply entrance animation based on previous navigation
+    const slideDirection = sessionStorage.getItem('slideDirection');
+    if (slideDirection === 'forward') {
+        currentPage.classList.add('slide-in-left');
+    } else if (slideDirection === 'backward') {
+        currentPage.classList.add('slide-in-right');
+    }
+
+    // Clear direction after animation
+    sessionStorage.removeItem('slideDirection');
+}
+
+// Theme toggle (light/dark)
+const THEME_KEY = 'theme';
+
+function toggleTheme() {
+    const current = document.documentElement.classList.contains('theme-dark') ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+}
+
+function applyTheme(theme) {
+    const next = theme === 'dark' ? 'theme-dark' : 'theme-light';
+    const root = document.documentElement;
+    const body = document.body;
+
+    root.classList.remove('theme-dark', 'theme-light');
+    body.classList.remove('theme-dark', 'theme-light');
+    root.classList.add(next);
+    body.classList.add(next);
+
+    const btn = document.getElementById('theme-toggle');
+    if (btn) {
+        const icon = btn.querySelector('.theme-icon');
+        const label = btn.querySelector('.theme-label');
+        if (theme === 'dark') {
+            if (icon) icon.textContent = '🌞';
+            if (label) label.textContent = 'Light';
+        } else {
+            if (icon) icon.textContent = '🌙';
+            if (label) label.textContent = 'Dark';
+        }
+    }
+
+    try {
+        localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {
+        /* ignore storage errors */
+    }
+}
+
+function initThemeToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    let initial = 'light';
+    try {
+        const stored = localStorage.getItem(THEME_KEY);
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        initial = stored || (prefersDark ? 'dark' : 'light');
+    } catch (e) {
+        /* ignore */
+    }
+
+    // Always apply once to sync html/body classes with stored preference
+    applyTheme(initial);
+
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleTheme();
+    });
+
+    // Fallback global handler (for inline onclick if needed)
+    window.toggleTheme = toggleTheme;
+}
+
 /**
  * Initialize password visibility toggle
  */
@@ -497,49 +606,38 @@ function initPasswordToggle() {
  * Initialize auto-formatting for phone and postal code
  */
 function initAutoFormatting() {
-    // Formatage Téléphone (Supporte 06... et +33...)
     const phoneInputs = document.querySelectorAll('input[name="phone_number"], input[name="telephone"]');
 
     phoneInputs.forEach(input => {
         input.addEventListener('input', (e) => {
             let v = e.target.value;
-
-            // Si ça commence par +, on garde le +, sinon on nettoie tout sauf les chiffres
             const hasPlus = v.startsWith('+');
             v = v.replace(/[^\d]/g, '');
-
-            // Si on avait un +, on le remet au début
             if (hasPlus) v = '+' + v;
-
-            // Petit formatage visuel (espaces tous les 2 chiffres après l'indicatif ou le 0)
-            // Note : C'est une version simplifiée pour ne pas buguer avec le +33
-            if (v.length > 15) v = v.substring(0, 15); // Limite longueur
-
+            if (v.length > 15) v = v.substring(0, 15);
             e.target.value = v;
         });
     });
-}
 
-// Postal code (French - 5 digits)
-const postalInput = document.querySelector('#postal_code, #profile_postal');
-if (postalInput) {
-    postalInput.addEventListener('input', function (e) {
-        e.target.value = e.target.value.replace(/[^\d]/g, '').substring(0, 5);
-    });
-}
+    const postalInput = document.querySelector('#postal_code, #profile_postal');
+    if (postalInput) {
+        postalInput.addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/[^\d]/g, '').substring(0, 5);
+        });
+    }
 
-// Date of birth (DD/MM/YYYY)
-const dateInput = document.querySelector('#date_of_birth, #profile_dob');
-if (dateInput) {
-    dateInput.addEventListener('input', function (e) {
-        let value = e.target.value.replace(/[^\d]/g, '');
-        if (value.length > 2 && value.length <= 4) {
-            value = value.substring(0, 2) + '/' + value.substring(2);
-        } else if (value.length > 4) {
-            value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4, 8);
-        }
-        e.target.value = value;
-    });
+    const dateInput = document.querySelector('#date_of_birth, #profile_dob');
+    if (dateInput) {
+        dateInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            if (value.length > 2 && value.length <= 4) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            } else if (value.length > 4) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4, 8);
+            }
+            e.target.value = value;
+        });
+    }
 }
 
 /**
@@ -653,17 +751,16 @@ function initRippleEffect() {
 }
 
 /**
- * Transfère l'email saisi dans le login vers la page mot de passe oublié
+ * Transfer email from login to forgot password page
  */
 function initForgotPasswordTransfer() {
     const loginEmailInput = document.getElementById('email');
-    const forgotLink = document.getElementById('forgot-password-link'); // Assurez-vous d'avoir mis cet ID dans le HTML
+    const forgotLink = document.getElementById('forgot-password-link');
 
     if (loginEmailInput && forgotLink) {
         forgotLink.addEventListener('click', function (e) {
             if (loginEmailInput.value) {
                 e.preventDefault();
-                // On ajoute l'email en paramètre GET de l'URL
                 const url = new URL(this.href);
                 url.searchParams.set('email', loginEmailInput.value);
                 window.location.href = url.toString();
@@ -673,309 +770,83 @@ function initForgotPasswordTransfer() {
 }
 
 // ===================================
-// DASHBOARD FUNCTIONALITY
+// DASHBOARD MOBILE
 // ===================================
 
 /**
- * Initialize dashboard navigation and forms
+ * Initialize mobile menu for dashboard
  */
-function initDashboard() {
-    const dashboardWrapper = document.querySelector('.dashboard-wrapper');
-    if (!dashboardWrapper) return;
+function initMobileDashboard() {
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar-pro');
 
-    initDashboardNavigation();
-    initVehicleFilter();
-    initReservationForm();
-    initPhotoUpload();
-    initInspectionToggle();
-}
+    if (!mobileToggle || !sidebar) return;
 
-/**
- * Initialize dashboard section navigation
- */
-function initDashboardNavigation() {
-    const sidebarLinks = document.querySelectorAll('.sidebar-link[data-section]');
-
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const section = this.getAttribute('data-section');
-            navigateTo(section);
-
-            const sidebar = document.querySelector('.dashboard-sidebar');
-            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        });
+    mobileToggle.addEventListener('click', function () {
+        sidebar.classList.toggle('open');
     });
-}
-
-/**
- * Navigate to a dashboard section
- */
-window.navigateTo = function (section) {
-    document.querySelectorAll('.dashboard-section').forEach(s => {
-        s.classList.remove('active');
-    });
-
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.classList.remove('active');
-    });
-
-    const targetSection = document.getElementById(section);
-    if (targetSection) {
-        targetSection.classList.add('active');
-    }
-
-    const targetLink = document.querySelector(`[data-section="${section}"]`);
-    if (targetLink) {
-        targetLink.classList.add('active');
-    }
-
-    const main = document.querySelector('.dashboard-main');
-    if (main) main.scrollTop = 0;
-};
-
-/**
- * Select vehicle from catalog
- */
-window.selectVehicle = function (model, type) {
-    const vehicleType = document.getElementById('vehicle_type');
-    const vehicleModel = document.getElementById('vehicle_model');
-
-    if (vehicleType) vehicleType.value = type;
-    if (vehicleModel) vehicleModel.value = model;
-
-    navigateTo('reservation');
-};
-
-/**
- * Initialize vehicle catalog filter
- */
-function initVehicleFilter() {
-    const typeFilter = document.getElementById('type-filter');
-
-    if (typeFilter) {
-        typeFilter.addEventListener('change', function () {
-            const selectedType = this.value;
-
-            document.querySelectorAll('.vehicle-card').forEach(card => {
-                if (!selectedType || card.getAttribute('data-type') === selectedType) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    }
-}
-
-/**
- * Initialize reservation form multi-step navigation
- */
-function initReservationForm() {
-    const form = document.getElementById('reservationForm');
-    if (!form) return;
-
-    let currentStep = 1;
-
-    window.nextStep = function (step) {
-        const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-        const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
-        let valid = true;
-
-        inputs.forEach(input => {
-            if (!input.value && input.type !== 'checkbox') {
-                input.classList.add('is-invalid');
-                valid = false;
-            } else if (input.type === 'checkbox' && input.required && !input.checked) {
-                valid = false;
-            } else {
-                input.classList.remove('is-invalid');
-            }
-        });
-
-        if (!valid) {
-            showNotification('Veuillez remplir tous les champs requis', 'warning');
-            return;
-        }
-
-        currentStepEl.classList.remove('active');
-        document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-        currentStep = step;
-
-        document.querySelector('.dashboard-main').scrollTop = 0;
-
-        if (step === 5) updateReservationSummary();
-    };
-
-    window.prevStep = function (step) {
-        document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
-        document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-        currentStep = step;
-        document.querySelector('.dashboard-main').scrollTop = 0;
-    };
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        showNotification('Réservation envoyée avec succès !', 'success');
-    });
-}
-
-/**
- * Update reservation summary
- */
-function updateReservationSummary() {
-    const vehicle = document.getElementById('vehicle_model')?.value || '-';
-    const contractSelect = document.getElementById('contract_type');
-    const contractType = contractSelect?.options[contractSelect.selectedIndex]?.text || '-';
-    const startDate = document.getElementById('start_date')?.value || '-';
-    const endDate = document.getElementById('end_date')?.value || '-';
-    const tarifSelect = document.getElementById('tarif_type');
-    const tarifType = tarifSelect?.options[tarifSelect.selectedIndex]?.text || '-';
-    const childSeat = document.getElementById('child_seat')?.checked;
-    const insurance = document.getElementById('insurance')?.checked;
-
-    const setElementText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-    };
-
-    setElementText('summary-vehicle', vehicle);
-    setElementText('summary-contract', contractType);
-    setElementText('summary-period', `${startDate} → ${endDate}`);
-    setElementText('summary-tarif', tarifType);
-
-    const options = [];
-    if (childSeat) options.push('Siège enfant');
-    if (insurance) options.push('Assurance tous risques');
-    setElementText('summary-options', options.length > 0 ? options.join(', ') : 'Aucune');
-    setElementText('summary-total', '350€ (estimation)');
-}
-
-/**
- * Initialize photo upload with preview
- */
-function initPhotoUpload() {
-    document.querySelectorAll('.photo-input').forEach(input => {
-        input.addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const label = input.closest('.photo-upload-item').querySelector('.photo-placeholder');
-                if (label) {
-                    label.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-}
-
-/**
- * Initialize inspection type toggle
- */
-function initInspectionToggle() {
-    window.selectInspectionType = function (type) {
-        document.querySelectorAll('.inspection-type-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-    };
-}
-
-/**
- * Initialize mobile sidebar toggle
- */
-function initSidebarToggle() {
-    const sidebar = document.querySelector('.dashboard-sidebar');
-    if (!sidebar) return;
-
-    if (!document.querySelector('.sidebar-toggle')) {
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'sidebar-toggle';
-        toggleBtn.innerHTML = '☰';
-        toggleBtn.setAttribute('aria-label', 'Toggle sidebar');
-
-        toggleBtn.addEventListener('click', function () {
-            sidebar.classList.toggle('open');
-            this.innerHTML = sidebar.classList.contains('open') ? '✕' : '☰';
-        });
-
-        document.body.appendChild(toggleBtn);
-    }
 
     document.addEventListener('click', function (e) {
-        if (window.innerWidth <= 768 &&
-            sidebar.classList.contains('open') &&
-            !sidebar.contains(e.target) &&
-            !e.target.classList.contains('sidebar-toggle')) {
-            sidebar.classList.remove('open');
-            document.querySelector('.sidebar-toggle').innerHTML = '☰';
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+
+}
+
+// Initialize global UI behaviors
+document.addEventListener('DOMContentLoaded', () => {
+    // Remove duplicate initThemeToggle
+    initThemeToggle();
+});
+
+// ===================================
+// LOGOUT CONFIRMATION MODAL
+// ===================================
+
+function initLogoutModal() {
+    const logoutBtn = document.querySelector('.logout-nav');
+    if (!logoutBtn) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'logout-modal';
+    modal.id = 'logout-modal';
+    modal.innerHTML = `
+        <div class="logout-modal-content">
+            <span class="logout-modal-icon">👋</span>
+            <h2 class="logout-modal-title">Confirmer la déconnexion</h2>
+            <p class="logout-modal-text">Êtes-vous sûr de vouloir vous déconnecter ?</p>
+            <div class="logout-modal-buttons">
+                <button type="button" class="logout-modal-btn logout-modal-btn-cancel" onclick="document.getElementById('logout-modal').classList.remove('show');">
+                    Annuler
+                </button>
+                <button type="button" class="logout-modal-btn logout-modal-btn-confirm" onclick="document.getElementById('logout-form-nav').submit();">
+                    Se déconnecter
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.add('show');
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            modal.classList.remove('show');
         }
     });
 }
-
-// ===================================
-// UTILITY FUNCTIONS
-// ===================================
-
-/**
- * Show a notification toast
- */
-function showNotification(message, type = 'info') {
-    document.querySelectorAll('.notification-toast').forEach(n => n.remove());
-
-    const toast = document.createElement('div');
-    toast.className = `notification-toast notification-${type}`;
-    toast.textContent = message;
-
-    const colors = {
-        success: '#00d9a5',
-        warning: '#ffc107',
-        danger: '#ff4757',
-        info: '#3498db'
-    };
-
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        background: ${colors[type] || colors.info};
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        z-index: 10000;
-        animation: slideInRight 0.3s ease;
-    `;
-
-    if (!document.getElementById('notification-styles')) {
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-window.showNotification = showNotification;
 
 // ===================================
 // ACCESSIBILITY
@@ -997,204 +868,4 @@ if (document.querySelector('.auth-container') || document.getElementById('loginF
         history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
-}
-
-/**
- * MACHINA PROFESSIONAL DASHBOARD
- * JavaScript pour le nouveau dashboard
- */
-
-document.addEventListener('DOMContentLoaded', function () {
-    initProfessionalDashboard();
-});
-
-/**
- * Initialize Professional Dashboard
- */
-function initProfessionalDashboard() {
-    const dashboardWrapper = document.querySelector('.dashboard-wrapper-pro');
-    if (!dashboardWrapper) return;
-
-    // Initialize menu navigation
-    initDashboardMenu();
-
-    // Initialize mobile menu
-    initMobileMenu();
-
-    // Initialize animations
-    initDashboardAnimations();
-
-    console.log('✨ Professional Dashboard Initialized');
-}
-
-/**
- * Dashboard Menu Navigation
- */
-function initDashboardMenu() {
-    const menuItems = document.querySelectorAll('.menu-item[data-page]');
-
-    menuItems.forEach(item => {
-        item.addEventListener('click', function (e) {
-            e.preventDefault();
-            const page = this.getAttribute('data-page');
-            navigateTo(page);
-        });
-    });
-}
-
-/**
- * Navigate to a specific page
- */
-window.navigateTo = function (page) {
-    // Remove active from all menu items
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.classList.remove('active');
-    });
-
-    // Hide all pages
-    document.querySelectorAll('.page-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
-    // Activate clicked menu item
-    const activeMenuItem = document.querySelector(`[data-page="${page}"]`);
-    if (activeMenuItem) {
-        activeMenuItem.classList.add('active');
-    }
-
-    // Show target page
-    const targetPage = document.getElementById(page);
-    if (targetPage) {
-        targetPage.classList.add('active');
-    }
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Close mobile menu if open
-    closeMobileMenu();
-};
-
-/**
- * Mobile Menu Toggle
- */
-function initMobileMenu() {
-    const mobileToggle = document.getElementById('mobileMenuToggle');
-    const sidebar = document.querySelector('.sidebar-pro');
-
-    if (!mobileToggle || !sidebar) return;
-
-    mobileToggle.addEventListener('click', function () {
-        sidebar.classList.toggle('open');
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function (e) {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-}
-
-/**
- * Close Mobile Menu
- */
-function closeMobileMenu() {
-    const sidebar = document.querySelector('.sidebar-pro');
-    if (sidebar && window.innerWidth <= 768) {
-        sidebar.classList.remove('open');
-    }
-}
-
-/**
- * Dashboard Animations
- */
-function initDashboardAnimations() {
-    // Animate stat cards on load
-    const statCards = document.querySelectorAll('.stat-card-pro');
-    statCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-
-        setTimeout(() => {
-            card.style.transition = 'all 0.4s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
-
-    // Add hover effect to action cards
-    const actionCards = document.querySelectorAll('.action-card-pro');
-    actionCards.forEach(card => {
-        card.addEventListener('mouseenter', function () {
-            this.style.transform = 'translateY(-4px) scale(1.02)';
-        });
-
-        card.addEventListener('mouseleave', function () {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-}
-
-/**
- * Show Notification (reuse existing function)
- */
-if (typeof showNotification === 'undefined') {
-    window.showNotification = function (message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast-notification toast-${type}`;
-        toast.textContent = message;
-
-        const colors = {
-            success: '#10b981',
-            warning: '#f59e0b',
-            danger: '#ef4444',
-            info: '#3b82f6'
-        };
-
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: ${colors[type] || colors.info};
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            z-index: 10000;
-            animation: slideInRight 0.3s ease;
-            max-width: 320px;
-        `;
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            toast.style.transition = 'all 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    };
-}
-
-// Add slideInRight animation if not exists
-if (!document.getElementById('toast-animation-styles')) {
-    const style = document.createElement('style');
-    style.id = 'toast-animation-styles';
-    style.textContent = `
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 }

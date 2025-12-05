@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
+            $table->string('brand');
+            $table->string('model');
+            $table->enum('type', ['car', 'suv', 'van', 'motorcycle', 'scooter']);
+            $table->integer('year');
+            $table->string('registration_number')->unique();
+            $table->enum('transmission', ['manual', 'automatic']);
+            $table->enum('fuel_type', ['gasoline', 'diesel', 'electric', 'hybrid']);
+            $table->integer('seats');
+            $table->decimal('price_per_day', 8, 2);
+            $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
+            $table->enum('status', ['available', 'rented', 'maintenance'])->default('available');
             $table->timestamps();
         });
     }

@@ -18,16 +18,41 @@
     
     @vite(['resources/css/style.css', 'resources/js/script.js'])
 </head>
-<body class="@if(Request::is('login') || Request::is('register') || Request::is('password/*') || Request::is('email/verify')) auth-page @endif">
+@php
+    $isAuthPage = request()->routeIs(
+        'login',
+        'register',
+        'password.*',
+        'verification.*',
+        'email.*'
+    );
+@endphp
+<body class="{{ $isAuthPage ? 'auth-page' : '' }}">
     <div id="app">
         <!-- Navigation -->
         <nav class="navbar">
             <div class="navbar-container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    Machina
+                <a class="navbar-brand" href="{{ url('/') }}" aria-label="Accueil">
+                    <img src="{{ asset('images/logo-dark.png') }}" alt="Logo" class="logo-img" width="128" height="32">
                 </a>
                 
                 <ul class="navbar-nav">
+                    @auth
+                        <li class="nav-item">
+                            <a class="nav-link nav-home-btn" href="{{ route('dashboard') }}" title="{{ __('Accueil') }}">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                                <span>{{ __('Accueil') }}</span>
+                            </a>
+                        </li>
+                    @endauth
+                    <li class="nav-item">
+                        <button type="button" class="nav-link theme-toggle" id="theme-toggle" aria-label="Basculer le thème" onclick="window.toggleTheme && window.toggleTheme();">
+                            <span class="theme-icon" aria-hidden="true">🌙</span>
+                        </button>
+                    </li>
                     <!-- Language Switcher -->
                     <li class="nav-item lang-switcher">
                         <button type="button" class="nav-link lang-toggle" id="lang-toggle-btn">
@@ -58,16 +83,13 @@
                         @endif
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">
-                                {{ Auth::user()->first_name }}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                {{ __('Déconnexion') }}
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            <button type="button" class="nav-link logout-nav" aria-label="Se déconnecter" title="Se déconnecter">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                                </svg>
+                            </button>
+
+                            <form id="logout-form-nav" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
                         </li>
