@@ -12,16 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // -----------------------------------------------------------------
-        // C'EST LA LIGNE QUE VOUS DEVEZ AJOUTER
-        // -----------------------------------------------------------------
-        // Cela dit à Laravel d'utiliser notre "gardien" de langue
-        // pour toutes les routes "web".
+        // Middleware global pour toutes les routes web
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
-        // -----------------------------------------------------------------
 
+        // Alias de middleware pour vérifier les rôles
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

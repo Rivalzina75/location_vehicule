@@ -93,7 +93,67 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // ========== PROFIL ==========
 
+        // Voir le profil
+        Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
+        // Éditer le profil
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
         // Mettre à jour le profil
         Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+        // Mettre à jour le mot de passe
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+        // Supprimer le compte
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| ROUTES ADMIN (Auth + Verified + Role:Admin)
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\VehicleController;
+
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // ========== DASHBOARD ADMIN ==========
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    // ========== GESTION VÉHICULES ==========
+    Route::resource('vehicles', VehicleController::class);
+
+    // Changer le statut d'un véhicule
+    Route::patch('vehicles/{id}/status', [VehicleController::class, 'updateStatus'])->name('vehicles.status');
+
+    // ========== GESTION RÉSERVATIONS ==========
+
+    // Liste toutes les réservations (admin)
+    Route::get('reservations', [ReservationController::class, 'adminIndex'])->name('reservations.index');
+
+    // Confirmer une réservation
+    Route::patch('reservations/{id}/confirm', [ReservationController::class, 'confirm'])->name('reservations.confirm');
+
+    // Démarrer une location
+    Route::patch('reservations/{id}/start', [ReservationController::class, 'start'])->name('reservations.start');
+
+    // Terminer une location
+    Route::patch('reservations/{id}/complete', [ReservationController::class, 'complete'])->name('reservations.complete');
+
+    // ========== GESTION DOCUMENTS ==========
+
+    // TODO: Ajouter routes pour valider/rejeter documents
+    // Route::patch('documents/{id}/approve', [DocumentController::class, 'approve'])->name('documents.approve');
+    // Route::patch('documents/{id}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
+
+    // ========== GESTION UTILISATEURS ==========
+
+    // TODO: Ajouter routes pour gérer les utilisateurs
+    // Route::get('users', [UserController::class, 'index'])->name('users.index');
+    // Route::get('users/{id}', [UserController::class, 'show'])->name('users.show');
 });

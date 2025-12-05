@@ -466,9 +466,9 @@ function initPageTransitions() {
             // Play exit animation before navigation
             currentPage.classList.remove('slide-in-left', 'slide-in-right');
             if (targetIndex > previousIndex) {
-                currentPage.classList.add('slide-out-left');
-            } else if (targetIndex < previousIndex) {
                 currentPage.classList.add('slide-out-right');
+            } else if (targetIndex < previousIndex) {
+                currentPage.classList.add('slide-out-left');
             }
 
             setTimeout(() => {

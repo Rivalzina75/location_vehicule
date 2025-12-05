@@ -13,12 +13,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Créer le compte admin par défaut
+        $this->call([
+            AdminSeeder::class,
+        ]);
 
+        // 2. Créer un utilisateur de test (client)
         User::factory()->create([
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'test@example.com',
+            'role' => 'client',
         ]);
+
+        // 3. Créer 10 utilisateurs clients aléatoires pour les tests
+        User::factory(10)->create();
+
+        $this->command->info('✅ Database seeded successfully!');
+        $this->command->info('📧 Admin: admin@machina.fr / Admin@Machina2025!');
+        $this->command->info('📧 Client test: test@example.com / password');
     }
 }

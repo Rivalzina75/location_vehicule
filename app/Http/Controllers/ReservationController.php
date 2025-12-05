@@ -13,10 +13,16 @@ class ReservationController extends Controller
 {
     /**
      * Liste toutes les réservations de l'utilisateur
+     * Ou toutes les réservations si admin
      */
     public function index()
     {
         $user = Auth::user();
+
+        // Si admin, voir toutes les réservations
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.reservations.index');
+        }
 
         $reservations = Reservation::with(['vehicle'])
             ->where('user_id', $user->id)
@@ -40,12 +46,67 @@ class ReservationController extends Controller
         $reservation = Reservation::with(['vehicle', 'user', 'inspections'])
             ->findOrFail($id);
 
-        // Vérifier que l'utilisateur a accès à cette réservation
-        if ($reservation->user_id !== Auth::id()) {
+        // Vérifier que l'utilisateur a accès à cette réservation (ou est admin)
+        if ($reservation->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
             abort(403, 'Accès non autorisé');
         }
 
         return view('reservations.show', compact('reservation'));
+    }
+
+    /**
+     * ADMIN - Liste toutes les réservations
+     */
+    public function adminIndex(Request $request)
+    {
+        // Vérifier que l'utilisateur est admin
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $query = Reservation::with(['vehicle', 'user']);
+
+        // Filtrer par statut
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filtrer par date
+        if ($request->filled('date_from')) {
+            $query->where('start_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('end_date', '<=', $request->date_to);
+        }
+
+        // Recherche par client ou véhicule
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('vehicle', function ($vehicleQuery) use ($search) {
+                    $vehicleQuery->where('brand', 'like', "%{$search}%")
+                        ->orWhere('model', 'like', "%{$search}%")
+                        ->orWhere('license_plate', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $reservations = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Statistiques
+        $stats = [
+            'pending' => Reservation::where('status', 'pending')->count(),
+            'confirmed' => Reservation::where('status', 'confirmed')->count(),
+            'active' => Reservation::where('status', 'active')->count(),
+            'late' => Reservation::where('status', 'late')->count(),
+            'total_revenue' => Reservation::whereIn('status', ['completed'])->sum('total_price'),
+        ];
+
+        return view('admin.reservations.index', compact('reservations', 'stats'));
     }
 
     /**
@@ -256,6 +317,11 @@ class ReservationController extends Controller
      */
     public function confirm($id)
     {
+        // Vérifier que l'utilisateur est admin
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Accès non autorisé');
+        }
+
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'pending') {
@@ -265,6 +331,7 @@ class ReservationController extends Controller
         $reservation->update([
             'status' => 'confirmed',
             'payment_status' => 'completed',
+            'admin_notes' => 'Confirmée par ' . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i'),
         ]);
 
         return back()->with('success', 'Réservation confirmée.');
@@ -275,6 +342,11 @@ class ReservationController extends Controller
      */
     public function start($id, Request $request)
     {
+        // Vérifier que l'utilisateur est admin
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Accès non autorisé');
+        }
+
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'confirmed') {
@@ -293,6 +365,7 @@ class ReservationController extends Controller
         $reservation->update([
             'status' => 'active',
             'mileage_start' => $validated['mileage_start'],
+            'admin_notes' => ($reservation->admin_notes ?? '') . "\nLocation démarrée par " . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i'),
         ]);
 
         return back()->with('success', 'Location démarrée.');
@@ -303,6 +376,11 @@ class ReservationController extends Controller
      */
     public function complete($id, Request $request)
     {
+        // Vérifier que l'utilisateur est admin
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Accès non autorisé');
+        }
+
         $reservation = Reservation::findOrFail($id);
 
         if (!in_array($reservation->status, ['active', 'late'])) {
@@ -317,6 +395,7 @@ class ReservationController extends Controller
         $validated = $request->validate([
             'mileage_end' => 'required|integer|min:' . ($reservation->mileage_start ?? 0),
             'damage_cost' => 'nullable|numeric|min:0',
+            'admin_notes_final' => 'nullable|string|max:1000',
         ]);
 
         $reservation->mileage_end = $validated['mileage_end'];
@@ -326,6 +405,13 @@ class ReservationController extends Controller
         if ($reservation->is_late) {
             $reservation->late_penalty = $reservation->calculateLatePenalty();
         }
+
+        // Ajouter les notes admin
+        $adminNotes = ($reservation->admin_notes ?? '') . "\nLocation terminée par " . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i');
+        if ($validated['admin_notes_final']) {
+            $adminNotes .= "\n" . $validated['admin_notes_final'];
+        }
+        $reservation->admin_notes = $adminNotes;
 
         // Finaliser
         $reservation->complete();

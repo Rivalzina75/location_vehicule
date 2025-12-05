@@ -61,12 +61,13 @@ class RegisterController extends Controller
             'first_name' => trim($data['first_name']),
             'last_name' => trim($data['last_name']),
             'email' => strtolower(trim($data['email'])),
+            'password' => Hash::make($data['password']),
             'date_of_birth' => $data['date_of_birth'],
             'phone_number' => $data['phone_number'],
             'address_line1' => trim($data['address_line1']),
             'postal_code' => $data['postal_code'],
             'city' => trim($data['city']),
-            'password' => Hash::make($data['password']),
+            'role' => 'client', // Par défaut, tous les nouveaux utilisateurs sont des clients
         ]);
     }
 }
