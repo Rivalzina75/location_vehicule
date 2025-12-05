@@ -39,6 +39,12 @@ use App\Notifications\CustomResetPasswordNotification;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method bool update(array $attributes = [], array $options = [])
+ * @method bool delete()
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany reservations()
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany documents()
+ * @method bool isAdmin()
+ * @method bool isClient()
  */
 class User extends Authenticatable implements MustVerifyEmail
 {

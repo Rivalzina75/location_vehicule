@@ -1,312 +1,657 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
-<div class="dashboard-wrapper-pro" style="padding-top: 70px;">
-    <!-- Sidebar Premium -->
-    <aside class="sidebar-pro">
-        <div class="sidebar-brand">
-            <div class="logo-container">
-                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1M12 15l-3 3m0 0l-3-3m3 3V9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <circle cx="8.5" cy="19" r="1.5"/>
-                    <circle cx="15.5" cy="19" r="1.5"/>
-                </svg>
-                <div class="logo-text">
-                    <span class="brand-name">Machina</span>
-                    <span class="brand-tagline">Location Premium</span>
+<div class="page-transition" data-page-index="2">
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ __('Catalogue de Véhicules') }}</h1>
+        <p class="page-subtitle">{{ __('Trouvez le véhicule parfait pour votre location') }}</p>
+    </div>
+</div>
+
+<div class="catalogue-wrapper">
+    <!-- BARRE LATÉRALE - FILTRES -->
+    <aside class="filters-sidebar">
+            <h2>{{ __('Filtrer') }}</h2>
+
+            <form method="GET" action="{{ route('dashboard.catalogue') }}" id="filterForm" class="filters-form">
+                <!-- Recherche par prix -->
+                <div class="filter-group">
+                    <label for="max_price">{{ __('Prix max (€/jour)') }}</label>
+                    <input 
+                        type="range" 
+                        id="max_price" 
+                        name="max_price" 
+                        min="0" 
+                        max="500" 
+                        value="{{ request('max_price', 500) }}"
+                        class="range-slider"
+                        oninput="updateMaxPrice(this)"
+                    >
+                    <div class="price-display">
+                        <span id="priceValue">{{ request('max_price', 500) }}€</span>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <nav class="sidebar-menu">
-            <a href="{{ route('dashboard') }}" class="menu-item" data-page-index="0">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M9 22V12h6v10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Accueil') }}</span>
-            </a>
-            
-            <a href="{{ route('dashboard.catalogue') }}" class="menu-item active" data-page-index="1">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M3 9h18M9 21V9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Catalogue') }}</span>
-            </a>
-            
-            <a href="{{ route('dashboard.reservations') }}" class="menu-item" data-page-index="2">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Mes Réservations') }}</span>
-                <span class="badge">3</span>
-            </a>
-            
-            <a href="{{ route('dashboard.documents') }}" class="menu-item" data-page-index="3">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Documents') }}</span>
-            </a>
-            
-            <a href="{{ route('dashboard.inspection') }}" class="menu-item" data-page-index="4">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Inspection') }}</span>
-            </a>
-            
-            <a href="#" class="menu-item" data-page-index="5">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-                <span>{{ __('Profil') }}</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar">{{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}</div>
-                <div class="user-info">
-                    <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                    <div class="user-email">{{ Auth::user()->email }}</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content-pro page-transition" data-page-index="1">
-        <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 40px 20px;">
-        
-        <!-- Header -->
-        <div style="margin-bottom: 40px;">
-            <h1 style="font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">
-                🚗 {{ __('Catalogue de véhicules') }}
-            </h1>
-            <p style="font-size: 16px; color: var(--text-light);">
-                Découvrez notre flotte de {{ $vehicles->total() }} véhicules disponibles
-            </p>
-        </div>
-
-        <!-- Filtres -->
-        <div style="background: var(--bg-white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
-            <form method="GET" action="{{ route('dashboard.catalogue') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
-                
-                <!-- Type de véhicule -->
-                <div>
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-                        Type de véhicule
-                    </label>
-                    <select name="type" class="form-control" style="width: 100%; padding: 10px 12px; border: 2px solid var(--border); background: var(--bg-white); color: var(--text-primary); border-radius: 8px; font-size: 14px;">
-                        <option value="">Tous les types</option>
-                        @foreach($types as $key => $label)
-                            <option value="{{ $key }}" {{ request('type') == $key ? 'selected' : '' }}>
-                                {{ $label }}
+                <!-- Filtrer par type de véhicule -->
+                <div class="filter-group">
+                    <label for="type">{{ __('Type de véhicule') }}</label>
+                    <select name="type" id="type" class="form-control">
+                        <option value="">{{ __('Tous les types') }}</option>
+                        @foreach($types as $typeKey => $typeName)
+                            <option value="{{ $typeKey }}" @selected(request('type') === $typeKey)>
+                                {{ $typeName }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Transmission -->
-                <div>
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-                        Transmission
-                    </label>
-                    <select name="transmission" class="form-control">
-                        <option value="">Toutes</option>
-                        <option value="automatique" {{ request('transmission') == 'automatique' ? 'selected' : '' }}>Automatique</option>
-                        <option value="manuelle" {{ request('transmission') == 'manuelle' ? 'selected' : '' }}>Manuelle</option>
+                <!-- Filtrer par transmission -->
+                <div class="filter-group">
+                    <label for="transmission">{{ __('Transmission') }}</label>
+                    <select name="transmission" id="transmission" class="form-control">
+                        <option value="">{{ __('Toutes les transmissions') }}</option>
+                        <option value="manual" @selected(request('transmission') === 'manual')>{{ __('Manuelle') }}</option>
+                        <option value="automatic" @selected(request('transmission') === 'automatic')>{{ __('Automatique') }}</option>
                     </select>
                 </div>
 
-                <!-- Prix maximum -->
-                <div>
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-                        Prix max/jour
-                    </label>
-                    <input type="number" name="max_price" value="{{ request('max_price') }}" 
-                           placeholder="Ex: 100" class="form-control" step="10">
+                <!-- Filtrer par carburant -->
+                <div class="filter-group">
+                    <label for="fuel_type">{{ __('Carburant') }}</label>
+                    <select name="fuel_type" id="fuel_type" class="form-control">
+                        <option value="">{{ __('Tous les carburants') }}</option>
+                        <option value="gasoline" @selected(request('fuel_type') === 'gasoline')>{{ __('Essence') }}</option>
+                        <option value="diesel" @selected(request('fuel_type') === 'diesel')>{{ __('Diesel') }}</option>
+                        <option value="electric" @selected(request('fuel_type') === 'electric')>{{ __('Électrique') }}</option>
+                        <option value="hybrid" @selected(request('fuel_type') === 'hybrid')>{{ __('Hybride') }}</option>
+                    </select>
                 </div>
 
-                <!-- Tri -->
-                <div>
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-                        Trier par
-                    </label>
-                    <select name="sort" class="form-control">
-                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
-                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix décroissant</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nom A-Z</option>
+                <!-- Trier par -->
+                <div class="filter-group">
+                    <label for="sort">{{ __('Trier par') }}</label>
+                    <select name="sort" id="sort" class="form-control">
+                        <option value="price_asc" @selected(request('sort') === 'price_asc')>{{ __('Prix croissant') }}</option>
+                        <option value="price_desc" @selected(request('sort') === 'price_desc')>{{ __('Prix décroissant') }}</option>
+                        <option value="name" @selected(request('sort') === 'name')>{{ __('Nom (A-Z)') }}</option>
+                        <option value="year" @selected(request('sort') === 'year')>{{ __('Année (Plus récent)') }}</option>
                     </select>
                 </div>
 
                 <!-- Boutons -->
-                <div style="display: flex; gap: 12px;">
-                    <button type="submit" class="btn-primary" style="flex: 1; padding: 12px 20px;">
-                        🔍 Rechercher
+                <div class="filter-buttons">
+                    <button type="submit" class="btn-primary btn-full">
+                        {{ __('Appliquer les filtres') }}
                     </button>
-                    <a href="{{ route('dashboard.catalogue') }}" class="btn-secondary" style="flex: 1; padding: 12px 20px; text-align: center; text-decoration: none;">
-                        ↻ Réinitialiser
+                    <a href="{{ route('dashboard.catalogue') }}" class="btn-secondary btn-full">
+                        {{ __('Réinitialiser') }}
                     </a>
                 </div>
-
             </form>
-        </div>
+        </aside>
 
-        <!-- Grille de véhicules -->
-        @if($vehicles->count() > 0)
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-bottom: 40px;">
-                @foreach($vehicles as $vehicle)
-                    <div class="vehicle-card" style="background: var(--bg-white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.3s ease; cursor: pointer;" 
-                         onclick="window.location='{{ route('catalogue.show', $vehicle->id) }}'">
-                        
-                        <!-- Image -->
-                        <div style="height: 200px; background: linear-gradient(135deg, var(--bg-light), var(--border)); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative;">
-                            @if($vehicle->main_image)
-                                <img src="{{ $vehicle->image_url }}" alt="{{ $vehicle->full_name }}" 
-                                     style="width: 100%; height: 100%; object-fit: cover;">
-                            @else
-                                <!-- Emoji par type -->
-                                @switch($vehicle->type)
-                                    @case('berline') 🚗 @break
-                                    @case('suv') 🚙 @break
-                                    @case('moto') 🏍️ @break
-                                    @case('scooter') 🛵 @break
-                                    @case('camionnette') 🚐 @break
-                                    @case('camion') 🚚 @break
-                                    @default 🚗
-                                @endswitch
-                            @endif
-                            
-                            <!-- Badge statut -->
-                            <div style="position: absolute; top: 12px; right: 12px; background: var(--success); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">
-                                ✓ Disponible
-                            </div>
-                        </div>
-
-                        <!-- Infos -->
-                        <div style="padding: 20px;">
-                            <!-- Titre -->
-                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
-                                {{ $vehicle->full_name }}
-                            </h3>
-
-                            <!-- Type -->
-                            <div style="display: inline-block; background: var(--bg-light); color: var(--text-secondary); padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 16px;">
-                                {{ $types[$vehicle->type] ?? $vehicle->type }}
-                            </div>
-
-                            <!-- Caractéristiques -->
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-                                @if($vehicle->seats)
-                                <div style="text-align: center;">
-                                    <div style="font-size: 20px;">👥</div>
-                                    <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">{{ $vehicle->seats }} places</div>
-                                </div>
-                                @endif
-
-                                <div style="text-align: center;">
-                                    <div style="font-size: 20px;">⚙️</div>
-                                    <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">{{ ucfirst($vehicle->transmission) }}</div>
-                                </div>
-
-                                <div style="text-align: center;">
-                                    <div style="font-size: 20px;">⛽</div>
-                                    <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">{{ ucfirst($vehicle->fuel_type) }}</div>
-                                </div>
-                            </div>
-
-                            <!-- Prix -->
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 28px; font-weight: 800; color: #e94560;">
-                                        {{ number_format($vehicle->price_per_day, 0) }}€
-                                    </div>
-                                    <div style="font-size: 12px; color: #94a3b8;">par jour</div>
-                                </div>
-                                
-                                <button class="btn-primary" style="padding: 10px 20px; font-size: 14px;" 
-                                        onclick="event.stopPropagation(); window.location='{{ route('catalogue.show', $vehicle->id) }}'">
-                                    Réserver →
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Pagination -->
-            <div style="display: flex; justify-content: center; margin-top: 40px;">
-                {{ $vehicles->links() }}
-            </div>
-
-        @else
-            <!-- Aucun résultat -->
-            <div style="text-align: center; padding: 80px 20px;">
-                <div style="font-size: 80px; margin-bottom: 20px;">🔍</div>
-                <h2 style="font-size: 24px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px;">
-                    Aucun véhicule trouvé
-                </h2>
-                <p style="color: #64748b; margin-bottom: 24px;">
-                    Essayez de modifier vos filtres de recherche
+        <!-- GRILLE DE VÉHICULES -->
+        <main class="vehicles-grid-wrapper">
+            <div class="vehicles-info">
+                <p class="vehicles-count">
+                    {{ __('Résultats') }}: <strong>{{ $vehicles->total() }}</strong> {{ __('véhicule(s) trouvé(s)') }}
                 </p>
-                <a href="{{ route('dashboard.catalogue') }}" class="btn-primary" style="display: inline-block; padding: 12px 24px; text-decoration: none;">
-                    Voir tous les véhicules
-                </a>
             </div>
-        @endif
 
+            @if($vehicles->count() > 0)
+                <div class="vehicles-grid">
+                    @foreach($vehicles as $vehicle)
+                        <div class="vehicle-card" data-vehicle-id="{{ $vehicle->id }}">
+                            <!-- Image du véhicule -->
+                            <div class="vehicle-image">
+                                @if($vehicle->images && count($vehicle->images) > 0)
+                                    <img 
+                                        src="{{ asset('storage/' . $vehicle->images[0]) }}" 
+                                        alt="{{ $vehicle->brand }} {{ $vehicle->model }}"
+                                        class="vehicle-img"
+                                    >
+                                @else
+                                    <div class="vehicle-img-placeholder">
+                                        <span>{{ __('Pas d\'image') }}</span>
+                                    </div>
+                                @endif
+                                
+                                @if($vehicle->fuel_type)
+                                    <div class="vehicle-badge fuel-{{ $vehicle->fuel_type }}">
+                                        {{ ucfirst($vehicle->fuel_type) }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Informations du véhicule -->
+                            <div class="vehicle-info">
+                                <h3 class="vehicle-title">
+                                    {{ $vehicle->brand }} {{ $vehicle->model }}
+                                </h3>
+                                
+                                <div class="vehicle-specs">
+                                    <span class="spec">📅 {{ $vehicle->year }}</span>
+                                    <span class="spec">👥 {{ $vehicle->seats }} places</span>
+                                    <span class="spec">🚪 {{ $vehicle->doors }} portes</span>
+                                    <span class="spec">⚙️ {{ $vehicle->transmission === 'manual' ? __('Manuelle') : __('Automatique') }}</span>
+                                </div>
+
+                                <!-- Caractéristiques optionnelles -->
+                                @if($vehicle->child_seat_available || $vehicle->gps_available || $vehicle->bluetooth || $vehicle->air_conditioning)
+                                    <div class="vehicle-features">
+                                        @if($vehicle->child_seat_available)
+                                            <span class="feature-badge">🪑 {{ __('Siège enfant') }}</span>
+                                        @endif
+                                        @if($vehicle->gps_available)
+                                            <span class="feature-badge">📍 {{ __('GPS') }}</span>
+                                        @endif
+                                        @if($vehicle->bluetooth)
+                                            <span class="feature-badge">🎵 {{ __('Bluetooth') }}</span>
+                                        @endif
+                                        @if($vehicle->air_conditioning)
+                                            <span class="feature-badge">❄️ {{ __('Climatisation') }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Tarification -->
+                            <div class="vehicle-pricing">
+                                <div class="price-item">
+                                    <span class="price-label">Jour</span>
+                                    <span class="price-value">{{ number_format($vehicle->price_per_day, 2, ',', ' ') }}€</span>
+                                </div>
+                                @if($vehicle->price_per_week)
+                                    <div class="price-item">
+                                        <span class="price-label">Semaine</span>
+                                        <span class="price-value">{{ number_format($vehicle->price_per_week, 2, ',', ' ') }}€</span>
+                                    </div>
+                                @endif
+                                @if($vehicle->price_per_month)
+                                    <div class="price-item">
+                                        <span class="price-label">Mois</span>
+                                        <span class="price-value">{{ number_format($vehicle->price_per_month, 2, ',', ' ') }}€</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="vehicle-actions">
+                                <a 
+                                    href="{{ route('dashboard.catalogue.show', $vehicle->id) }}" 
+                                    class="btn-primary btn-full"
+                                >
+                                    {{ __('Voir les détails') }}
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- PAGINATION -->
+                @if($vehicles->hasPages())
+                    <div class="pagination-wrapper">
+                        {{ $vehicles->appends(request()->query())->links() }}
+                    </div>
+                @endif
+            @else
+                <!-- Aucun résultat -->
+                <div class="no-results">
+                    <div class="no-results-content">
+                        <h3>{{ __('Aucun véhicule trouvé') }}</h3>
+                        <p>{{ __('Veuillez essayer avec d\'autres critères de filtre.') }}</p>
+                        <a href="{{ route('dashboard.catalogue') }}" class="btn-primary">
+                            {{ __('Réinitialiser les filtres') }}
+                        </a>
+                    </div>
+                </div>
+            @endif
+        </main>
     </div>
 </div>
 
+<script>
+function updateMaxPrice(input) {
+    const value = parseFloat(input.value || 0);
+    const min = parseFloat(input.min || 0);
+    const max = parseFloat(input.max || 1);
+    const percent = ((value - min) * 100) / Math.max(max - min, 1);
+
+    const priceLabel = document.getElementById('priceValue');
+    if (priceLabel) {
+        priceLabel.textContent = value + '€';
+    }
+
+    input.style.setProperty('--range-progress', percent + '%');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const slider = document.getElementById('max_price');
+    if (slider) {
+        updateMaxPrice(slider);
+    }
+});
+</script>
+
 <style>
-.vehicle-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
-
-.pagination {
-    display: flex;
-    gap: 8px;
-    list-style: none;
+.catalogue-wrapper {
     padding: 0;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
-.pagination .page-item {
-    margin: 0;
+.filters-sidebar {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
 }
 
-.pagination .page-link {
-    padding: 10px 16px;
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    color: #1a1a2e;
-    text-decoration: none;
+.filters-sidebar h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.filter-group select,
+.filter-group input:not([type="range"]) {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.filter-group select option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+}
+
+.range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    display: block;
+}
+
+.range-slider:focus {
+    outline: none;
+}
+
+.range-slider::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        var(--accent) 0,
+        var(--accent) var(--range-progress, 100%),
+        #cbd5e1 var(--range-progress, 100%),
+        #cbd5e1 100%
+    );
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.range-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        var(--accent) 0,
+        var(--accent) var(--range-progress, 100%),
+        #cbd5e1 var(--range-progress, 100%),
+        #cbd5e1 100%
+    );
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top: -5px; /* center thumb on 6px track */
+}
+
+.range-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top: -5px; /* center thumb on 6px track */
+}
+
+.price-display {
+    text-align: center;
+    margin-top: 0.5rem;
     font-weight: 600;
-    transition: all 0.2s ease;
+    color: var(--accent);
 }
 
-.pagination .page-link:hover {
-    background: #f8fafc;
-    border-color: #e94560;
-    color: #e94560;
+.filter-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2rem;
 }
 
-.pagination .active .page-link {
-    background: #e94560;
-    border-color: #e94560;
+.btn-full {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary.btn-full {
+    background: var(--accent);
     color: white;
 }
+
+.btn-primary.btn-full:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.btn-secondary.btn-full {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary.btn-full:hover {
+    background: var(--bg-secondary);
+}
+
+.vehicles-grid-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.vehicles-info {
+    margin-bottom: 1.5rem;
+}
+
+.vehicles-count {
+    color: var(--text-secondary);
+}
+
+.vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.vehicle-card {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--accent);
+}
+
+.vehicle-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+}
+
+.vehicle-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vehicle-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.vehicle-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--accent);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.vehicle-info {
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+.vehicle-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.vehicle-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.spec {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.vehicle-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.feature-badge {
+    font-size: 0.8rem;
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+.vehicle-pricing {
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.price-item {
+    text-align: center;
+}
+
+.price-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.price-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.vehicle-actions {
+    padding: 1rem;
+    padding-top: 0;
+}
+
+.no-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.no-results-content {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.no-results-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.pagination-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 1024px) {
+    .catalogue-wrapper {
+        grid-template-columns: 1fr;
+    }
+    .filters-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .catalogue-container {
+        padding: 1rem;
+    }
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+    .vehicles-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .vehicles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Pagination Laravel */
+.pagination-wrapper nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-wrapper .flex {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pagination-wrapper a,
+.pagination-wrapper span {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+    background: var(--bg-secondary);
+}
+
+.pagination-wrapper a:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.pagination-wrapper .relative {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pagination-wrapper [aria-current="page"] {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    font-weight: 600;
+}
+
+.pagination-wrapper [aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 </style>
-        </div>
-    </main>
 </div>
 @endsection

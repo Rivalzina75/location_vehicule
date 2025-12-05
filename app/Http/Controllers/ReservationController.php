@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+/**
+ * @mixin \App\Models\Reservation
+ * @mixin \Illuminate\Foundation\Auth\User
+ */
 class ReservationController extends Controller
 {
     /**

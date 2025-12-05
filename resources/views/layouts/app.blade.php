@@ -6,6 +6,24 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Machina - Votre solution de location de véhicules simple et rapide">
     <meta name="theme-color" content="#1a1a2e">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- Appliquer le thème IMMÉDIATEMENT pour éviter le flash -->
+    <script>
+        (function() {
+            const THEME_KEY = 'theme';
+            let theme = 'light';
+            try {
+                const stored = localStorage.getItem(THEME_KEY);
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                theme = stored || (prefersDark ? 'dark' : 'light');
+            } catch (e) {}
+            
+            const className = theme === 'dark' ? 'theme-dark' : 'theme-light';
+            document.documentElement.classList.add(className);
+            document.documentElement.style.background = theme === 'dark' ? '#0e0b1a' : '#f8fafc';
+        })();
+    </script>
     
     <title>{{ config('app.name', 'Machina') }} - Location de Véhicules</title>
     
@@ -32,22 +50,11 @@
         <!-- Navigation -->
         <nav class="navbar">
             <div class="navbar-container">
-                <a class="navbar-brand" href="{{ url('/') }}" aria-label="Accueil">
+                <a class="navbar-brand" href="{{ url('/') }}" aria-label="Accueil" data-page-index="0">
                     <img src="{{ asset('images/logo-dark.png') }}" alt="Logo" class="logo-img" width="128" height="32">
                 </a>
                 
                 <ul class="navbar-nav">
-                    @auth
-                        <li class="nav-item">
-                            <a class="nav-link nav-home-btn" href="{{ route('dashboard') }}" title="{{ __('Accueil') }}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                    <polyline points="9 22 9 12 15 12 15 22"/>
-                                </svg>
-                                <span>{{ __('Accueil') }}</span>
-                            </a>
-                        </li>
-                    @endauth
                     <li class="nav-item">
                         <button type="button" class="nav-link theme-toggle" id="theme-toggle" aria-label="Basculer le thème" onclick="window.toggleTheme && window.toggleTheme();">
                             <span class="theme-icon" aria-hidden="true">🌙</span>

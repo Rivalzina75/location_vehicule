@@ -429,7 +429,8 @@ function clearFieldError(field) {
 
 // Page transitions with hierarchy
 function initPageTransitions() {
-    const menuItems = document.querySelectorAll('.menu-item[data-page-index]');
+    // Cible tous les liens porteurs d'un data-page-index (navbar haut + sidebar)
+    const menuItems = Array.from(document.querySelectorAll('[data-page-index]')).filter(el => el.tagName === 'A');
     const currentPage = document.querySelector('.page-transition[data-page-index]');
 
     if (!currentPage) return;
@@ -446,6 +447,15 @@ function initPageTransitions() {
 
             // Allow new tab / modifier clicks
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || this.target === '_blank') {
+                return;
+            }
+
+            // Ne rien faire si on clique sur la page actuelle
+            const currentPath = window.location.pathname.replace(/\/$/, '');
+            const targetPath = new URL(href, window.location.origin).pathname.replace(/\/$/, '');
+
+            if (currentPath === targetPath) {
+                e.preventDefault();
                 return;
             }
 
@@ -471,9 +481,10 @@ function initPageTransitions() {
                 currentPage.classList.add('slide-out-left');
             }
 
+            // Laisse l'animation de sortie se jouer avant de naviguer pour éviter l'effet de rafraîchissement brusque
             setTimeout(() => {
                 window.location.href = href;
-            }, 280);
+            }, 380);
         });
     });
 
@@ -483,6 +494,9 @@ function initPageTransitions() {
         currentPage.classList.add('slide-in-left');
     } else if (slideDirection === 'backward') {
         currentPage.classList.add('slide-in-right');
+    } else {
+        // Aucune direction => pas d'animation à l'entrée
+        currentPage.classList.remove('slide-in-left', 'slide-in-right');
     }
 
     // Clear direction after animation

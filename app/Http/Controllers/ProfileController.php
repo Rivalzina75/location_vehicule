@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Rules\PasswordRobustness;
 
+/**
+ * @mixin \App\Models\User
+ */
 class ProfileController extends Controller
 {
     /**
@@ -62,7 +65,7 @@ class ProfileController extends Controller
         ]);
 
         try {
-            $user->update([
+            $user->fill([
                 'first_name' => trim($validated['first_name']),
                 'last_name' => trim($validated['last_name']),
                 'email' => strtolower(trim($validated['email'])),
@@ -71,7 +74,7 @@ class ProfileController extends Controller
                 'address_line1' => trim($validated['address_line1']),
                 'postal_code' => $validated['postal_code'],
                 'city' => trim($validated['city']),
-            ]);
+            ])->save();
 
             return redirect()->route('profile.show')
                 ->with('success', __('Profil mis à jour avec succès.'));
