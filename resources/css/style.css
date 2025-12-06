@@ -26,7 +26,7 @@
     --bg-dark: #0f0f23;
 
     /* Fonds hero/auth */
-    --hero-bg-image: url('/images/auth-bg.jpg');
+    /* --hero-bg-image: url('/images/auth-bg.jpg'); */ /* Image de fond par défaut, à personnaliser */
     --hero-overlay: linear-gradient(
         135deg,
         rgba(26, 26, 46, 0.92) 0%,
@@ -96,6 +96,8 @@
     --bg-light: #f8fafc;
     --bg-white: #ffffff;
     --bg-dark: #0f0f23;
+    --bg-error: #ffe8e8;
+    --bg-error-light: #fff5f5;
 }
 
 /* Thème sombre inspiré du site, plus doux et contrasté */
@@ -117,6 +119,8 @@
     --bg-light: #0e0b1a;
     --bg-white: #1a1527;
     --bg-dark: #05030d;
+    --bg-error: #4b2129;
+    --bg-error-light: #3a2028;
 
     /* Overlay hero/auth plus sombre en dark */
     --hero-overlay: linear-gradient(
@@ -148,24 +152,25 @@
 }
 
 html {
-    scroll-behavior: smooth;
+    overflow: hidden; /* Empêche le scroll global */
+    height: 100%;
 }
 
 body {
     font-family: var(--font-family);
-    font-size: var(--font-size-base);
-    line-height: 1.6;
     color: var(--text-primary);
     background: var(--bg-light);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    overflow-y: scroll; /* Avoid layout shift when scrollbar appears */
+    height: 100vh; /* Force la hauteur écran */
+    overflow: hidden; /* Coupe tout ce qui dépasse */
+    width: 100%;
 }
 
 #app {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* ===================================
@@ -178,7 +183,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 2000;
     backdrop-filter: blur(10px);
     height: 64px;
     align-items: center;
@@ -192,6 +197,8 @@ body {
     justify-content: space-between;
     align-items: center;
     height: 68px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .navbar-brand {
@@ -448,6 +455,10 @@ body.auth-page main {
 .auth-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: #ffffff;
+
+    body.home-page {
+        overflow-y: hidden;
+    }
     padding: var(--space-xl) var(--space-lg);
     font-size: var(--font-size-2xl);
     font-weight: 700;
@@ -617,7 +628,7 @@ label {
 
 /* Requirements */
 .password-requirements {
-    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+    background: linear-gradient(135deg, var(--bg-error), var(--bg-error-light));
     border: 1px solid #ffcdd2;
     border-left: 3px solid var(--danger);
     border-radius: var(--radius-sm);
@@ -739,7 +750,7 @@ hr {
     justify-content: center;
     gap: 8px;
     padding: 12px 24px;
-    background: linear-gradient(135deg, var(--accent) 0%, #ff6b6b 100%);
+    background: var(--accent-hover);
     color: var(--bg-white);
     border: none;
     border-radius: var(--radius-md);
@@ -923,8 +934,21 @@ hr {
     display: flex;
     min-height: 100vh;
     background: var(--bg-light);
-    /* CRITIQUE : Ajouter padding-top pour la navbar fixe */
     padding-top: 70px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dashboard-wrapper-pro.no-sidebar {
+    padding-left: 0;
+}
+
+.dashboard-wrapper-pro.no-sidebar .sidebar-pro {
+    display: none;
+}
+
+.dashboard-wrapper-pro.no-sidebar .main-content-pro {
+    margin-left: 0;
 }
 
 /* Sidebar Pro */
@@ -1131,13 +1155,19 @@ hr {
 }
 
 /* Main Content Pro */
+/* --- DANS resources/css/style.css --- */
+
 .main-content-pro {
     flex: 1;
-    margin-left: 280px;
-    padding: 32px;
-    overflow-y: auto;
-    min-height: calc(100vh - 60px);
+    margin-left: 280px; /* Espace pour la sidebar */
     background: var(--bg-light);
+    /* --- LE SECRET DU SCROLL --- */
+    height: calc(100vh - 70px); /* Hauteur écran MOINS la hauteur du header (70px) */
+    overflow-y: auto; /* Active le scroll VERTICAL uniquement ici */
+    overflow-x: hidden; /* Empêche le scroll horizontal */
+    padding: 32px; /* Votre padding interne */
+    /* Pour un défilement fluide */
+    scroll-behavior: smooth;
 }
 
 .page-header {
@@ -2886,4 +2916,36 @@ a.btn-primary {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* ===================================
+   CUSTOM SCROLLBAR (Rouge Machina)
+   =================================== */
+
+/* --- 1. Pour Firefox --- */
+html {
+    scrollbar-width: thin;
+    /* Curseur Rouge (Accent) sur Fond Clair */
+    scrollbar-color: #e94560 var(--bg-light);
+}
+
+/* --- 2. Pour Chrome, Edge, Safari --- */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #e94560; /* <--- C'EST ICI : LE ROUGE DU SITE */
+    border-radius: 5px;
+    border: 2px solid var(--bg-light);
+}
+
+/* Au survol, on peut le rendre un peu plus foncé ou laisser pareil */
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-hover); 
 }
