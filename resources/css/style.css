@@ -26,13 +26,12 @@
     --bg-dark: #0f0f23;
 
     /* Fonds hero/auth */
-    /* --hero-bg-image: url('/images/auth-bg.jpg'); */ /* Image de fond par défaut, à personnaliser */
-    --hero-overlay: linear-gradient(
-        135deg,
-        rgba(26, 26, 46, 0.92) 0%,
-        rgba(22, 33, 62, 0.88) 50%,
-        rgba(15, 52, 96, 0.92) 100%
-    );
+    /* --hero-bg-image: url('/images/auth-bg.jpg'); */
+    /* Image de fond par défaut, à personnaliser */
+    --hero-overlay: linear-gradient(135deg,
+            rgba(26, 26, 46, 0.92) 0%,
+            rgba(22, 33, 62, 0.88) 50%,
+            rgba(15, 52, 96, 0.92) 100%);
 
     /* Ombres */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -73,7 +72,9 @@
 }
 
 /* Transition universelle pour le changement de thème */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
 }
 
@@ -98,6 +99,10 @@
     --bg-dark: #0f0f23;
     --bg-error: #ffe8e8;
     --bg-error-light: #fff5f5;
+
+    /* Checkbox */
+    --checkbox-bg: #ffffff;
+    --checkbox-border: #e2e8f0;
 }
 
 /* Thème sombre inspiré du site, plus doux et contrasté */
@@ -105,7 +110,8 @@
     --primary: #0f0b1f;
     --primary-light: #17122c;
     --secondary: #1f1a38;
-    --accent: #7c3aed; /* violet plus sombre pour boutons en sombre */
+    --accent: #7c3aed;
+    /* violet plus sombre pour boutons en sombre */
     --accent-hover: #9f67ff;
     --success: #34d399;
     --warning: #facc15;
@@ -123,23 +129,25 @@
     --bg-error-light: #3a2028;
 
     /* Overlay hero/auth plus sombre en dark */
-    --hero-overlay: linear-gradient(
-        135deg,
-        rgba(10, 8, 21, 0.92) 0%,
-        rgba(15, 11, 31, 0.9) 50%,
-        rgba(12, 9, 25, 0.92) 100%
-    );
+    --hero-overlay: linear-gradient(135deg,
+            rgba(10, 8, 21, 0.92) 0%,
+            rgba(15, 11, 31, 0.9) 50%,
+            rgba(12, 9, 25, 0.92) 100%);
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -1px rgba(0, 0, 0, 0.25);
     --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.45), 0 8px 16px -4px rgba(0, 0, 0, 0.35);
     --shadow-xl: 0 20px 35px -8px rgba(0, 0, 0, 0.55), 0 12px 20px -8px rgba(0, 0, 0, 0.35);
     --shadow-glow: 0 0 40px rgba(192, 132, 252, 0.18);
-    
+
     /* Inputs spécifiques mode dark */
     --input-bg: #252033;
     --input-border: #3d3550;
     --input-text: #e7e7f3;
+
+    /* Checkbox */
+    --checkbox-bg: #1a1527;
+    --checkbox-border: #2d2850;
 }
 
 /* --- RESET & BASE --- */
@@ -152,7 +160,8 @@
 }
 
 html {
-    overflow: hidden; /* Empêche le scroll global */
+    overflow: hidden;
+    /* Empêche le scroll global */
     height: 100%;
 }
 
@@ -160,8 +169,10 @@ body {
     font-family: var(--font-family);
     color: var(--text-primary);
     background: var(--bg-light);
-    height: 100vh; /* Force la hauteur écran */
-    overflow: hidden; /* Coupe tout ce qui dépasse */
+    height: 100vh;
+    /* Force la hauteur écran */
+    overflow: hidden;
+    /* Coupe tout ce qui dépasse */
     width: 100%;
 }
 
@@ -336,7 +347,7 @@ body {
 }
 
 .lang-toggle .arrow-down {
-    font-size: 0.6em;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+    font-size: 0.6em;
     transition: var(--transition-base);
 }
 
@@ -415,19 +426,20 @@ body.auth-page main {
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100vh; /* Prend toute la hauteur */
+    min-height: 100vh;
+    /* Prend toute la hauteur */
     /* Espacement vital pour le Header fixe (70px + 30px de marge) */
-    padding-top: 100px; 
+    padding-top: 100px;
     padding-bottom: 40px;
     padding-left: 1rem;
     padding-right: 1rem;
-    
+
     box-sizing: border-box;
 }
 
 .auth-container {
-    margin: auto; 
-    
+    margin: auto;
+
     /* ... Vos autres styles (gardez-les) ... */
     background: var(--bg-white);
     border-radius: var(--radius-xl);
@@ -437,6 +449,7 @@ body.auth-page main {
     max-width: 440px;
     animation: slideUp 0.5s ease;
 }
+
 .auth-container-wide {
     max-width: 700px;
 }
@@ -446,6 +459,7 @@ body.auth-page main {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -459,6 +473,7 @@ body.auth-page main {
     body.home-page {
         overflow-y: hidden;
     }
+
     padding: var(--space-xl) var(--space-lg);
     font-size: var(--font-size-2xl);
     font-weight: 700;
@@ -484,6 +499,40 @@ body.auth-page main {
 /* ===================================
    FORMS & INPUTS
    =================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-white) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary) !important;
+    /* Couleur du curseur */
+    border: 2px solid var(--border) !important;
+    transition: border-color 0.15s ease-in-out;
+    /* Pour l'effet de focus */
+}
+
+/* 2. SURCHARGE SPÉCIFIQUE POUR LE MODE DARK */
+/* Ici, on change l'ombre pour utiliser la couleur sombre des inputs (--input-bg) */
+.theme-dark input:-webkit-autofill,
+.theme-dark input:-webkit-autofill:hover,
+.theme-dark input:-webkit-autofill:focus,
+.theme-dark input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+}
+
+/* 3. GESTION DU FOCUS (Bordure rouge) */
+/* On s'assure que la bordure rouge s'applique bien même en autofill */
+input:-webkit-autofill:focus {
+    border-color: var(--accent) !important;
+    /* On garde l'ombre interne correspondante (blanc ou dark) au focus */
+}
+
+.theme-dark input:-webkit-autofill:focus {
+    border-color: var(--accent) !important;
+}
+
 .form-group {
     margin-bottom: var(--space-md);
 }
@@ -682,15 +731,18 @@ label {
 /* Error Messages */
 .error-message {
     color: var(--danger);
-    font-size: 0.8rem; /* Un peu plus petit pour gagner de la place */
+    font-size: 0.8rem;
+    /* Un peu plus petit pour gagner de la place */
     margin-top: 4px;
-    
+
     display: flex;
-    align-items: flex-start; /* IMPORTANT : Aligne l'icône en haut, pas au milieu */
+    align-items: flex-start;
+    /* IMPORTANT : Aligne l'icône en haut, pas au milieu */
     text-align: left;
     gap: 6px;
-    
-    line-height: 1.4; /* Meilleure lecture sur 2 lignes */
+
+    line-height: 1.4;
+    /* Meilleure lecture sur 2 lignes */
     animation: shake 0.3s ease;
 }
 
@@ -699,9 +751,19 @@ label {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 /* Checkboxes */
@@ -716,8 +778,33 @@ label {
     width: 20px;
     height: 20px;
     cursor: pointer;
-    accent-color: var(--accent);
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--checkbox-bg);
+    border: 2px solid var(--checkbox-border);
     border-radius: var(--radius-sm);
+    position: relative;
+    transition: var(--transition-base);
+}
+
+.form-check input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-check input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.form-check input[type="checkbox"]:hover {
+    border-color: var(--accent);
 }
 
 .form-check label {
@@ -750,7 +837,7 @@ hr {
     justify-content: center;
     gap: 8px;
     padding: 12px 24px;
-    background: var(--accent-hover);
+    background: var(--accent);
     color: var(--bg-white);
     border: none;
     border-radius: var(--radius-md);
@@ -780,12 +867,14 @@ hr {
 }
 
 .btn-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg), 0 0 30px rgba(233, 69, 96, 0.3);
 }
 
 .btn-primary:active:not(:disabled) {
     transform: translateY(0);
+    background: var(--accent);
 }
 
 .btn-primary:disabled {
@@ -864,6 +953,7 @@ hr {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -919,9 +1009,12 @@ hr {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.85;
     }
@@ -959,7 +1052,8 @@ hr {
     flex-direction: column;
     position: fixed;
     left: 0;
-    top: 70px; /* Sous la navbar */
+    top: 70px;
+    /* Sous la navbar */
     bottom: 0;
     z-index: 100;
     box-shadow: var(--shadow-lg);
@@ -1159,13 +1253,18 @@ hr {
 
 .main-content-pro {
     flex: 1;
-    margin-left: 280px; /* Espace pour la sidebar */
+    margin-left: 280px;
+    /* Espace pour la sidebar */
     background: var(--bg-light);
     /* --- LE SECRET DU SCROLL --- */
-    height: calc(100vh - 70px); /* Hauteur écran MOINS la hauteur du header (70px) */
-    overflow-y: auto; /* Active le scroll VERTICAL uniquement ici */
-    overflow-x: hidden; /* Empêche le scroll horizontal */
-    padding: 32px; /* Votre padding interne */
+    height: calc(100vh - 70px);
+    /* Hauteur écran MOINS la hauteur du header (70px) */
+    overflow-y: auto;
+    /* Active le scroll VERTICAL uniquement ici */
+    overflow-x: hidden;
+    /* Empêche le scroll horizontal */
+    padding: 32px;
+    /* Votre padding interne */
     /* Pour un défilement fluide */
     scroll-behavior: smooth;
 }
@@ -1206,6 +1305,7 @@ hr {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1653,8 +1753,10 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: url('/images/auth-bg.jpg'); /* Même image */
-        background-image: var(--hero-bg-image); /* Même image que pages auth */
+    background-image: url('/images/auth-bg.jpg');
+    /* Même image */
+    background-image: var(--hero-bg-image);
+    /* Même image que pages auth */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1669,7 +1771,7 @@ hr {
     background: var(--hero-overlay);
     z-index: 1;
 }
- 
+
 .hero-content {
     position: relative;
     z-index: 1;
@@ -1683,6 +1785,7 @@ hr {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1899,26 +2002,22 @@ hr {
 .range-slider::-webkit-slider-runnable-track {
     height: 8px;
     border-radius: 999px;
-    background: linear-gradient(
-        90deg,
-        var(--accent) 0,
-        var(--accent) var(--range-progress, 100%),
-        #e2e8f0 var(--range-progress, 100%),
-        #e2e8f0 100%
-    );
+    background: linear-gradient(90deg,
+            var(--accent) 0,
+            var(--accent) var(--range-progress, 100%),
+            #e2e8f0 var(--range-progress, 100%),
+            #e2e8f0 100%);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .range-slider::-moz-range-track {
     height: 8px;
     border-radius: 999px;
-    background: linear-gradient(
-        90deg,
-        var(--accent) 0,
-        var(--accent) var(--range-progress, 100%),
-        #e2e8f0 var(--range-progress, 100%),
-        #e2e8f0 100%
-    );
+    background: linear-gradient(90deg,
+            var(--accent) 0,
+            var(--accent) var(--range-progress, 100%),
+            #e2e8f0 var(--range-progress, 100%),
+            #e2e8f0 100%);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
@@ -2397,7 +2496,7 @@ hr {
         grid-template-columns: 280px 1fr;
         gap: 1.5rem;
     }
-    
+
     .vehicles-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
@@ -2408,11 +2507,11 @@ hr {
     .catalogue-wrapper {
         grid-template-columns: 1fr;
     }
-    
+
     .filters-sidebar {
         position: static;
     }
-    
+
     .vehicles-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
@@ -2422,16 +2521,16 @@ hr {
     .catalogue-wrapper {
         gap: 1rem;
     }
-    
+
     .page-header h1 {
         font-size: 1.8rem;
     }
-    
+
     .vehicles-grid {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 1rem;
     }
-    
+
     .vehicle-image {
         height: 180px;
     }
@@ -2441,7 +2540,7 @@ hr {
     .vehicles-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .vehicle-pricing {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -2553,12 +2652,14 @@ hr {
 
 @media (max-width: 768px) {
     .dashboard-wrapper-pro {
-        padding-top: 70px; /* Garde le padding sur mobile */
+        padding-top: 70px;
+        /* Garde le padding sur mobile */
     }
 
     .sidebar-pro {
         transform: translateX(-100%);
-        z-index: 1001; /* Au-dessus du reste sur mobile */
+        z-index: 1001;
+        /* Au-dessus du reste sur mobile */
     }
 
     .sidebar-pro.open {
@@ -2643,7 +2744,8 @@ body.auth-page main {
     flex-direction: column;
     width: 100%;
     min-height: 100vh;
-    padding-top: 100px; /* Navbar (70px) + marge (30px) */
+    padding-top: 100px;
+    /* Navbar (70px) + marge (30px) */
     padding-bottom: 40px;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -2651,7 +2753,8 @@ body.auth-page main {
 }
 
 .auth-container {
-    margin: auto; /* Centrage vertical et horizontal */
+    margin: auto;
+    /* Centrage vertical et horizontal */
     background: var(--bg-white);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl), var(--shadow-glow);
@@ -2670,6 +2773,7 @@ body.auth-page main {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2684,7 +2788,8 @@ body.auth-page main {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000; /* Au-dessus de tout */
+    z-index: 1000;
+    /* Au-dessus de tout */
     backdrop-filter: blur(10px);
     height: 70px;
 }
@@ -2715,7 +2820,8 @@ body.auth-page main {
 /* 8. FIX ACTION CARDS - Supprimé (styles définis ci-dessus) */
 
 /* 9. AJOUT - Style pour les liens qui ressemblent à des boutons */
-a.action-card-pro, a.action-card-pro:visited,
+a.action-card-pro,
+a.action-card-pro:visited,
 a.btn-secondary,
 a.btn-primary {
     display: inline-flex;
@@ -2771,6 +2877,7 @@ a.btn-primary {
         transform: translateX(0);
         opacity: 1;
     }
+
     to {
         transform: translateX(-100%);
         opacity: 0;
@@ -2782,6 +2889,7 @@ a.btn-primary {
         transform: translateX(0);
         opacity: 1;
     }
+
     to {
         transform: translateX(100%);
         opacity: 0;
@@ -2793,6 +2901,7 @@ a.btn-primary {
         transform: translateX(-100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -2804,6 +2913,7 @@ a.btn-primary {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -2902,6 +3012,7 @@ a.btn-primary {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -2912,6 +3023,7 @@ a.btn-primary {
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -2940,12 +3052,13 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #e94560; /* <--- C'EST ICI : LE ROUGE DU SITE */
+    background-color: #e94560;
+    /* <--- C'EST ICI : LE ROUGE DU SITE */
     border-radius: 5px;
     border: 2px solid var(--bg-light);
 }
 
 /* Au survol, on peut le rendre un peu plus foncé ou laisser pareil */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--accent-hover); 
+    background-color: var(--accent-hover);
 }
