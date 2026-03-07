@@ -20,6 +20,17 @@ class ReservationTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
+
+        // Add a valid payment method to the user for reservation tests
+        $this->user->paymentMethods()->create([
+            'card_brand' => 'visa',
+            'card_last_four' => '4242',
+            'card_holder_name' => 'Test User',
+            'expiry_month' => '12',
+            'expiry_year' => (string) (now()->year + 1),
+            'is_default' => true,
+        ]);
+
         $this->vehicle = Vehicle::create([
             'brand' => 'Toyota',
             'model' => 'Yaris',
@@ -372,6 +383,129 @@ class ReservationTest extends TestCase
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'type' => 'reservation_created',
+        ]);
+    }
+
+    public function test_reservation_requires_valid_payment_method(): void
+    {
+        // Create a user without a valid payment method
+        $userWithoutPayment = User::factory()->create();
+
+        $response = $this->actingAs($userWithoutPayment)->post(route('dashboard.reservation.store'), [
+            'vehicle_id' => $this->vehicle->id,
+            'start_date' => today()->addDays(3)->format('Y-m-d'),
+            'end_date' => today()->addDays(5)->format('Y-m-d'),
+        ]);
+
+        $response->assertRedirect(route('dashboard.payment-methods'));
+        $response->assertSessionHas('error');
+        $this->assertDatabaseMissing('reservations', [
+            'user_id' => $userWithoutPayment->id,
+            'vehicle_id' => $this->vehicle->id,
+            'start_date' => today()->addDays(3)->format('Y-m-d'),
+        ]);
+    }
+
+    public function test_reservation_is_allowed_with_valid_payment_method(): void
+    {
+        // User already has a valid payment method from setUp()
+        $response = $this->actingAs($this->user)->post(route('dashboard.reservation.store'), [
+            'vehicle_id' => $this->vehicle->id,
+            'start_date' => today()->addDays(3)->format('Y-m-d'),
+            'end_date' => today()->addDays(5)->format('Y-m-d'),
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('reservations', [
+            'user_id' => $this->user->id,
+            'vehicle_id' => $this->vehicle->id,
+            'start_date' => today()->addDays(3)->format('Y-m-d'),
+        ]);
+    }
+
+    public function test_cancellation_must_be_at_least_3_days_in_advance(): void
+    {
+        // Create a second vehicle for this test
+        $vehicle2 = Vehicle::create([
+            'brand' => 'Honda',
+            'model' => 'Civic',
+            'type' => 'sedan',
+            'year' => 2024,
+            'registration_number' => 'AA-124-BB',
+            'transmission' => 'automatic',
+            'fuel_type' => 'hybrid',
+            'seats' => 5,
+            'doors' => 4,
+            'price_per_day' => 50.00,
+            'deposit' => 600,
+            'gps_available' => true,
+            'child_seat_available' => true,
+            'status' => 'available',
+        ]);
+
+        // Create reservation starting in 2 days via POST
+        $startDate = today()->addDays(2)->format('Y-m-d');
+        $this->actingAs($this->user)->post(route('dashboard.reservation.store'), [
+            'vehicle_id' => $vehicle2->id,
+            'start_date' => $startDate,
+            'end_date' => today()->addDays(4)->format('Y-m-d'),
+        ]);
+
+        $reservation = Reservation::where('user_id', $this->user->id)
+            ->where('vehicle_id', $vehicle2->id)
+            ->first();
+
+        $response = $this->actingAs($this->user)->delete(route('dashboard.reservation.destroy', $reservation->id));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('reservations', [
+            'id' => $reservation->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_cancellation_is_allowed_with_3_days_advance(): void
+    {
+        // Create a third vehicle for this test
+        $vehicle3 = Vehicle::create([
+            'brand' => 'BMW',
+            'model' => '3 Series',
+            'type' => 'sedan',
+            'year' => 2024,
+            'registration_number' => 'AA-125-BB',
+            'transmission' => 'automatic',
+            'fuel_type' => 'petrol',
+            'seats' => 5,
+            'doors' => 4,
+            'price_per_day' => 80.00,
+            'deposit' => 800,
+            'gps_available' => true,
+            'child_seat_available' => true,
+            'status' => 'available',
+        ]);
+
+        // Create reservation starting in 3 days via POST
+        $startDate = today()->addDays(3)->format('Y-m-d');
+        $this->actingAs($this->user)->post(route('dashboard.reservation.store'), [
+            'vehicle_id' => $vehicle3->id,
+            'start_date' => $startDate,
+            'end_date' => today()->addDays(5)->format('Y-m-d'),
+        ]);
+
+        $reservation = Reservation::where('user_id', $this->user->id)
+            ->where('vehicle_id', $vehicle3->id)
+            ->first();
+
+        // Before deletion, manually set it to confirmed status so it can be cancelled
+        $reservation->update(['status' => 'confirmed']);
+
+        $response = $this->actingAs($this->user)->delete(route('dashboard.reservation.destroy', $reservation->id));
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('reservations', [
+            'id' => $reservation->id,
+            'status' => 'cancelled',
         ]);
     }
 }

@@ -28,7 +28,7 @@
     <div class="reservations-list">
         @if($reservations->count() > 0)
             @foreach($reservations as $reservation)
-                <div class="reservation-card" data-status="{{ in_array($reservation->status, ['active']) ? 'active' : (in_array($reservation->status, ['pending', 'confirmed']) ? 'upcoming' : 'past') }}">
+                <div class="reservation-card" data-status="{{ $reservation->list_category ?? 'upcoming' }}">
                     <div class="reservation-card-header">
                         <div class="reservation-vehicle-info">
                             <div class="reservation-vehicle-icon">

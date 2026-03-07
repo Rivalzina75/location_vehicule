@@ -16,6 +16,27 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    @php
+        $totalCards = $paymentMethods->count();
+        $validCards = $paymentMethods->filter(fn($card) => !$card->is_expired)->count();
+        $defaultCard = $paymentMethods->firstWhere('is_default', true);
+    @endphp
+
+    <div class="payment-overview">
+        <div class="payment-overview-card">
+            <span class="payment-overview-label">{{ __('Cartes enregistrées') }}</span>
+            <strong class="payment-overview-value">{{ $totalCards }}</strong>
+        </div>
+        <div class="payment-overview-card">
+            <span class="payment-overview-label">{{ __('Cartes valides') }}</span>
+            <strong class="payment-overview-value">{{ $validCards }}</strong>
+        </div>
+        <div class="payment-overview-card payment-overview-wide">
+            <span class="payment-overview-label">{{ __('Carte par défaut') }}</span>
+            <strong class="payment-overview-value">{{ $defaultCard ? ucfirst($defaultCard->card_brand) . ' •••• ' . $defaultCard->card_last_four : __('Aucune') }}</strong>
+        </div>
+    </div>
+
     <div class="payment-layout">
         <!-- Existing Cards -->
         <div class="payment-cards-section">
@@ -70,10 +91,15 @@
                     @endforeach
                 </div>
             @else
-                <div class="empty-state">
-                    <div class="empty-icon">💳</div>
+                <div class="payment-empty-state card-section">
+                    <div class="payment-empty-icon">💳</div>
                     <h3>{{ __('Aucun moyen de paiement') }}</h3>
-                    <p>{{ __('Ajoutez une carte bancaire pour faciliter vos réservations.') }}</p>
+                    <p>{{ __('Ajoutez une carte bancaire pour faciliter vos réservations et sécuriser les départs le jour même.') }}</p>
+                    <div class="payment-empty-points">
+                        <span>✓ {{ __('Ajout rapide en moins d\'une minute') }}</span>
+                        <span>✓ {{ __('Carte par défaut modifiable à tout moment') }}</span>
+                        <span>✓ {{ __('Suppression possible en un clic') }}</span>
+                    </div>
                 </div>
             @endif
         </div>
@@ -195,9 +221,40 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
 .payment-layout {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: minmax(0, 1fr) 390px;
     gap: 2rem;
     align-items: start;
+}
+
+.payment-overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.payment-overview-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.payment-overview-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.payment-overview-value {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.payment-overview-wide {
+    min-width: 0;
 }
 
 .payment-cards-grid {
@@ -207,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 .payment-card {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%);
+    background: linear-gradient(145deg, var(--primary) 0%, var(--primary-light) 60%, var(--secondary) 100%);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
     color: white;
@@ -232,8 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 .payment-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 .payment-card-default { border: 2px solid var(--accent); }
@@ -282,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 .card-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 0.75rem;
     padding-top: 0.75rem;
@@ -315,22 +373,30 @@ document.addEventListener('DOMContentLoaded', () => {
 .card-actions .btn-danger-sm:hover { background: rgba(251, 113, 133, 0.2); }
 
 .add-card-section {
-    background: var(--bg-white);
+    background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     position: sticky;
     top: 80px;
 }
 
-.empty-state {
+.payment-empty-state {
     text-align: center;
-    padding: 3rem 2rem;
+    padding: 2.5rem 2rem;
     color: var(--text-secondary);
 }
 
-.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-.empty-state h3 { color: var(--text-primary); margin-bottom: 0.5rem; }
+.payment-empty-icon { font-size: 2.4rem; margin-bottom: 0.75rem; }
+.payment-empty-state h3 { color: var(--text-primary); margin-bottom: 0.35rem; }
+.payment-empty-state p { margin-bottom: 0.75rem; }
+
+.payment-empty-points {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
 
 .form-info {
     background: rgba(var(--accent-rgb, 233, 69, 96), 0.05);
@@ -343,7 +409,9 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 @media (max-width: 1024px) {
+    .payment-overview { grid-template-columns: 1fr; }
     .payment-layout { grid-template-columns: 1fr; }
+    .add-card-section { position: static; }
 }
 
 @media (max-width: 768px) {

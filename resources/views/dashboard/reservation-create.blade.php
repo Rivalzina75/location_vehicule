@@ -20,8 +20,15 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <form action="{{ route('dashboard.reservation.store') }}" method="POST" class="reservation-form" id="reservationForm">
+    <form action="{{ route('dashboard.reservation.store') }}" method="POST" class="reservation-form" id="reservationForm" data-has-payment-method="{{ !empty($hasValidPaymentMethod) ? '1' : '0' }}">
         @csrf
+
+        @if(empty($hasValidPaymentMethod))
+            <div class="alert alert-warning reservation-payment-warning">
+                {{ __('Vous devez ajouter un moyen de paiement valide pour effectuer une réservation.') }}
+                <a href="{{ route('dashboard.payment-methods') }}" class="reservation-payment-link">{{ __('Ajouter un moyen de paiement') }}</a>
+            </div>
+        @endif
 
         <div class="reservation-grid">
             <!-- Left: Form -->
@@ -169,7 +176,10 @@
                             <span id="summaryDeposit">0€</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary btn-block" style="margin-top:1.5rem">
+                    <div id="paymentMethodNotice" class="summary-warning" style="display:none">
+                        {{ __('Réservation du jour indisponible sans moyen de paiement valide.') }}
+                    </div>
+                    <button type="submit" id="reservationSubmitBtn" class="btn-primary btn-block" style="margin-top:1.5rem">
                         {{ __('Confirmer la réservation') }}
                     </button>
                 </div>
@@ -210,6 +220,11 @@
 .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 .alert { padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
 .alert-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.alert-warning { background: rgba(251, 191, 36, 0.15); color: #f59e0b; border: 1px solid rgba(251, 191, 36, 0.3); }
+.reservation-payment-warning { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.reservation-payment-link { color: var(--accent); font-weight: 600; text-decoration: none; }
+.reservation-payment-link:hover { text-decoration: underline; }
+.summary-warning { margin-top: 1rem; padding: 0.625rem 0.75rem; border: 1px solid rgba(251, 191, 36, 0.35); border-radius: var(--radius-sm); background: rgba(251, 191, 36, 0.08); color: #f59e0b; font-size: 0.8rem; }
 @media (max-width: 768px) { .reservation-grid { grid-template-columns: 1fr; } .sticky-summary { position: static; } }
 </style>
 
@@ -219,6 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const startDate = document.getElementById('start_date');
     const endDate = document.getElementById('end_date');
     const form = document.getElementById('reservationForm');
+    const submitButton = document.getElementById('reservationSubmitBtn');
+    const paymentMethodNotice = document.getElementById('paymentMethodNotice');
+    const hasPaymentMethod = form?.dataset?.hasPaymentMethod === '1';
 
     // Pre-selected vehicle data (when coming from catalogue)
     const fixedVehicleData = {
@@ -320,6 +338,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('summaryDeposit').textContent = deposit.toFixed(0) + '€';
         } else {
             depLine.style.display = 'none';
+        }
+
+        const selectedStartDate = startDate.value ? new Date(startDate.value + 'T00:00:00') : null;
+        const shouldBlockByPayment = selectedStartDate && !hasPaymentMethod;
+
+        if (submitButton) {
+            submitButton.disabled = shouldBlockByPayment;
+            submitButton.style.opacity = shouldBlockByPayment ? '0.65' : '1';
+            submitButton.style.cursor = shouldBlockByPayment ? 'not-allowed' : 'pointer';
+        }
+
+        if (paymentMethodNotice) {
+            paymentMethodNotice.style.display = shouldBlockByPayment ? '' : 'none';
         }
     }
 

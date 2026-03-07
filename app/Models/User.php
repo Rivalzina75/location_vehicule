@@ -203,6 +203,26 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user has at least one valid (non-expired) payment method.
+     */
+    public function hasValidPaymentMethod(): bool
+    {
+        $now = now();
+        $currentYear = (int) $now->format('Y');
+        $currentMonth = (int) $now->format('m');
+
+        return $this->paymentMethods()
+            ->where(function ($query) use ($currentYear, $currentMonth) {
+                $query->where('expiry_year', '>', (string) $currentYear)
+                    ->orWhere(function ($q) use ($currentYear, $currentMonth) {
+                        $q->where('expiry_year', (string) $currentYear)
+                            ->where('expiry_month', '>=', str_pad((string) $currentMonth, 2, '0', STR_PAD_LEFT));
+                    });
+            })
+            ->exists();
+    }
+
+    /**
      * Check if user is currently locked out.
      */
     public function isLockedOut(): bool

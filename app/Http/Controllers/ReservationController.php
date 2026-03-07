@@ -30,10 +30,28 @@ class ReservationController extends Controller
             ->orderBy('start_date', 'desc')
             ->get();
 
-        $active = $reservations->whereIn('status', ['active']);
-        $upcoming = $reservations->whereIn('status', ['pending', 'confirmed'])
-            ->where('start_date', '>', now());
-        $past = $reservations->whereIn('status', ['completed', 'cancelled']);
+        $today = now()->startOfDay();
+
+        $reservations->each(function (Reservation $reservation) use ($today) {
+            $startDate = $reservation->start_date->copy()->startOfDay();
+            $endDate = $reservation->end_date->copy()->startOfDay();
+
+            if (in_array($reservation->status, ['completed', 'cancelled'], true) || $endDate->lt($today)) {
+                $reservation->list_category = 'past';
+                return;
+            }
+
+            if ($startDate->lte($today) && $endDate->gte($today)) {
+                $reservation->list_category = 'active';
+                return;
+            }
+
+            $reservation->list_category = 'upcoming';
+        });
+
+        $active = $reservations->where('list_category', 'active');
+        $upcoming = $reservations->where('list_category', 'upcoming');
+        $past = $reservations->where('list_category', 'past');
 
         return view('dashboard.reservations', compact('reservations', 'active', 'upcoming', 'past'));
     }
@@ -43,11 +61,15 @@ class ReservationController extends Controller
      */
     public function create(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $vehicleId = $request->get('vehicle_id');
         $vehicle = $vehicleId ? Vehicle::findOrFail($vehicleId) : null;
         $vehicles = Vehicle::where('status', 'available')->orderBy('brand')->get();
+        $hasValidPaymentMethod = $user->hasValidPaymentMethod();
 
-        return view('dashboard.reservation-create', compact('vehicle', 'vehicles'));
+        return view('dashboard.reservation-create', compact('vehicle', 'vehicles', 'hasValidPaymentMethod'));
     }
 
     /**
@@ -139,6 +161,18 @@ class ReservationController extends Controller
 
         try {
             DB::beginTransaction();
+
+            /** @var User $user */
+            $user = Auth::user();
+
+            // Check if user has valid payment method for any reservation
+            if (!$user->hasValidPaymentMethod()) {
+                DB::rollBack();
+                return redirect()->route('dashboard.payment-methods')
+                    ->with('error', __('Réservation indisponible sans moyen de paiement.'));
+            }
+
+            $startDate = Carbon::parse($request->start_date);
 
             $vehicle = Vehicle::findOrFail($request->vehicle_id);
 
@@ -245,6 +279,12 @@ class ReservationController extends Controller
 
         if (!in_array($reservation->status, ['pending', 'confirmed'])) {
             return back()->with('error', __('Cette réservation ne peut plus être annulée.'));
+        }
+
+        // Check if cancellation is at least 3 days in advance
+        $minCancellationDate = now()->addDays(3)->startOfDay();
+        if ($reservation->start_date->startOfDay()->lt($minCancellationDate)) {
+            return back()->with('error', __('Une annulation doit se faire au minimum 3 jours à l\'avance.'));
         }
 
         try {
