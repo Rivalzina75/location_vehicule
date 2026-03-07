@@ -84,19 +84,3 @@ Pour exécuter les tests, utilisez la commande suivante :
 ```bash
 php artisan test
 ```
-
-## Contribution
-1. Forkez le projet
-2. Créez une branche pour votre fonctionnalité :
-   ```bash
-   git checkout -b ma-fonctionnalite
-   ```
-3. Commitez vos modifications :
-   ```bash
-   git commit -m "Ajout d'une nouvelle fonctionnalité"
-   ```
-4. Poussez vos modifications :
-   ```bash
-   git push origin ma-fonctionnalite
-   ```
-5. Créez une Pull Request
