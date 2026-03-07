@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,7 +61,15 @@ class DocumentController extends Controller
                 'expiry_date' => $request->expiry_date,
             ]);
 
-            return back()->with('success', 'Document uploadé avec succès!');
+            ActivityLog::log(
+                Auth::id(),
+                'document_uploaded',
+                __('Document uploadé'),
+                $document->type_label . ' - ' . $document->filename,
+                ['document_id' => $document->id, 'type' => $document->type]
+            );
+
+            return back()->with('success', __('Document uploadé avec succès !'));
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de l\'upload: ' . $e->getMessage());
         }

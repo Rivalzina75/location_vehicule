@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware global pour toutes les routes web
         $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\SetLocale::class,
         ]);
 

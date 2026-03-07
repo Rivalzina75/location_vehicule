@@ -17,25 +17,31 @@
             </a>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- Stats Cards - DYNAMIC -->
         <div class="stats-grid-pro">
             <div class="stat-card-pro stat-primary">
                 <div class="stat-icon-wrapper">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1" stroke-width="2"/>
-                        <circle cx="8.5" cy="19" r="1.5"/>
-                        <circle cx="15.5" cy="19" r="1.5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Carrosserie principale -->
+    <path d="M3 11l2-4h14l2 4"/>
+    <rect x="1" y="11" width="22" height="6" rx="1"/>
+    <!-- Toit / vitres -->
+    <path d="M5 11l2.5-4h9L19 11"/>
+    <path d="M7.5 7.5l.5-0.5h8l.5.5" fill="currentColor" fill-opacity="0.15"/>
+    <!-- Roues -->
+    <circle cx="6.5" cy="17" r="2"/>
+    <circle cx="17.5" cy="17" r="2"/>
+    <!-- Jantes -->
+    <circle cx="6.5" cy="17" r="0.75" fill="currentColor"/>
+    <circle cx="17.5" cy="17" r="0.75" fill="currentColor"/>
+    <!-- Phares -->
+    <line x1="1" y1="13" x2="1" y2="15"/>
+    <line x1="23" y1="13" x2="23" y2="15"/>
+</svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value">15</div>
+                    <div class="stat-value">{{ $availableVehicles }}</div>
                     <div class="stat-label">{{ __('Véhicules disponibles') }}</div>
-                    <div class="stat-trend positive">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M18 15l-6-6-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                        </svg>
-                        +12% {{ __('ce mois') }}
-                    </div>
                 </div>
             </div>
 
@@ -47,9 +53,9 @@
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value">3</div>
+                    <div class="stat-value">{{ $activeReservations }}</div>
                     <div class="stat-label">{{ __('Réservations actives') }}</div>
-                    <div class="stat-trend neutral">{{ __('En cours') }}</div>
+                    <div class="stat-trend neutral">{{ $activeReservations > 0 ? __('En cours') : __('Aucune') }}</div>
                 </div>
             </div>
 
@@ -61,9 +67,8 @@
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value">12</div>
+                    <div class="stat-value">{{ $completedReservations }}</div>
                     <div class="stat-label">{{ __('Locations terminées') }}</div>
-                    <div class="stat-trend positive">{{ __('100% complétées') }}</div>
                 </div>
             </div>
 
@@ -75,9 +80,15 @@
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value">4.9/5</div>
+                    <div class="stat-value">{{ $avgRating ? $avgRating . '/5' : '-' }}</div>
                     <div class="stat-label">{{ __('Note moyenne') }}</div>
-                    <div class="stat-trend positive">⭐⭐⭐⭐⭐</div>
+                    @if($avgRating)
+                        <div class="stat-trend positive">
+                            @for($i = 1; $i <= 5; $i++)
+                                {{ $i <= round($avgRating) ? '⭐' : '☆' }}
+                            @endfor
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -94,10 +105,11 @@
                     <div class="quick-actions-grid">
                         <a href="{{ route('dashboard.catalogue') }}" class="action-card-pro" style="text-decoration: none;">
                             <div class="action-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1" stroke-width="2"/>
-                                    <circle cx="8.5" cy="19" r="1.5"/>
-                                    <circle cx="15.5" cy="19" r="1.5"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 11l2-4h14l2 4"/><rect x="1" y="11" width="22" height="6" rx="1"/>
+                                    <path d="M5 11l2.5-4h9L19 11"/><circle cx="6.5" cy="17" r="2"/><circle cx="17.5" cy="17" r="2"/>
+                                    <circle cx="6.5" cy="17" r="0.75" fill="currentColor"/><circle cx="17.5" cy="17" r="0.75" fill="currentColor"/>
+                                    <line x1="1" y1="13" x2="1" y2="15"/><line x1="23" y1="13" x2="23" y2="15"/>
                                 </svg>
                             </div>
                             <div class="action-label">{{ __('Voir catalogue') }}</div>
@@ -135,89 +147,87 @@
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
+                <!-- Recent Activity - DYNAMIC -->
                 <div class="card-pro">
                     <div class="card-header">
                         <h3>{{ __('Activité récente') }}</h3>
-                        <a href="{{ route('dashboard.reservations') }}" class="link-text">{{ __('Tout voir') }} →</a>
+                        <a href="{{ route('dashboard.activity') }}" class="link-text">{{ __('Tout voir') }} →</a>
                     </div>
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon success">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                                    <path d="M22 4L12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                                </svg>
+                    <div class="activity-list" style="min-height: 300px;">
+                        @if($recentActivities->count() > 0)
+                            @foreach($recentActivities as $activity)
+                                <div class="activity-item">
+                                    <div class="activity-icon {{ in_array($activity->type, ['reservation_confirmed', 'reservation_completed']) ? 'success' : (in_array($activity->type, ['document_uploaded', 'inspection_start', 'inspection_end']) ? 'info' : 'warning') }}">
+                                        @if(str_contains($activity->type, 'reservation'))
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                                <path d="M22 4L12 14.01l-3-3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                            </svg>
+                                        @elseif(str_contains($activity->type, 'document'))
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/>
+                                                <path d="M14 2v6h6" stroke-width="2"/>
+                                            </svg>
+                                        @else
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                                <path d="M12 8v4M12 16h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">{{ $activity->title }}</div>
+                                        @if($activity->description)
+                                            <div class="activity-desc">{{ $activity->description }}</div>
+                                        @endif
+                                        <div class="activity-time">
+                                            @if($activity->created_at->isToday())
+                                                {{ __('Aujourd\'hui') }}, {{ $activity->created_at->format('H:i') }}
+                                            @elseif($activity->created_at->isYesterday())
+                                                {{ __('Hier à') }} {{ $activity->created_at->format('H:i') }}
+                                            @else
+                                                {{ $activity->created_at->format('d/m/Y') }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="empty-state-small">
+                                <p>{{ __('Aucune activité récente') }}</p>
                             </div>
-                            <div class="activity-content">
-                                <div class="activity-title">{{ __('Réservation confirmée') }}</div>
-                                <div class="activity-desc">Peugeot 508 • {{ __('Du 10 au 17 Nov') }}</div>
-                                <div class="activity-time">{{ __('Il y a 2 heures') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon info">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/>
-                                    <path d="M14 2v6h6" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">{{ __('Document vérifié') }}</div>
-                                <div class="activity-desc">{{ __('Permis de conduire approuvé') }}</div>
-                                <div class="activity-time">{{ __('Hier à 14:30') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon warning">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
-                                    <path d="M12 8v4M12 16h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">{{ __('Rappel : Inspection') }}</div>
-                                <div class="activity-desc">{{ __('Inspection retour dans 3 jours') }}</div>
-                                <div class="activity-time">{{ __('Il y a 1 jour') }}</div>
-                            </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- Right Column -->
             <div class="column-right">
-                <!-- Upcoming Reservations -->
-                <div class="card-pro">
+                <!-- Upcoming Reservations - DYNAMIC -->
+                <div class="card-pro" style="min-height: 320px;">
                     <div class="card-header">
                         <h3>{{ __('Prochaines réservations') }}</h3>
                     </div>
-                    <div class="reservation-preview-list">
-                        <div class="reservation-preview">
-                            <div class="preview-date">
-                                <div class="date-day">10</div>
-                                <div class="date-month">NOV</div>
+                    <div class="reservation-preview-list" style="min-height: 220px;">
+                        @if($upcomingReservations->count() > 0)
+                            @foreach($upcomingReservations as $reservation)
+                                <div class="reservation-preview">
+                                    <div class="preview-date">
+                                        <div class="date-day">{{ $reservation->start_date->format('d') }}</div>
+                                        <div class="date-month">{{ strtoupper($reservation->start_date->locale('fr')->shortMonthName) }}</div>
+                                    </div>
+                                    <div class="preview-content">
+                                        <div class="preview-vehicle">{{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}</div>
+                                        <div class="preview-details">{{ $reservation->duration_days }} {{ __('jours') }} • {{ number_format($reservation->total_price, 0, ',', ' ') }}€</div>
+                                        <div class="preview-status {{ $reservation->status === 'active' ? 'active' : 'upcoming' }}">{{ $reservation->status_label }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="empty-state-small">
+                                <p>{{ __('Pas de réservation en cours') }}</p>
                             </div>
-                            <div class="preview-content">
-                                <div class="preview-vehicle">Peugeot 508</div>
-                                <div class="preview-details">7 {{ __('jours') }} • 315€</div>
-                                <div class="preview-status active">{{ __('En cours') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="reservation-preview">
-                            <div class="preview-date">
-                                <div class="date-day">20</div>
-                                <div class="date-month">NOV</div>
-                            </div>
-                            <div class="preview-content">
-                                <div class="preview-vehicle">Yamaha MT-07</div>
-                                <div class="preview-details">2 {{ __('jours') }} • 100€</div>
-                                <div class="preview-status upcoming">{{ __('À venir') }}</div>
-                            </div>
-                        </div>
+                        @endif
                     </div>
                     <a href="{{ route('dashboard.reservations') }}" class="btn-secondary" style="text-decoration: none; display: flex; justify-content: center; align-items: center;">
                         {{ __('Voir toutes les réservations') }}
@@ -228,7 +238,7 @@
                 <div class="card-pro card-gradient">
                     <div class="tip-icon">💡</div>
                     <h4>{{ __('Astuce du jour') }}</h4>
-                    <p>{{ __('Pensez à vérifier le niveau de carburant avant chaque départ pour éviter des frais supplémentaires !') }}</p>
+                    <p>{{ $tipOfTheDay }}</p>
                 </div>
 
                 <!-- Support Card -->
@@ -237,18 +247,18 @@
                         <h3>{{ __('Besoin d\'aide ?') }}</h3>
                     </div>
                     <div class="support-buttons">
-                        <button class="support-btn">
+                        <a href="mailto:support@machina.fr" class="support-btn" style="text-decoration: none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             </svg>
-                            {{ __('Chat en ligne') }}
-                        </button>
-                        <button class="support-btn">
+                            {{ __('Email support') }}
+                        </a>
+                        <a href="tel:+33123456789" class="support-btn" style="text-decoration: none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             </svg>
                             {{ __('Appeler') }}
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentMethodController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // ========== PROFIL ==========
 
+        // Historique d'activité
+        Route::get('/activity', [HomeController::class, 'activity'])->name('activity');
+
         // Voir le profil
         Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
@@ -104,6 +108,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Mettre à jour le mot de passe
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+        // ========== MOYENS DE PAIEMENT ==========
+
+        Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-methods');
+        Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
+        Route::patch('/payment-methods/{id}/default', [PaymentMethodController::class, 'setDefault'])->name('payment-methods.default');
+        Route::delete('/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
 
         // Supprimer le compte
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

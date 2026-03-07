@@ -99,11 +99,6 @@
             <aside class="sidebar-pro">
                 <div class="sidebar-brand">
                     <div class="logo-container">
-                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1M12 15l-3 3m0 0l-3-3m3 3V9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                            <circle cx="8.5" cy="19" r="1.5"/>
-                            <circle cx="15.5" cy="19" r="1.5"/>
-                        </svg>
                         <div class="logo-text">
                             <span class="brand-name">Machina</span>
                             <span class="brand-tagline">Location Premium</span>
@@ -128,7 +123,7 @@
                         <span>{{ __('Catalogue') }}</span>
                     </a>
                     
-                    <a href="{{ route('dashboard.reservations') }}" class="menu-item {{ Request::routeIs('dashboard.reservation*') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.reservations') }}" class="menu-item {{ Request::routeIs('dashboard.reservation*') ? 'active' : '' }}" data-page-index="3">
                         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -136,7 +131,7 @@
                         <span>{{ __('Mes Réservations') }}</span>
                     </a>
                     
-                    <a href="{{ route('dashboard.documents') }}" class="menu-item {{ Request::routeIs('dashboard.documents') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.documents') }}" class="menu-item {{ Request::routeIs('dashboard.documents') ? 'active' : '' }}" data-page-index="4">
                         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -144,7 +139,7 @@
                         <span>{{ __('Documents') }}</span>
                     </a>
                     
-                    <a href="{{ route('dashboard.inspection') }}" class="menu-item {{ Request::routeIs('dashboard.inspection*') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.inspection') }}" class="menu-item {{ Request::routeIs('dashboard.inspection*') ? 'active' : '' }}" data-page-index="5">
                         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             <circle cx="12" cy="13" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -152,7 +147,7 @@
                         <span>{{ __('Inspection') }}</span>
                     </a>
                     
-                    <a href="{{ route('dashboard.profile.show') }}" class="menu-item {{ Request::routeIs('dashboard.profile.*') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.profile.show') }}" class="menu-item {{ Request::routeIs('dashboard.profile.*') ? 'active' : '' }}" data-page-index="6">
                         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -160,11 +155,19 @@
                         <span>{{ __('Profil') }}</span>
                     </a>
 
+                    <a href="{{ route('dashboard.payment-methods') }}" class="menu-item {{ Request::routeIs('dashboard.payment-methods*') ? 'active' : '' }}" data-page-index="7">
+                        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M1 10h22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ __('Paiement') }}</span>
+                    </a>
+
                     @if(Auth::user()->isAdmin())
                         <div class="menu-divider"></div>
                         <div class="menu-section-title">{{ __('Administration') }}</div>
                         
-                        <a href="{{ route('admin.dashboard') }}" class="menu-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('admin.dashboard') }}" class="menu-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}" data-page-index="8">
                             <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <rect x="3" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                                 <rect x="14" y="3" width="7" height="7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -174,7 +177,7 @@
                             <span>{{ __('Admin Dashboard') }}</span>
                         </a>
                         
-                        <a href="{{ route('admin.vehicles.index') }}" class="menu-item {{ Request::routeIs('admin.vehicles.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.vehicles.index') }}" class="menu-item {{ Request::routeIs('admin.vehicles.*') ? 'active' : '' }}" data-page-index="9">
                             <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                                 <circle cx="8.5" cy="19" r="1.5"/>
@@ -183,7 +186,7 @@
                             <span>{{ __('Gestion Véhicules') }}</span>
                         </a>
                         
-                        <a href="{{ route('admin.reservations.index') }}" class="menu-item {{ Request::routeIs('admin.reservations.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.reservations.index') }}" class="menu-item {{ Request::routeIs('admin.reservations.*') ? 'active' : '' }}" data-page-index="10">
                             <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                             </svg>

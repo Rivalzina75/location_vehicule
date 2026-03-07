@@ -94,11 +94,23 @@
     --text-secondary: #6c757d;
     --text-light: #94a3b8;
     --border: #e2e8f0;
+    --border-color: #e2e8f0;
     --bg-light: #f8fafc;
     --bg-white: #ffffff;
     --bg-dark: #0f0f23;
     --bg-error: #ffe8e8;
     --bg-error-light: #fff5f5;
+
+    /* Aliases for dashboard views */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --accent-rgb: 233, 69, 96;
+
+    /* Inputs mode clair */
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --input-text: #1a1a2e;
 
     /* Checkbox */
     --checkbox-bg: #ffffff;
@@ -122,11 +134,18 @@
     --text-secondary: #a8aab8;
     --text-light: #8b8d9a;
     --border: #2d2850;
+    --border-color: #2d2850;
     --bg-light: #0e0b1a;
     --bg-white: #1a1527;
     --bg-dark: #05030d;
     --bg-error: #4b2129;
     --bg-error-light: #3a2028;
+
+    /* Aliases for dashboard views */
+    --bg-primary: #0e0b1a;
+    --bg-secondary: #1a1527;
+    --bg-tertiary: #252033;
+    --accent-rgb: 124, 58, 237;
 
     /* Overlay hero/auth plus sombre en dark */
     --hero-overlay: linear-gradient(135deg,
@@ -554,19 +573,39 @@ label {
 .form-control {
     width: 100%;
     padding: 0.75rem var(--space-md);
-    border: 2px solid var(--border);
+    border: 2px solid var(--input-border, var(--border));
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
     font-family: inherit;
     transition: var(--transition-base);
-    background: var(--bg-white);
-    color: var(--text-primary);
+    background: var(--input-bg, var(--bg-white));
+    color: var(--input-text, var(--text-primary));
+}
+
+/* Light mode: ensure form fields have visible borders and backgrounds */
+.theme-light .form-control {
+    background: #ffffff;
+    color: #1a1a2e;
+    border-color: #d1d5db;
 }
 
 .theme-dark .form-control {
     background: var(--input-bg, #252033);
     color: var(--input-text, #e7e7f3);
     border-color: var(--input-border, #3d3550);
+}
+
+/* Fix native select options in both themes */
+.form-control option,
+select.form-control option {
+    background-color: var(--bg-white);
+    color: var(--text-primary);
+}
+
+.theme-dark select.form-control option,
+.theme-dark .form-control option {
+    background-color: #252033;
+    color: #e7e7f3;
 }
 
 .form-control:focus {
@@ -1617,6 +1656,23 @@ hr {
     color: var(--text-light);
 }
 
+/* Selected Vehicle Display (reservation create) */
+.selected-vehicle-display {
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary, #f1f5f9);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: var(--font-size-base);
+}
+
+.theme-dark .selected-vehicle-display {
+    background: var(--input-bg, #252033);
+    border-color: var(--input-border, #3d3550);
+    color: var(--input-text, #e7e7f3);
+}
+
 /* Reservations Preview */
 .reservation-preview-list {
     display: flex;
@@ -1903,6 +1959,8 @@ hr {
     grid-template-columns: 300px 1fr;
     gap: 2rem;
     margin-bottom: 2rem;
+    align-items: start;
+    /* No sticky on sidebar — filter scrolls with vehicles */
 }
 
 /* Sidebar Filtres - Design Premium */
@@ -1910,9 +1968,6 @@ hr {
     background: var(--bg-white);
     padding: 1.75rem;
     border-radius: var(--radius-lg);
-    height: fit-content;
-    position: sticky;
-    top: 90px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
 }
@@ -1930,7 +1985,6 @@ hr {
 }
 
 .filters-sidebar h2::before {
-    content: '🔍';
     font-size: 1.2em;
 }
 
@@ -1943,7 +1997,7 @@ hr {
     margin-bottom: 1.75rem;
 }
 
-.filter-group label {
+.filter-group label:not(.unit-option):not(.filter-tag) {
     display: block;
     margin-bottom: 0.625rem;
     font-weight: 600;
@@ -2508,10 +2562,6 @@ hr {
         grid-template-columns: 1fr;
     }
 
-    .filters-sidebar {
-        position: static;
-    }
-
     .vehicles-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
@@ -3061,4 +3111,533 @@ html {
 /* Au survol, on peut le rendre un peu plus foncé ou laisser pareil */
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-hover);
+}
+
+/* ===================================
+   CATALOGUE (Dashboard)
+   =================================== */
+
+.catalogue-wrapper {
+    padding: 0;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.filters-sidebar {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.filters-sidebar h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group label:not(.filter-tag):not(.unit-option) {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.filter-section-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.filter-tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.filter-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.filter-tag.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.filter-tag.cat-type.active {
+    background: #7c3aed;
+    border-color: #7c3aed;
+}
+
+.filter-tag.cat-spec.active {
+    background: #0891b2;
+    border-color: #0891b2;
+}
+
+.filter-tag.cat-fuel.active {
+    background: #059669;
+    border-color: #059669;
+}
+
+.active-filters-display {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.active-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.active-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.active-tag.cat-type {
+    background: #7c3aed;
+}
+
+.active-tag.cat-spec {
+    background: #0891b2;
+}
+
+.active-tag.cat-fuel {
+    background: #059669;
+}
+
+.active-tag.cat-feature {
+    background: var(--accent);
+}
+
+.price-unit-toggle {
+    display: flex;
+    margin-bottom: 0.75rem;
+    background: var(--bg-primary);
+    border-radius: var(--radius-full);
+    padding: 0.2rem;
+    border: 1px solid var(--border-color);
+}
+
+.unit-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.unit-option input {
+    display: none;
+}
+
+.unit-option span {
+    display: flex;
+    height: 34px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unit-option input:checked+span {
+    background: var(--accent);
+    color: #fff;
+}
+
+.range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    border-radius: 999px;
+    background: transparent;
+}
+
+.range-slider::-webkit-slider-runnable-track,
+.range-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+            var(--accent) 0,
+            var(--accent) var(--range-progress, 100%),
+            #cbd5e1 var(--range-progress, 100%),
+            #cbd5e1 100%);
+}
+
+.range-slider::-webkit-slider-thumb,
+.range-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -5px;
+}
+
+.price-display {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.price-slider-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.vehicle-specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.spec {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+.spec-icon {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+}
+
+.vehicle-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+}
+
+.feature-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+.feature-clickable {
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.feature-clickable:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.feature-active {
+    background: var(--accent);
+    color: #fff;
+}
+
+.vehicle-pricing {
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(86px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.price-item {
+    text-align: center;
+}
+
+.price-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.price-value {
+    display: block;
+    font-size: clamp(0.86rem, 1.05vw, 1rem);
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.pagination-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pagination-btn {
+    min-width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    background: var(--bg-secondary);
+    font-weight: 600;
+}
+
+.pagination-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ===================================
+   CATALOGUE SHOW (Dashboard)
+   =================================== */
+
+.vehicle-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.vehicle-detail-image {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    aspect-ratio: 16/10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vehicle-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vehicle-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+.vehicle-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.vehicle-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent);
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.vehicle-detail-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.vehicle-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.equipment-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.equip-tag {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.price-card {
+    padding: 1rem;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.price-card.accent {
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.05);
+}
+
+.price-amount {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(15, 23, 42, 0.55);
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.gallery-prev {
+    left: 0.75rem;
+}
+
+.gallery-next {
+    right: 0.75rem;
+}
+
+@media (max-width: 900px) {
+    .catalogue-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .vehicles-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .vehicle-specs,
+    .vehicle-detail-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .vehicles-grid {
+        grid-template-columns: 1fr;
+    }
 }

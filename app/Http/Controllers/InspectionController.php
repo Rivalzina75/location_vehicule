@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Inspection;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
@@ -93,7 +94,15 @@ class InspectionController extends Controller
                 'mileage_start' => $request->mileage,
             ]);
 
-            return back()->with('success', 'Inspection de départ enregistrée!');
+            ActivityLog::log(
+                Auth::id(),
+                'inspection_start',
+                __('Inspection de départ'),
+                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                ['reservation_id' => $reservation->id, 'inspection_id' => $inspection->id]
+            );
+
+            return back()->with('success', __('Inspection de départ enregistrée !'));
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur: ' . $e->getMessage());
         }
@@ -161,7 +170,15 @@ class InspectionController extends Controller
                 'mileage_end' => $request->mileage,
             ]);
 
-            return back()->with('success', 'Inspection de retour enregistrée!');
+            ActivityLog::log(
+                Auth::id(),
+                'inspection_end',
+                __('Inspection de retour'),
+                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                ['reservation_id' => $reservation->id, 'inspection_id' => $inspection->id]
+            );
+
+            return back()->with('success', __('Inspection de retour enregistrée !'));
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur: ' . $e->getMessage());
         }

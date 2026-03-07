@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Reservation;
 use App\Models\Vehicle;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-/**
- * @mixin \App\Models\Reservation
- * @mixin \Illuminate\Foundation\Auth\User
- */
 class ReservationController extends Controller
 {
     /**
      * Liste toutes les réservations de l'utilisateur
-     * Ou toutes les réservations si admin
      */
     public function index()
     {
+        /** @var User $user */
         $user = Auth::user();
 
-        // Si admin, voir toutes les réservations
         if ($user->isAdmin()) {
             return redirect()->route('admin.reservations.index');
         }
@@ -33,13 +30,24 @@ class ReservationController extends Controller
             ->orderBy('start_date', 'desc')
             ->get();
 
-        // Grouper par statut pour affichage
-        $active = $reservations->where('status', 'active');
+        $active = $reservations->whereIn('status', ['active']);
         $upcoming = $reservations->whereIn('status', ['pending', 'confirmed'])
             ->where('start_date', '>', now());
-        $past = $reservations->where('status', 'completed');
+        $past = $reservations->whereIn('status', ['completed', 'cancelled']);
 
-        return view('reservations.index', compact('reservations', 'active', 'upcoming', 'past'));
+        return view('dashboard.reservations', compact('reservations', 'active', 'upcoming', 'past'));
+    }
+
+    /**
+     * Formulaire de création de réservation
+     */
+    public function create(Request $request)
+    {
+        $vehicleId = $request->get('vehicle_id');
+        $vehicle = $vehicleId ? Vehicle::findOrFail($vehicleId) : null;
+        $vehicles = Vehicle::where('status', 'available')->orderBy('brand')->get();
+
+        return view('dashboard.reservation-create', compact('vehicle', 'vehicles'));
     }
 
     /**
@@ -50,12 +58,14 @@ class ReservationController extends Controller
         $reservation = Reservation::with(['vehicle', 'user', 'inspections'])
             ->findOrFail($id);
 
-        // Vérifier que l'utilisateur a accès à cette réservation (ou est admin)
-        if ($reservation->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        if ($reservation->user_id !== Auth::id() && !$currentUser->isAdmin()) {
             abort(403, 'Accès non autorisé');
         }
 
-        return view('reservations.show', compact('reservation'));
+        return view('dashboard.reservation-show', compact('reservation'));
     }
 
     /**
@@ -63,19 +73,19 @@ class ReservationController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        // Vérifier que l'utilisateur est admin
-        if (!Auth::user()->isAdmin()) {
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        if (!$currentUser->isAdmin()) {
             abort(403);
         }
 
         $query = Reservation::with(['vehicle', 'user']);
 
-        // Filtrer par statut
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filtrer par date
         if ($request->filled('date_from')) {
             $query->where('start_date', '>=', $request->date_from);
         }
@@ -83,7 +93,6 @@ class ReservationController extends Controller
             $query->where('end_date', '<=', $request->date_to);
         }
 
-        // Recherche par client ou véhicule
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -94,20 +103,19 @@ class ReservationController extends Controller
                 })->orWhereHas('vehicle', function ($vehicleQuery) use ($search) {
                     $vehicleQuery->where('brand', 'like', "%{$search}%")
                         ->orWhere('model', 'like', "%{$search}%")
-                        ->orWhere('license_plate', 'like', "%{$search}%");
+                        ->orWhere('registration_number', 'like', "%{$search}%");
                 });
             });
         }
 
         $reservations = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        // Statistiques
         $stats = [
             'pending' => Reservation::where('status', 'pending')->count(),
             'confirmed' => Reservation::where('status', 'confirmed')->count(),
             'active' => Reservation::where('status', 'active')->count(),
             'late' => Reservation::where('status', 'late')->count(),
-            'total_revenue' => Reservation::whereIn('status', ['completed'])->sum('total_price'),
+            'total_revenue' => Reservation::where('status', 'completed')->sum('total_price'),
         ];
 
         return view('admin.reservations.index', compact('reservations', 'stats'));
@@ -118,13 +126,10 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
-            'start_date' => 'required|date|after:now',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'contract_type' => 'required|in:simple,professional',
-            'rate_type' => 'required|in:daily,weekly,monthly',
             'child_seat' => 'boolean',
             'gps' => 'boolean',
             'additional_driver' => 'boolean',
@@ -135,12 +140,10 @@ class ReservationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Récupérer le véhicule
             $vehicle = Vehicle::findOrFail($request->vehicle_id);
 
-            // Vérifier la disponibilité
             if (!$vehicle->isAvailable()) {
-                return back()->with('error', 'Ce véhicule n\'est pas disponible.');
+                return back()->with('error', __('Ce véhicule n\'est pas disponible.'));
             }
 
             // Vérifier les conflits de dates
@@ -157,52 +160,46 @@ class ReservationController extends Controller
                 ->exists();
 
             if ($hasConflict) {
-                return back()->with('error', 'Le véhicule est déjà réservé pour ces dates.');
+                return back()->with('error', __('Le véhicule est déjà réservé pour ces dates.'));
             }
 
-            // Calculer la durée
             $startDate = Carbon::parse($request->start_date);
             $endDate = Carbon::parse($request->end_date);
-            $days = $startDate->diffInDays($endDate);
+            $days = max(1, $startDate->diffInDays($endDate));
 
-            // Calculer le prix de base
-            $basePrice = $vehicle->calculatePrice($days, $request->rate_type);
+            // Calcul prix
+            $pricingBreakdown = Reservation::calculateOfferBreakdown($vehicle, $days);
+            $basePrice = (float) $pricingBreakdown['total'];
 
-            // Calculer le prix des options
             $optionsPrice = 0;
             if ($request->child_seat && $vehicle->child_seat_available) {
-                $optionsPrice += 5 * $days; // 5€/jour
+                $optionsPrice += 5 * $days;
             }
             if ($request->gps && $vehicle->gps_available) {
-                $optionsPrice += 3 * $days; // 3€/jour
+                $optionsPrice += 3 * $days;
             }
             if ($request->additional_driver) {
-                $optionsPrice += 10 * $days; // 10€/jour
+                $optionsPrice += 10 * $days;
             }
 
-            // Prix de l'assurance
             $insurancePrice = 0;
             if ($request->insurance_full) {
-                $insurancePrice = $basePrice * 0.15; // 15% du prix de base
+                $insurancePrice = $basePrice * 0.15;
             }
 
-            // Prix total
             $totalPrice = $basePrice + $optionsPrice + $insurancePrice;
 
-            // Créer la réservation
             $reservation = Reservation::create([
                 'user_id' => Auth::id(),
                 'vehicle_id' => $vehicle->id,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'duration_days' => $days,
-                'contract_type' => $request->contract_type,
-                'rate_type' => $request->rate_type,
                 'base_price' => $basePrice,
                 'insurance_price' => $insurancePrice,
                 'options_price' => $optionsPrice,
                 'total_price' => $totalPrice,
-                'deposit_paid' => $vehicle->deposit,
+                'deposit_amount' => $vehicle->deposit,
                 'child_seat' => $request->child_seat ?? false,
                 'gps' => $request->gps ?? false,
                 'additional_driver' => $request->additional_driver ?? false,
@@ -212,68 +209,26 @@ class ReservationController extends Controller
                 'payment_status' => 'pending',
             ]);
 
-            // Mettre à jour le statut du véhicule
-            $vehicle->update(['status' => 'rented']);
+            // Log activité
+            ActivityLog::log(
+                Auth::id(),
+                'reservation_created',
+                __('Réservation créée'),
+                $vehicle->brand . ' ' . $vehicle->model . ' • ' . __('Du') . ' ' . $startDate->format('d/m') . ' ' . __('au') . ' ' . $endDate->format('d/m'),
+                [
+                    'reservation_id' => $reservation->id,
+                    'vehicle_id' => $vehicle->id,
+                    'pricing_breakdown' => $pricingBreakdown,
+                ]
+            );
 
             DB::commit();
 
-            return redirect()->route('reservations.show', $reservation->id)
-                ->with('success', 'Réservation créée avec succès! Code de confirmation: ' . $reservation->confirmation_code);
+            return redirect()->route('dashboard.reservation.show', $reservation->id)
+                ->with('success', __('Réservation créée avec succès ! Code :') . ' ' . $reservation->confirmation_code);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur lors de la création de la réservation: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Modifier une réservation
-     */
-    public function update(Request $request, $id)
-    {
-        $reservation = Reservation::findOrFail($id);
-
-        // Vérifier les droits
-        if ($reservation->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        // On ne peut modifier que les réservations en attente
-        if (!in_array($reservation->status, ['pending', 'confirmed'])) {
-            return back()->with('error', 'Cette réservation ne peut plus être modifiée.');
-        }
-
-        $validated = $request->validate([
-            'start_date' => 'sometimes|date|after:now',
-            'end_date' => 'sometimes|date|after:start_date',
-            'child_seat' => 'boolean',
-            'gps' => 'boolean',
-            'insurance_full' => 'boolean',
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            // Recalculer les prix si les dates ont changé
-            if ($request->has('start_date') || $request->has('end_date')) {
-                $startDate = Carbon::parse($request->start_date ?? $reservation->start_date);
-                $endDate = Carbon::parse($request->end_date ?? $reservation->end_date);
-                $days = $startDate->diffInDays($endDate);
-
-                $basePrice = $reservation->vehicle->calculatePrice($days, $reservation->rate_type);
-
-                $validated['duration_days'] = $days;
-                $validated['base_price'] = $basePrice;
-                $validated['total_price'] = $basePrice + $reservation->options_price + $reservation->insurance_price;
-            }
-
-            $reservation->update($validated);
-
-            DB::commit();
-
-            return back()->with('success', 'Réservation modifiée avec succès.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', __('Erreur lors de la création de la réservation: ') . $e->getMessage());
         }
     }
 
@@ -284,35 +239,39 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
 
-        // Vérifier les droits
         if ($reservation->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // On ne peut annuler que les réservations pending/confirmed
         if (!in_array($reservation->status, ['pending', 'confirmed'])) {
-            return back()->with('error', 'Cette réservation ne peut plus être annulée.');
+            return back()->with('error', __('Cette réservation ne peut plus être annulée.'));
         }
 
         try {
             DB::beginTransaction();
 
-            // Libérer le véhicule
             $reservation->vehicle->update(['status' => 'available']);
 
-            // Marquer comme annulée
             $reservation->update([
                 'status' => 'cancelled',
-                'admin_notes' => 'Annulée par le client le ' . now()->format('d/m/Y à H:i'),
+                'admin_notes' => __('Annulée par le client le') . ' ' . now()->format('d/m/Y à H:i'),
             ]);
+
+            ActivityLog::log(
+                Auth::id(),
+                'reservation_cancelled',
+                __('Réservation annulée'),
+                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                ['reservation_id' => $reservation->id]
+            );
 
             DB::commit();
 
-            return redirect()->route('reservations.index')
-                ->with('success', 'Réservation annulée. Le remboursement sera traité sous 48h.');
+            return redirect()->route('dashboard.reservations')
+                ->with('success', __('Réservation annulée avec succès.'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', __('Erreur: ') . $e->getMessage());
         }
     }
 
@@ -321,24 +280,33 @@ class ReservationController extends Controller
      */
     public function confirm($id)
     {
-        // Vérifier que l'utilisateur est admin
-        if (!Auth::user()->isAdmin()) {
-            abort(403, 'Accès non autorisé');
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        if (!$currentUser->isAdmin()) {
+            abort(403);
         }
 
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'pending') {
-            return back()->with('error', 'Cette réservation n\'est pas en attente.');
+            return back()->with('error', __('Cette réservation n\'est pas en attente.'));
         }
 
         $reservation->update([
             'status' => 'confirmed',
             'payment_status' => 'completed',
-            'admin_notes' => 'Confirmée par ' . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i'),
         ]);
 
-        return back()->with('success', 'Réservation confirmée.');
+        ActivityLog::log(
+            $reservation->user_id,
+            'reservation_confirmed',
+            __('Réservation confirmée'),
+            $reservation->vehicle->brand . ' ' . $reservation->vehicle->model . ' • ' . __('Du') . ' ' . $reservation->start_date->format('d/m') . ' ' . __('au') . ' ' . $reservation->end_date->format('d/m'),
+            ['reservation_id' => $reservation->id]
+        );
+
+        return back()->with('success', __('Réservation confirmée.'));
     }
 
     /**
@@ -346,33 +314,28 @@ class ReservationController extends Controller
      */
     public function start($id, Request $request)
     {
-        // Vérifier que l'utilisateur est admin
-        if (!Auth::user()->isAdmin()) {
-            abort(403, 'Accès non autorisé');
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        if (!$currentUser->isAdmin()) {
+            abort(403);
         }
 
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'confirmed') {
-            return back()->with('error', 'Cette réservation n\'est pas confirmée.');
+            return back()->with('error', __('Cette réservation n\'est pas confirmée.'));
         }
 
-        // Vérifier que l'inspection de départ a été faite
         if (!$reservation->start_inspection_done) {
-            return back()->with('error', 'L\'inspection de départ doit être réalisée avant de démarrer la location.');
+            return back()->with('error', __('L\'inspection de départ doit être réalisée.'));
         }
-
-        $validated = $request->validate([
-            'mileage_start' => 'required|integer|min:0',
-        ]);
 
         $reservation->update([
             'status' => 'active',
-            'mileage_start' => $validated['mileage_start'],
-            'admin_notes' => ($reservation->admin_notes ?? '') . "\nLocation démarrée par " . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i'),
         ]);
 
-        return back()->with('success', 'Location démarrée.');
+        return back()->with('success', __('Location démarrée.'));
     }
 
     /**
@@ -380,46 +343,46 @@ class ReservationController extends Controller
      */
     public function complete($id, Request $request)
     {
-        // Vérifier que l'utilisateur est admin
-        if (!Auth::user()->isAdmin()) {
-            abort(403, 'Accès non autorisé');
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        if (!$currentUser->isAdmin()) {
+            abort(403);
         }
 
         $reservation = Reservation::findOrFail($id);
 
         if (!in_array($reservation->status, ['active', 'late'])) {
-            return back()->with('error', 'Cette réservation n\'est pas active.');
+            return back()->with('error', __('Cette réservation n\'est pas active.'));
         }
 
-        // Vérifier que l'inspection de fin a été faite
         if (!$reservation->end_inspection_done) {
-            return back()->with('error', 'L\'inspection de retour doit être réalisée avant de clôturer la location.');
+            return back()->with('error', __('L\'inspection de retour doit être réalisée.'));
         }
 
         $validated = $request->validate([
             'mileage_end' => 'required|integer|min:' . ($reservation->mileage_start ?? 0),
             'damage_cost' => 'nullable|numeric|min:0',
-            'admin_notes_final' => 'nullable|string|max:1000',
         ]);
 
         $reservation->mileage_end = $validated['mileage_end'];
         $reservation->damage_cost = $validated['damage_cost'] ?? 0;
 
-        // Calculer les pénalités de retard si nécessaire
         if ($reservation->is_late) {
             $reservation->late_penalty = $reservation->calculateLatePenalty();
         }
 
-        // Ajouter les notes admin
-        $adminNotes = ($reservation->admin_notes ?? '') . "\nLocation terminée par " . Auth::user()->full_name . ' le ' . now()->format('d/m/Y à H:i');
-        if ($validated['admin_notes_final']) {
-            $adminNotes .= "\n" . $validated['admin_notes_final'];
-        }
-        $reservation->admin_notes = $adminNotes;
-
-        // Finaliser
+        $reservation->save();
         $reservation->complete();
 
-        return back()->with('success', 'Location terminée. Total final: ' . $reservation->formatted_total_price);
+        ActivityLog::log(
+            $reservation->user_id,
+            'reservation_completed',
+            __('Location terminée'),
+            $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+            ['reservation_id' => $reservation->id]
+        );
+
+        return back()->with('success', __('Location terminée.'));
     }
 }

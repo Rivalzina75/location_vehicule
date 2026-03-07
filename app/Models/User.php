@@ -177,6 +177,32 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Relation: User has many activity logs.
+     */
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
+
+    /**
+     * Relation: User has many payment methods.
+     */
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    /**
+     * Get user's default payment method.
+     *
+     * @return PaymentMethod|null
+     */
+    public function defaultPaymentMethod()
+    {
+        return $this->paymentMethods()->where('is_default', true)->first();
+    }
+
+    /**
      * Check if user is currently locked out.
      */
     public function isLockedOut(): bool

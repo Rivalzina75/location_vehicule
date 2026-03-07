@@ -41,7 +41,7 @@ class VehicleController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('brand', 'like', "%{$search}%")
                     ->orWhere('model', 'like', "%{$search}%")
-                    ->orWhere('license_plate', 'like', "%{$search}%");
+                    ->orWhere('registration_number', 'like', "%{$search}%");
             });
         }
 
@@ -69,44 +69,39 @@ class VehicleController extends Controller
             'brand' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
             'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'license_plate' => ['required', 'string', 'max:20', 'unique:vehicles,license_plate'],
-            'color' => ['required', 'string', 'max:50'],
+            'registration_number' => ['required', 'string', 'max:20', 'unique:vehicles,registration_number'],
             'transmission' => ['required', 'in:manual,automatic'],
             'fuel_type' => ['required', 'in:gasoline,diesel,electric,hybrid'],
             'seats' => ['required', 'integer', 'min:1', 'max:50'],
-            'doors' => ['required', 'integer', 'min:2', 'max:10'],
-            'mileage' => ['required', 'integer', 'min:0'],
+            'doors' => ['nullable', 'integer', 'min:0', 'max:10'],
+            'mileage' => ['nullable', 'integer', 'min:0'],
             'price_per_day' => ['required', 'numeric', 'min:0'],
-            'price_per_week' => ['required', 'numeric', 'min:0'],
-            'price_per_month' => ['required', 'numeric', 'min:0'],
-            'deposit' => ['required', 'numeric', 'min:0'],
-            'insurance_daily' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['required', 'in:available,rented,maintenance,unavailable'],
+            'price_per_week' => ['nullable', 'numeric', 'min:0'],
+            'price_per_month' => ['nullable', 'numeric', 'min:0'],
+            'deposit' => ['nullable', 'numeric', 'min:0'],
+            'status' => ['required', 'in:available,rented,maintenance'],
             'child_seat_available' => ['boolean'],
             'gps_available' => ['boolean'],
             'bluetooth' => ['boolean'],
             'air_conditioning' => ['boolean'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'description' => ['nullable', 'string', 'max:2000'],
         ]);
 
         try {
-            // Upload des images
-            $imagePaths = [];
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $path = $image->storeAs('vehicles', $filename, 'public');
-                    $imagePaths[] = $path;
-                }
+            // Upload image
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('vehicles', $filename, 'public');
+                $validated['image_path'] = $path;
             }
 
-            $validated['images'] = $imagePaths;
             $validated['child_seat_available'] = $request->has('child_seat_available');
             $validated['gps_available'] = $request->has('gps_available');
             $validated['bluetooth'] = $request->has('bluetooth');
             $validated['air_conditioning'] = $request->has('air_conditioning');
+            unset($validated['image']);
 
             $vehicle = Vehicle::create($validated);
 
@@ -154,57 +149,43 @@ class VehicleController extends Controller
             'brand' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
             'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'license_plate' => ['required', 'string', 'max:20', Rule::unique('vehicles')->ignore($vehicle->id)],
-            'color' => ['required', 'string', 'max:50'],
+            'registration_number' => ['required', 'string', 'max:20', Rule::unique('vehicles')->ignore($vehicle->id)],
             'transmission' => ['required', 'in:manual,automatic'],
             'fuel_type' => ['required', 'in:gasoline,diesel,electric,hybrid'],
             'seats' => ['required', 'integer', 'min:1', 'max:50'],
-            'doors' => ['required', 'integer', 'min:2', 'max:10'],
-            'mileage' => ['required', 'integer', 'min:0'],
+            'doors' => ['nullable', 'integer', 'min:0', 'max:10'],
+            'mileage' => ['nullable', 'integer', 'min:0'],
             'price_per_day' => ['required', 'numeric', 'min:0'],
-            'price_per_week' => ['required', 'numeric', 'min:0'],
-            'price_per_month' => ['required', 'numeric', 'min:0'],
-            'deposit' => ['required', 'numeric', 'min:0'],
-            'insurance_daily' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['required', 'in:available,rented,maintenance,unavailable'],
+            'price_per_week' => ['nullable', 'numeric', 'min:0'],
+            'price_per_month' => ['nullable', 'numeric', 'min:0'],
+            'deposit' => ['nullable', 'numeric', 'min:0'],
+            'status' => ['required', 'in:available,rented,maintenance'],
             'child_seat_available' => ['boolean'],
             'gps_available' => ['boolean'],
             'bluetooth' => ['boolean'],
             'air_conditioning' => ['boolean'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-            'remove_images' => ['nullable', 'array'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'description' => ['nullable', 'string', 'max:2000'],
         ]);
 
         try {
-            // Supprimer les images demandées
-            if ($request->filled('remove_images')) {
-                $currentImages = $vehicle->images ?? [];
-                foreach ($request->remove_images as $imageToRemove) {
-                    if (in_array($imageToRemove, $currentImages)) {
-                        Storage::disk('public')->delete($imageToRemove);
-                        $currentImages = array_values(array_diff($currentImages, [$imageToRemove]));
-                    }
+            // Upload new image if provided
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($vehicle->image_path) {
+                    Storage::disk('public')->delete($vehicle->image_path);
                 }
-                $validated['images'] = $currentImages;
-            } else {
-                $validated['images'] = $vehicle->images ?? [];
-            }
-
-            // Ajouter de nouvelles images
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $path = $image->storeAs('vehicles', $filename, 'public');
-                    $validated['images'][] = $path;
-                }
+                $image = $request->file('image');
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('vehicles', $filename, 'public');
+                $validated['image_path'] = $path;
             }
 
             $validated['child_seat_available'] = $request->has('child_seat_available');
             $validated['gps_available'] = $request->has('gps_available');
             $validated['bluetooth'] = $request->has('bluetooth');
             $validated['air_conditioning'] = $request->has('air_conditioning');
+            unset($validated['image']);
 
             $vehicle->update($validated);
 
@@ -230,11 +211,9 @@ class VehicleController extends Controller
         }
 
         try {
-            // Supprimer les images
-            if ($vehicle->images) {
-                foreach ($vehicle->images as $image) {
-                    Storage::disk('public')->delete($image);
-                }
+            // Supprimer l'image
+            if ($vehicle->image_path) {
+                Storage::disk('public')->delete($vehicle->image_path);
             }
 
             $vehicle->delete();

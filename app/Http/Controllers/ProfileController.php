@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Rules\PasswordRobustness;
+use App\Models\User;
 
 /**
  * @mixin \App\Models\User
@@ -26,8 +27,9 @@ class ProfileController extends Controller
      */
     public function show()
     {
+        /** @var User $user */
         $user = Auth::user();
-        return view('profile.show', compact('user'));
+        return view('dashboard.profile', compact('user'));
     }
 
     /**
@@ -35,8 +37,9 @@ class ProfileController extends Controller
      */
     public function edit()
     {
+        /** @var User $user */
         $user = Auth::user();
-        return view('profile.edit', compact('user'));
+        return view('dashboard.profile-edit', compact('user'));
     }
 
     /**
@@ -44,6 +47,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -65,6 +69,9 @@ class ProfileController extends Controller
         ]);
 
         try {
+            // Detect email change for re-verification
+            $emailChanged = strtolower(trim($validated['email'])) !== $user->email;
+
             $user->fill([
                 'first_name' => trim($validated['first_name']),
                 'last_name' => trim($validated['last_name']),
@@ -74,9 +81,21 @@ class ProfileController extends Controller
                 'address_line1' => trim($validated['address_line1']),
                 'postal_code' => $validated['postal_code'],
                 'city' => trim($validated['city']),
-            ])->save();
+            ]);
 
-            return redirect()->route('profile.show')
+            if ($emailChanged) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
+
+            if ($emailChanged) {
+                $user->sendEmailVerificationNotification();
+                return redirect()->route('dashboard.profile.show')
+                    ->with('success', __('Profil mis à jour. Un email de vérification a été envoyé à votre nouvelle adresse.'));
+            }
+
+            return redirect()->route('dashboard.profile.show')
                 ->with('success', __('Profil mis à jour avec succès.'));
         } catch (\Exception $e) {
             return back()
@@ -90,6 +109,7 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -130,6 +150,7 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         // Vérifier le mot de passe pour confirmation

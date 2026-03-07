@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // 1. Créer le compte admin par défaut
         $this->call([
             AdminSeeder::class,
+            VehicleSeeder::class,
         ]);
 
         // 2. Créer un utilisateur de test (client)
