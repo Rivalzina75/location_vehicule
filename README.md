@@ -159,14 +159,10 @@ php artisan test
    ```
 5. Créez une Pull Request
 
-## Licence
-Ce projet est sous licence [MIT](LICENSE).
+## Note Importante
 
----
+Ce projet a été réalisé dans le cadre d'un cours et est destiné uniquement à des fins de démonstration. Il est publié sur GitHub pour permettre aux recruteurs de consulter mon travail.
 
-### Auteur
-Reda
-
----
-
-Pour toute question ou suggestion, n'hésitez pas à me contacter.
+**Veuillez noter :**
+- Ce projet n'est pas destiné à être cloné, forké ou utilisé à des fins commerciales ou personnelles.
+- Toute utilisation du code sans autorisation explicite est interdite.
