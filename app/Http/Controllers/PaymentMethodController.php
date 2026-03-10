@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,7 +45,7 @@ class PaymentMethodController extends Controller
         ]);
 
         // Validate expiry date is in the future
-        $expiryDate = \Carbon\Carbon::createFromFormat('m/Y', $validated['expiry_month'] . '/' . $validated['expiry_year'])->endOfMonth();
+        $expiryDate = \Carbon\Carbon::createFromFormat('m/Y', $validated['expiry_month'].'/'.$validated['expiry_year'])->endOfMonth();
         if ($expiryDate->isPast()) {
             return back()->withErrors(['expiry_month' => __('La carte est expirée.')])->withInput();
         }

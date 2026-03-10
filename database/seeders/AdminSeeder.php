@@ -17,6 +17,7 @@ class AdminSeeder extends Seeder
         // Vérifier si l'admin existe déjà
         if (User::where('email', 'admin@machina.fr')->exists()) {
             $this->command->info('Admin account already exists.');
+
             return;
         }
 

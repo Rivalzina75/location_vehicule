@@ -31,15 +31,15 @@ class CustomResetPasswordNotification extends Notification
         ], false));
 
         // Récupération du délai d'expiration (60 min par défaut)
-        $expirationCount = config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
+        $expirationCount = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
 
         // Utilisation de la vue multilingue
         return (new MailMessage)
-            ->subject(Lang::get('Réinitialisation de votre mot de passe') . ' - Machina')
+            ->subject(Lang::get('Réinitialisation de votre mot de passe').' - Machina')
             ->view('emails.password-reset', [
                 'url' => $resetUrl,
                 'count' => $expirationCount,
-                'user' => $notifiable
+                'user' => $notifiable,
             ]);
     }
 }

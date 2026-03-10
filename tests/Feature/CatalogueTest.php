@@ -26,7 +26,7 @@ class CatalogueTest extends TestCase
             'model' => '208',
             'type' => 'citycar',
             'year' => 2024,
-            'registration_number' => 'AA-' . rand(100, 999) . '-BB',
+            'registration_number' => 'AA-'.rand(100, 999).'-BB',
             'transmission' => 'manual',
             'fuel_type' => 'gasoline',
             'seats' => 5,

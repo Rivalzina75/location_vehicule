@@ -63,7 +63,7 @@ class Reservation extends Model
     {
         static::creating(function (Reservation $reservation) {
             if (empty($reservation->confirmation_code)) {
-                $reservation->confirmation_code = 'RES-' . strtoupper(Str::random(8));
+                $reservation->confirmation_code = 'RES-'.strtoupper(Str::random(8));
             }
         });
     }
@@ -85,16 +85,18 @@ class Reservation extends Model
 
     public function getIsLateAttribute(): bool
     {
-        if (!in_array($this->status, ['active', 'late'])) {
+        if (! in_array($this->status, ['active', 'late'])) {
             return false;
         }
+
         return Carbon::now()->greaterThan($this->end_date);
     }
 
     public function getFormattedTotalPriceAttribute(): string
     {
         $total = $this->total_price + $this->damage_cost + $this->late_penalty;
-        return number_format($total, 2, ',', ' ') . ' €';
+
+        return number_format($total, 2, ',', ' ').' €';
     }
 
     public function getStatusLabelAttribute(): string
@@ -125,10 +127,11 @@ class Reservation extends Model
 
     public function calculateLatePenalty(): float
     {
-        if (!$this->is_late) {
+        if (! $this->is_late) {
             return 0;
         }
         $lateDays = Carbon::now()->diffInDays($this->end_date);
+
         return $lateDays * ($this->vehicle->price_per_day * 1.5);
     }
 
@@ -140,12 +143,12 @@ class Reservation extends Model
         $weeks = 0;
         $singleDays = 0;
 
-        if (!empty($vehicle->price_per_month) && $vehicle->price_per_month > 0) {
+        if (! empty($vehicle->price_per_month) && $vehicle->price_per_month > 0) {
             $months = intdiv($remainingDays, 30);
             $remainingDays %= 30;
         }
 
-        if (!empty($vehicle->price_per_week) && $vehicle->price_per_week > 0) {
+        if (! empty($vehicle->price_per_week) && $vehicle->price_per_week > 0) {
             $weeks = intdiv($remainingDays, 7);
             $remainingDays %= 7;
         }

@@ -52,7 +52,7 @@ class PaymentMethod extends Model
      */
     public function getDisplayNameAttribute(): string
     {
-        return ucfirst($this->card_brand) . ' •••• ' . $this->card_last_four;
+        return ucfirst($this->card_brand).' •••• '.$this->card_last_four;
     }
 
     /**
@@ -61,7 +61,8 @@ class PaymentMethod extends Model
     public function getIsExpiredAttribute(): bool
     {
         $now = now();
-        $expiryDate = \Carbon\Carbon::createFromFormat('m/Y', $this->expiry_month . '/' . $this->expiry_year)->endOfMonth();
+        $expiryDate = \Carbon\Carbon::createFromFormat('m/Y', $this->expiry_month.'/'.$this->expiry_year)->endOfMonth();
+
         return $now->greaterThan($expiryDate);
     }
 

@@ -75,6 +75,6 @@ class Inspection extends Model
 
     public function hasIssues(): bool
     {
-        return !$this->exterior_ok || !$this->interior_ok || !$this->tires_ok || !$this->lights_ok || !$this->documents_ok;
+        return ! $this->exterior_ok || ! $this->interior_ok || ! $this->tires_ok || ! $this->lights_ok || ! $this->documents_ok;
     }
 }

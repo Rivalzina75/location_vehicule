@@ -7,7 +7,6 @@ use App\Models\Inspection;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class InspectionController extends Controller
 {
@@ -64,7 +63,7 @@ class InspectionController extends Controller
             $photoPaths = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $filename = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                    $filename = time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
                     $path = $photo->storeAs('inspections', $filename, 'public');
                     $photoPaths[] = $path;
                 }
@@ -98,13 +97,13 @@ class InspectionController extends Controller
                 Auth::id(),
                 'inspection_start',
                 __('Inspection de départ'),
-                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                $reservation->vehicle->brand.' '.$reservation->vehicle->model,
                 ['reservation_id' => $reservation->id, 'inspection_id' => $inspection->id]
             );
 
             return back()->with('success', __('Inspection de départ enregistrée !'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', 'Erreur: '.$e->getMessage());
         }
     }
 
@@ -120,7 +119,7 @@ class InspectionController extends Controller
         }
 
         $validated = $request->validate([
-            'mileage' => 'required|integer|min:' . ($reservation->mileage_start ?? 0),
+            'mileage' => 'required|integer|min:'.($reservation->mileage_start ?? 0),
             'fuel_level' => 'required|in:empty,quarter,half,three_quarters,full',
             'cleanliness' => 'required|in:dirty,acceptable,clean,very_clean',
             'exterior_ok' => 'boolean',
@@ -139,7 +138,7 @@ class InspectionController extends Controller
             $photoPaths = [];
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $filename = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                    $filename = time().'_'.uniqid().'.'.$photo->getClientOriginalExtension();
                     $path = $photo->storeAs('inspections', $filename, 'public');
                     $photoPaths[] = $path;
                 }
@@ -174,13 +173,13 @@ class InspectionController extends Controller
                 Auth::id(),
                 'inspection_end',
                 __('Inspection de retour'),
-                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                $reservation->vehicle->brand.' '.$reservation->vehicle->model,
                 ['reservation_id' => $reservation->id, 'inspection_id' => $inspection->id]
             );
 
             return back()->with('success', __('Inspection de retour enregistrée !'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', 'Erreur: '.$e->getMessage());
         }
     }
 }

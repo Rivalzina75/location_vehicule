@@ -65,7 +65,7 @@ class CatalogueController extends Controller
 
         // Filtrer par caractéristiques (tags)
         $activeFeatures = $request->get('features', []);
-        if (!is_array($activeFeatures)) {
+        if (! is_array($activeFeatures)) {
             $activeFeatures = [$activeFeatures];
         }
         $activeFeatures = array_filter($activeFeatures);
@@ -113,6 +113,7 @@ class CatalogueController extends Controller
         $vehicles = $query->paginate(12);
         $vehicles->getCollection()->transform(function (Vehicle $vehicle) {
             $vehicle->setAttribute('resolved_image_url', $this->resolveVehiclePrimaryImage($vehicle));
+
             return $vehicle;
         });
 
@@ -157,7 +158,7 @@ class CatalogueController extends Controller
         $vehicle = Vehicle::findOrFail($id);
 
         // Vérifier si le véhicule est disponible
-        if (!$vehicle->isAvailable()) {
+        if (! $vehicle->isAvailable()) {
             return redirect()->route('dashboard.catalogue')
                 ->with('error', __('Ce véhicule n\'est pas disponible actuellement.'));
         }
@@ -189,16 +190,16 @@ class CatalogueController extends Controller
             'images/vehicles',
             'images/vehicule',
             'images/véhicule',
-        ], fn(string $dir) => is_dir(public_path($dir))));
+        ], fn (string $dir) => is_dir(public_path($dir))));
     }
 
     private function allVehicleImageFiles(): Collection
     {
         $files = collect();
         foreach ($this->imageDirectories() as $directory) {
-            $glob = glob(public_path($directory . '/*.{png,jpg,jpeg,webp}'), GLOB_BRACE) ?: [];
+            $glob = glob(public_path($directory.'/*.{png,jpg,jpeg,webp}'), GLOB_BRACE) ?: [];
             foreach ($glob as $absolutePath) {
-                $relativePath = str_replace(public_path() . DIRECTORY_SEPARATOR, '', $absolutePath);
+                $relativePath = str_replace(public_path().DIRECTORY_SEPARATOR, '', $absolutePath);
                 $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
                 $files->push($relativePath);
             }
@@ -214,15 +215,15 @@ class CatalogueController extends Controller
 
     private function vehicleKey(Vehicle $vehicle): string
     {
-        return Str::slug(Str::ascii($vehicle->brand . '-' . $vehicle->model));
+        return Str::slug(Str::ascii($vehicle->brand.'-'.$vehicle->model));
     }
 
     private function resolveVehiclePrimaryImage(Vehicle $vehicle): ?string
     {
-        if (!empty($vehicle->image_path)) {
+        if (! empty($vehicle->image_path)) {
             return Str::startsWith($vehicle->image_path, 'images/')
                 ? asset($vehicle->image_path)
-                : asset('storage/' . $vehicle->image_path);
+                : asset('storage/'.$vehicle->image_path);
         }
 
         $vehicleKey = $this->vehicleKey($vehicle);
@@ -230,8 +231,9 @@ class CatalogueController extends Controller
 
         $matched = $allFiles->first(function (string $relativePath) use ($vehicleKey) {
             $normalized = $this->normalizeName($relativePath);
+
             return $normalized === $vehicleKey
-                || Str::startsWith($normalized, $vehicleKey . '-')
+                || Str::startsWith($normalized, $vehicleKey.'-')
                 || Str::contains($normalized, $vehicleKey);
         });
 
@@ -245,8 +247,9 @@ class CatalogueController extends Controller
 
         $matchedFiles = $allFiles->filter(function (string $relativePath) use ($vehicleKey) {
             $normalized = $this->normalizeName($relativePath);
+
             return $normalized === $vehicleKey
-                || Str::startsWith($normalized, $vehicleKey . '-')
+                || Str::startsWith($normalized, $vehicleKey.'-')
                 || Str::contains($normalized, $vehicleKey);
         })->values();
 
@@ -272,6 +275,7 @@ class CatalogueController extends Controller
                         return true;
                     }
                 }
+
                 return false;
             });
 

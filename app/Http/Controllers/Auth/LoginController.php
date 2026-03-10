@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -57,7 +57,7 @@ class LoginController extends Controller
 
             // Use translation key - countdown handled by JavaScript
             throw \Illuminate\Validation\ValidationException::withMessages([
-                $this->username() => [__('lockout_message')]
+                $this->username() => [__('lockout_message')],
             ]);
         }
     }
@@ -106,7 +106,7 @@ class LoginController extends Controller
                 return redirect()->back()
                     ->withInput($request->only($this->username(), 'remember'))
                     ->withErrors([
-                        $this->username() => __('lockout_message')
+                        $this->username() => __('lockout_message'),
                     ]);
             }
 

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use App\Rules\PasswordRobustness; // On garde cet import
+use App\Rules\PasswordRobustness;
+use Illuminate\Foundation\Auth\ResetsPasswords; // On garde cet import
 
 class ResetPasswordController extends Controller
 {

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Models\Vehicle;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,6 +13,7 @@ class ReservationTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Vehicle $vehicle;
 
     protected function setUp(): void

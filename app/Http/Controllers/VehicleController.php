@@ -56,6 +56,7 @@ class VehicleController extends Controller
     public function create()
     {
         $types = Vehicle::types();
+
         return view('admin.vehicles.create', compact('types'));
     }
 
@@ -68,7 +69,7 @@ class VehicleController extends Controller
             'type' => ['required', Rule::in(array_keys(Vehicle::types()))],
             'brand' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
-            'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y') + 1)],
             'registration_number' => ['required', 'string', 'max:20', 'unique:vehicles,registration_number'],
             'transmission' => ['required', 'in:manual,automatic'],
             'fuel_type' => ['required', 'in:gasoline,diesel,electric,hybrid'],
@@ -92,7 +93,7 @@ class VehicleController extends Controller
             // Upload image
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $filename = time().'_'.uniqid().'.'.$image->getClientOriginalExtension();
                 $path = $image->storeAs('vehicles', $filename, 'public');
                 $validated['image_path'] = $path;
             }
@@ -110,7 +111,7 @@ class VehicleController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Erreur lors de la création du véhicule: ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la création du véhicule: '.$e->getMessage());
         }
     }
 
@@ -148,7 +149,7 @@ class VehicleController extends Controller
             'type' => ['required', Rule::in(array_keys(Vehicle::types()))],
             'brand' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
-            'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y') + 1)],
             'registration_number' => ['required', 'string', 'max:20', Rule::unique('vehicles')->ignore($vehicle->id)],
             'transmission' => ['required', 'in:manual,automatic'],
             'fuel_type' => ['required', 'in:gasoline,diesel,electric,hybrid'],
@@ -176,7 +177,7 @@ class VehicleController extends Controller
                     Storage::disk('public')->delete($vehicle->image_path);
                 }
                 $image = $request->file('image');
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $filename = time().'_'.uniqid().'.'.$image->getClientOriginalExtension();
                 $path = $image->storeAs('vehicles', $filename, 'public');
                 $validated['image_path'] = $path;
             }
@@ -194,7 +195,7 @@ class VehicleController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la mise à jour: '.$e->getMessage());
         }
     }
 
@@ -221,7 +222,7 @@ class VehicleController extends Controller
             return redirect()->route('admin.vehicles.index')
                 ->with('success', 'Véhicule supprimé avec succès.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la suppression: '.$e->getMessage());
         }
     }
 
@@ -238,6 +239,6 @@ class VehicleController extends Controller
 
         $vehicle->update(['status' => $validated['status']]);
 
-        return back()->with('success', 'Statut mis à jour: ' . $validated['status']);
+        return back()->with('success', 'Statut mis à jour: '.$validated['status']);
     }
 }

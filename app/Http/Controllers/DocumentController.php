@@ -44,7 +44,7 @@ class DocumentController extends Controller
             $file = $request->file('file');
 
             // Générer un nom unique
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time().'_'.$file->getClientOriginalName();
 
             // Stocker dans storage/app/public/documents
             $path = $file->storeAs('documents', $filename, 'public');
@@ -65,13 +65,13 @@ class DocumentController extends Controller
                 Auth::id(),
                 'document_uploaded',
                 __('Document uploadé'),
-                $document->type_label . ' - ' . $document->filename,
+                $document->type_label.' - '.$document->filename,
                 ['document_id' => $document->id, 'type' => $document->type]
             );
 
             return back()->with('success', __('Document uploadé avec succès !'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'upload: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'upload: '.$e->getMessage());
         }
     }
 
@@ -100,7 +100,7 @@ class DocumentController extends Controller
 
             return back()->with('success', 'Document supprimé.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur: ' . $e->getMessage());
+            return back()->with('error', 'Erreur: '.$e->getMessage());
         }
     }
 }

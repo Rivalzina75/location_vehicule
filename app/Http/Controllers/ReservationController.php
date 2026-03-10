@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Reservation;
-use App\Models\Vehicle;
 use App\Models\User;
+use App\Models\Vehicle;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
@@ -38,11 +38,13 @@ class ReservationController extends Controller
 
             if (in_array($reservation->status, ['completed', 'cancelled'], true) || $endDate->lt($today)) {
                 $reservation->list_category = 'past';
+
                 return;
             }
 
             if ($startDate->lte($today) && $endDate->gte($today)) {
                 $reservation->list_category = 'active';
+
                 return;
             }
 
@@ -83,7 +85,7 @@ class ReservationController extends Controller
         /** @var User $currentUser */
         $currentUser = Auth::user();
 
-        if ($reservation->user_id !== Auth::id() && !$currentUser->isAdmin()) {
+        if ($reservation->user_id !== Auth::id() && ! $currentUser->isAdmin()) {
             abort(403, 'Accès non autorisé');
         }
 
@@ -98,7 +100,7 @@ class ReservationController extends Controller
         /** @var User $currentUser */
         $currentUser = Auth::user();
 
-        if (!$currentUser->isAdmin()) {
+        if (! $currentUser->isAdmin()) {
             abort(403);
         }
 
@@ -166,8 +168,9 @@ class ReservationController extends Controller
             $user = Auth::user();
 
             // Check if user has valid payment method for any reservation
-            if (!$user->hasValidPaymentMethod()) {
+            if (! $user->hasValidPaymentMethod()) {
                 DB::rollBack();
+
                 return redirect()->route('dashboard.payment-methods')
                     ->with('error', __('Réservation indisponible sans moyen de paiement.'));
             }
@@ -176,7 +179,7 @@ class ReservationController extends Controller
 
             $vehicle = Vehicle::findOrFail($request->vehicle_id);
 
-            if (!$vehicle->isAvailable()) {
+            if (! $vehicle->isAvailable()) {
                 return back()->with('error', __('Ce véhicule n\'est pas disponible.'));
             }
 
@@ -248,7 +251,7 @@ class ReservationController extends Controller
                 Auth::id(),
                 'reservation_created',
                 __('Réservation créée'),
-                $vehicle->brand . ' ' . $vehicle->model . ' • ' . __('Du') . ' ' . $startDate->format('d/m') . ' ' . __('au') . ' ' . $endDate->format('d/m'),
+                $vehicle->brand.' '.$vehicle->model.' • '.__('Du').' '.$startDate->format('d/m').' '.__('au').' '.$endDate->format('d/m'),
                 [
                     'reservation_id' => $reservation->id,
                     'vehicle_id' => $vehicle->id,
@@ -259,10 +262,11 @@ class ReservationController extends Controller
             DB::commit();
 
             return redirect()->route('dashboard.reservation.show', $reservation->id)
-                ->with('success', __('Réservation créée avec succès ! Code :') . ' ' . $reservation->confirmation_code);
+                ->with('success', __('Réservation créée avec succès ! Code :').' '.$reservation->confirmation_code);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', __('Erreur lors de la création de la réservation: ') . $e->getMessage());
+
+            return back()->with('error', __('Erreur lors de la création de la réservation: ').$e->getMessage());
         }
     }
 
@@ -277,7 +281,7 @@ class ReservationController extends Controller
             abort(403);
         }
 
-        if (!in_array($reservation->status, ['pending', 'confirmed'])) {
+        if (! in_array($reservation->status, ['pending', 'confirmed'])) {
             return back()->with('error', __('Cette réservation ne peut plus être annulée.'));
         }
 
@@ -294,14 +298,14 @@ class ReservationController extends Controller
 
             $reservation->update([
                 'status' => 'cancelled',
-                'admin_notes' => __('Annulée par le client le') . ' ' . now()->format('d/m/Y à H:i'),
+                'admin_notes' => __('Annulée par le client le').' '.now()->format('d/m/Y à H:i'),
             ]);
 
             ActivityLog::log(
                 Auth::id(),
                 'reservation_cancelled',
                 __('Réservation annulée'),
-                $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+                $reservation->vehicle->brand.' '.$reservation->vehicle->model,
                 ['reservation_id' => $reservation->id]
             );
 
@@ -311,7 +315,8 @@ class ReservationController extends Controller
                 ->with('success', __('Réservation annulée avec succès.'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', __('Erreur: ') . $e->getMessage());
+
+            return back()->with('error', __('Erreur: ').$e->getMessage());
         }
     }
 
@@ -323,7 +328,7 @@ class ReservationController extends Controller
         /** @var User $currentUser */
         $currentUser = Auth::user();
 
-        if (!$currentUser->isAdmin()) {
+        if (! $currentUser->isAdmin()) {
             abort(403);
         }
 
@@ -342,7 +347,7 @@ class ReservationController extends Controller
             $reservation->user_id,
             'reservation_confirmed',
             __('Réservation confirmée'),
-            $reservation->vehicle->brand . ' ' . $reservation->vehicle->model . ' • ' . __('Du') . ' ' . $reservation->start_date->format('d/m') . ' ' . __('au') . ' ' . $reservation->end_date->format('d/m'),
+            $reservation->vehicle->brand.' '.$reservation->vehicle->model.' • '.__('Du').' '.$reservation->start_date->format('d/m').' '.__('au').' '.$reservation->end_date->format('d/m'),
             ['reservation_id' => $reservation->id]
         );
 
@@ -357,7 +362,7 @@ class ReservationController extends Controller
         /** @var User $currentUser */
         $currentUser = Auth::user();
 
-        if (!$currentUser->isAdmin()) {
+        if (! $currentUser->isAdmin()) {
             abort(403);
         }
 
@@ -367,7 +372,7 @@ class ReservationController extends Controller
             return back()->with('error', __('Cette réservation n\'est pas confirmée.'));
         }
 
-        if (!$reservation->start_inspection_done) {
+        if (! $reservation->start_inspection_done) {
             return back()->with('error', __('L\'inspection de départ doit être réalisée.'));
         }
 
@@ -386,22 +391,22 @@ class ReservationController extends Controller
         /** @var User $currentUser */
         $currentUser = Auth::user();
 
-        if (!$currentUser->isAdmin()) {
+        if (! $currentUser->isAdmin()) {
             abort(403);
         }
 
         $reservation = Reservation::findOrFail($id);
 
-        if (!in_array($reservation->status, ['active', 'late'])) {
+        if (! in_array($reservation->status, ['active', 'late'])) {
             return back()->with('error', __('Cette réservation n\'est pas active.'));
         }
 
-        if (!$reservation->end_inspection_done) {
+        if (! $reservation->end_inspection_done) {
             return back()->with('error', __('L\'inspection de retour doit être réalisée.'));
         }
 
         $validated = $request->validate([
-            'mileage_end' => 'required|integer|min:' . ($reservation->mileage_start ?? 0),
+            'mileage_end' => 'required|integer|min:'.($reservation->mileage_start ?? 0),
             'damage_cost' => 'nullable|numeric|min:0',
         ]);
 
@@ -419,7 +424,7 @@ class ReservationController extends Controller
             $reservation->user_id,
             'reservation_completed',
             __('Location terminée'),
-            $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+            $reservation->vehicle->brand.' '.$reservation->vehicle->model,
             ['reservation_id' => $reservation->id]
         );
 

@@ -7,9 +7,9 @@ return [
     | Lignes de Langue de Validation
     |--------------------------------------------------------------------------
     |
-    | Les lignes de langue suivantes contiennent les messages d'erreur par défaut 
-    | utilisés par la classe de validation. Certaines de ces règles ont 
-    | plusieurs versions, comme les règles de taille. N'hésitez pas à 
+    | Les lignes de langue suivantes contiennent les messages d'erreur par défaut
+    | utilisés par la classe de validation. Certaines de ces règles ont
+    | plusieurs versions, comme les règles de taille. N'hésitez pas à
     | personnaliser chaque message ici.
     |
     */
@@ -143,9 +143,9 @@ return [
     | Lignes de Langue de Validation Personnalisées
     |--------------------------------------------------------------------------
     |
-    | Ici, vous pouvez spécifier des messages de validation personnalisés pour 
-    | les attributs en utilisant la convention "attribute.rule" pour nommer 
-    | les lignes. Cela permet de spécifier rapidement une ligne de langue 
+    | Ici, vous pouvez spécifier des messages de validation personnalisés pour
+    | les attributs en utilisant la convention "attribute.rule" pour nommer
+    | les lignes. Cela permet de spécifier rapidement une ligne de langue
     | personnalisée spécifique pour une règle d'attribut donnée.
     |
     */
@@ -161,9 +161,9 @@ return [
     | Attributs de Validation Personnalisés
     |--------------------------------------------------------------------------
     |
-    | Les lignes de langue suivantes sont utilisées pour échanger notre 
-    | espace réservé d'attribut avec quelque chose de plus convivial 
-    | comme "Adresse E-Mail" au lieu de "email". Cela nous aide 
+    | Les lignes de langue suivantes sont utilisées pour échanger notre
+    | espace réservé d'attribut avec quelque chose de plus convivial
+    | comme "Adresse E-Mail" au lieu de "email". Cela nous aide
     | simplement à rendre notre message plus expressif.
     |
     */

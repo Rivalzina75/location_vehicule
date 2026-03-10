@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CatalogueController;
-use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservationController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

@@ -16,8 +16,11 @@ class InspectionTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Vehicle $vehicle;
+
     private Reservation $confirmedReservation;
+
     private Reservation $activeReservation;
 
     protected function setUp(): void

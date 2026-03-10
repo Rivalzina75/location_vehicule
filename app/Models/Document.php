@@ -70,9 +70,10 @@ class Document extends Model
     {
         $bytes = $this->size;
         if ($bytes >= 1048576) {
-            return number_format($bytes / 1048576, 1) . ' Mo';
+            return number_format($bytes / 1048576, 1).' Mo';
         }
-        return number_format($bytes / 1024, 0) . ' Ko';
+
+        return number_format($bytes / 1024, 0).' Ko';
     }
 
     public function isExpired(): bool

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Rules\PasswordRobustness;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use App\Rules\PasswordRobustness;
-use App\Models\User;
 
 /**
  * @mixin \App\Models\User
@@ -29,6 +29,7 @@ class ProfileController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+
         return view('dashboard.profile', compact('user'));
     }
 
@@ -39,6 +40,7 @@ class ProfileController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+
         return view('dashboard.profile-edit', compact('user'));
     }
 
@@ -91,6 +93,7 @@ class ProfileController extends Controller
 
             if ($emailChanged) {
                 $user->sendEmailVerificationNotification();
+
                 return redirect()->route('dashboard.profile.show')
                     ->with('success', __('Profil mis à jour. Un email de vérification a été envoyé à votre nouvelle adresse.'));
             }
@@ -100,7 +103,7 @@ class ProfileController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', __('Erreur lors de la mise à jour du profil: ') . $e->getMessage());
+                ->with('error', __('Erreur lors de la mise à jour du profil: ').$e->getMessage());
         }
     }
 
@@ -121,16 +124,16 @@ class ProfileController extends Controller
         ]);
 
         // Vérifier que le mot de passe actuel est correct
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors([
-                'current_password' => __('Le mot de passe actuel est incorrect.')
+                'current_password' => __('Le mot de passe actuel est incorrect.'),
             ])->withInput();
         }
 
         // Vérifier que le nouveau mot de passe est différent de l'ancien
         if (Hash::check($validated['password'], $user->password)) {
             return back()->withErrors([
-                'password' => __('Le nouveau mot de passe doit être différent de l\'ancien.')
+                'password' => __('Le nouveau mot de passe doit être différent de l\'ancien.'),
             ])->withInput();
         }
 
@@ -141,7 +144,7 @@ class ProfileController extends Controller
 
             return back()->with('success', __('Mot de passe mis à jour avec succès.'));
         } catch (\Exception $e) {
-            return back()->with('error', __('Erreur lors de la mise à jour du mot de passe: ') . $e->getMessage());
+            return back()->with('error', __('Erreur lors de la mise à jour du mot de passe: ').$e->getMessage());
         }
     }
 
@@ -158,9 +161,9 @@ class ProfileController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return back()->withErrors([
-                'password' => __('Le mot de passe est incorrect.')
+                'password' => __('Le mot de passe est incorrect.'),
             ]);
         }
 
@@ -178,7 +181,7 @@ class ProfileController extends Controller
 
             return redirect('/')->with('success', __('Votre compte a été supprimé avec succès.'));
         } catch (\Exception $e) {
-            return back()->with('error', __('Erreur lors de la suppression du compte: ') . $e->getMessage());
+            return back()->with('error', __('Erreur lors de la suppression du compte: ').$e->getMessage());
         }
     }
 }

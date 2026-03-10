@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomResetPasswordNotification;
+use App\Notifications\VerifyEmail;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,8 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Notifications\VerifyEmail;
-use App\Notifications\CustomResetPasswordNotification;
 
 /**
  * @property int $id
@@ -98,12 +98,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if (empty($value)) {
             $this->attributes['date_of_birth'] = null;
+
             return;
         }
 
         // If already in Y-m-d format, keep it
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             $this->attributes['date_of_birth'] = $value;
+
             return;
         }
 
@@ -141,7 +143,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name . ' ' . $this->last_name);
+        return trim($this->first_name.' '.$this->last_name);
     }
 
     /**
@@ -235,7 +237,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getLockoutSecondsAttribute(): int
     {
-        if (!$this->isLockedOut()) {
+        if (! $this->isLockedOut()) {
             return 0;
         }
 

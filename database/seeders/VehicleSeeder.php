@@ -809,7 +809,7 @@ class VehicleSeeder extends Seeder
         ];
 
         foreach ($vehicles as $vehicleData) {
-            $vehicleKey = Str::slug(($vehicleData['brand'] ?? '') . '-' . ($vehicleData['model'] ?? ''));
+            $vehicleKey = Str::slug(($vehicleData['brand'] ?? '').'-'.($vehicleData['model'] ?? ''));
             if (empty($vehicleData['image_path']) && isset($imageMap[$vehicleKey])) {
                 $vehicleData['image_path'] = $imageMap[$vehicleKey];
             }
@@ -817,6 +817,6 @@ class VehicleSeeder extends Seeder
             Vehicle::create($vehicleData);
         }
 
-        $this->command->info('✅ ' . count($vehicles) . ' véhicules créés avec succès!');
+        $this->command->info('✅ '.count($vehicles).' véhicules créés avec succès!');
     }
 }

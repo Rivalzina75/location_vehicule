@@ -5,8 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\URL;
 
 class VerifyEmail extends Notification
 {
@@ -35,7 +35,7 @@ class VerifyEmail extends Notification
             ->subject(Lang::get('Bienvenue chez Machina - Vérification'))
             ->view('emails.verify-email', [
                 'url' => $verificationUrl,
-                'user' => $notifiable
+                'user' => $notifiable,
             ]);
     }
 
