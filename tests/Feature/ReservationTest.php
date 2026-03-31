@@ -419,7 +419,7 @@ class ReservationTest extends TestCase
         $this->assertDatabaseHas('reservations', [
             'user_id' => $this->user->id,
             'vehicle_id' => $this->vehicle->id,
-            'start_date' => today()->addDays(3)->format('Y-m-d'),
+            'start_date' => today()->addDays(3)->startOfDay()->toDateTimeString(),
         ]);
     }
 
