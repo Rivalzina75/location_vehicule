@@ -158,9 +158,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // ========== GESTION DOCUMENTS ==========
 
-    // TODO: Ajouter routes pour valider/rejeter documents
-    // Route::patch('documents/{id}/approve', [DocumentController::class, 'approve'])->name('documents.approve');
-    // Route::patch('documents/{id}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
+    // Valider/Rejeter des documents
+    Route::patch('documents/{id}/approve', [DocumentController::class, 'approve'])->name('documents.approve');
+    Route::patch('documents/{id}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
 
     // ========== GESTION UTILISATEURS ==========
 

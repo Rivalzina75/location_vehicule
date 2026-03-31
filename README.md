@@ -19,10 +19,11 @@ Location Vehicule est une application web permettant la gestion de la location d
 - Multilingue (anglais, français)
 
 ## Prérequis
-- PHP >= 8.0
+- PHP >= 8.2
 - Composer
 - Node.js & npm
-- MySQL ou tout autre système de gestion de base de données compatible
+- MySQL (développement/production)
+- SQLite + extensions `pdo_sqlite` et `sqlite3` (tests)
 
 ## Installation
 
@@ -83,4 +84,12 @@ Location Vehicule est une application web permettant la gestion de la location d
 Pour exécuter les tests, utilisez la commande suivante :
 ```bash
 php artisan test
+```
+
+Pour reproduire les contrôles de la CI :
+```bash
+./vendor/bin/pint --test
+npm run build
+composer audit --format=plain
+npm audit --audit-level=high
 ```

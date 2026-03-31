@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -102,5 +103,75 @@ class DocumentController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Approuver un document (Admin)
+     */
+    public function approve($id)
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (! $user || ! $user->isAdmin()) {
+            abort(403);
+        }
+
+        $document = Document::findOrFail($id);
+
+        if ($document->status === 'approved') {
+            return back()->with('info', __('Ce document est déjà approuvé.'));
+        }
+
+        $document->update([
+            'status' => 'approved',
+            'rejection_reason' => null,
+        ]);
+
+        ActivityLog::log(
+            $document->user_id,
+            'document_approved',
+            __('Document approuvé'),
+            $document->type_label.' - '.$document->filename,
+            ['document_id' => $document->id, 'type' => $document->type]
+        );
+
+        return back()->with('success', __('Document approuvé avec succès.'));
+    }
+
+    /**
+     * Rejeter un document (Admin)
+     */
+    public function reject(Request $request, $id)
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (! $user || ! $user->isAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $document = Document::findOrFail($id);
+
+        $document->update([
+            'status' => 'rejected',
+            'rejection_reason' => $validated['rejection_reason'],
+        ]);
+
+        ActivityLog::log(
+            $document->user_id,
+            'document_rejected',
+            __('Document rejeté'),
+            $document->type_label.' - '.$document->filename,
+            [
+                'document_id' => $document->id,
+                'type' => $document->type,
+                'reason' => $validated['rejection_reason'],
+            ]
+        );
+
+        return back()->with('success', __('Document rejeté.'));
     }
 }

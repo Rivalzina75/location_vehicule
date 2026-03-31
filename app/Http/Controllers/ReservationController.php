@@ -162,22 +162,16 @@ class ReservationController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
-
             /** @var User $user */
             $user = Auth::user();
 
             // Check if user has valid payment method for any reservation
             if (! $user->hasValidPaymentMethod()) {
-                DB::rollBack();
-
                 return redirect()->route('dashboard.payment-methods')
                     ->with('error', __('Réservation indisponible sans moyen de paiement.'));
             }
 
-            $startDate = Carbon::parse($request->start_date);
-
-            $vehicle = Vehicle::findOrFail($request->vehicle_id);
+            $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
 
             if (! $vehicle->isAvailable()) {
                 return back()->with('error', __('Ce véhicule n\'est pas disponible.'));
@@ -186,12 +180,12 @@ class ReservationController extends Controller
             // Vérifier les conflits de dates
             $hasConflict = Reservation::where('vehicle_id', $vehicle->id)
                 ->whereIn('status', ['confirmed', 'active'])
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('start_date', [$request->start_date, $request->end_date])
-                        ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('start_date', '<=', $request->start_date)
-                                ->where('end_date', '>=', $request->end_date);
+                ->where(function ($query) use ($validated) {
+                    $query->whereBetween('start_date', [$validated['start_date'], $validated['end_date']])
+                        ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
+                        ->orWhere(function ($q) use ($validated) {
+                            $q->where('start_date', '<=', $validated['start_date'])
+                                ->where('end_date', '>=', $validated['end_date']);
                         });
                 })
                 ->exists();
@@ -200,48 +194,55 @@ class ReservationController extends Controller
                 return back()->with('error', __('Le véhicule est déjà réservé pour ces dates.'));
             }
 
-            $startDate = Carbon::parse($request->start_date);
-            $endDate = Carbon::parse($request->end_date);
+            $startDate = Carbon::parse($validated['start_date']);
+            $endDate = Carbon::parse($validated['end_date']);
             $days = max(1, $startDate->diffInDays($endDate));
+
+            $childSeat = $request->boolean('child_seat');
+            $gps = $request->boolean('gps');
+            $additionalDriver = $request->boolean('additional_driver');
+            $insuranceFull = $request->boolean('insurance_full');
 
             // Calcul prix
             $pricingBreakdown = Reservation::calculateOfferBreakdown($vehicle, $days);
             $basePrice = (float) $pricingBreakdown['total'];
 
             $optionsPrice = 0;
-            if ($request->child_seat && $vehicle->child_seat_available) {
+            if ($childSeat && $vehicle->child_seat_available) {
                 $optionsPrice += 5 * $days;
             }
-            if ($request->gps && $vehicle->gps_available) {
+            if ($gps && $vehicle->gps_available) {
                 $optionsPrice += 3 * $days;
             }
-            if ($request->additional_driver) {
+            if ($additionalDriver) {
                 $optionsPrice += 10 * $days;
             }
 
             $insurancePrice = 0;
-            if ($request->insurance_full) {
+            if ($insuranceFull) {
                 $insurancePrice = $basePrice * 0.15;
             }
 
             $totalPrice = $basePrice + $optionsPrice + $insurancePrice;
 
+            DB::beginTransaction();
+
             $reservation = Reservation::create([
                 'user_id' => Auth::id(),
                 'vehicle_id' => $vehicle->id,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
                 'duration_days' => $days,
                 'base_price' => $basePrice,
                 'insurance_price' => $insurancePrice,
                 'options_price' => $optionsPrice,
                 'total_price' => $totalPrice,
                 'deposit_amount' => $vehicle->deposit,
-                'child_seat' => $request->child_seat ?? false,
-                'gps' => $request->gps ?? false,
-                'additional_driver' => $request->additional_driver ?? false,
-                'insurance_full' => $request->insurance_full ?? false,
-                'customer_notes' => $request->customer_notes,
+                'child_seat' => $childSeat,
+                'gps' => $gps,
+                'additional_driver' => $additionalDriver,
+                'insurance_full' => $insuranceFull,
+                'customer_notes' => $validated['customer_notes'] ?? null,
                 'status' => 'pending',
                 'payment_status' => 'pending',
             ]);
@@ -264,7 +265,9 @@ class ReservationController extends Controller
             return redirect()->route('dashboard.reservation.show', $reservation->id)
                 ->with('success', __('Réservation créée avec succès ! Code :').' '.$reservation->confirmation_code);
         } catch (\Exception $e) {
-            DB::rollBack();
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
 
             return back()->with('error', __('Erreur lors de la création de la réservation: ').$e->getMessage());
         }
@@ -294,7 +297,15 @@ class ReservationController extends Controller
         try {
             DB::beginTransaction();
 
-            $reservation->vehicle->update(['status' => 'available']);
+            // Keep vehicle rented if another active reservation still exists for it.
+            $hasActiveReservation = Reservation::where('vehicle_id', $reservation->vehicle_id)
+                ->where('id', '!=', $reservation->id)
+                ->where('status', 'active')
+                ->exists();
+
+            if (! $hasActiveReservation) {
+                $reservation->vehicle->update(['status' => 'available']);
+            }
 
             $reservation->update([
                 'status' => 'cancelled',
@@ -379,6 +390,8 @@ class ReservationController extends Controller
         $reservation->update([
             'status' => 'active',
         ]);
+
+        $reservation->vehicle->update(['status' => 'rented']);
 
         return back()->with('success', __('Location démarrée.'));
     }
