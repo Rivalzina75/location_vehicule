@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +19,7 @@ class PaymentMethodController extends Controller
      */
     public function index()
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
         $paymentMethods = $user->paymentMethods()->orderByDesc('is_default')->orderByDesc('created_at')->get();
 
@@ -29,7 +31,7 @@ class PaymentMethodController extends Controller
      */
     public function store(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -45,7 +47,7 @@ class PaymentMethodController extends Controller
         ]);
 
         // Validate expiry date is in the future
-        $expiryDate = \Carbon\Carbon::createFromFormat('m/Y', $validated['expiry_month'].'/'.$validated['expiry_year'])->endOfMonth();
+        $expiryDate = Carbon::createFromFormat('m/Y', $validated['expiry_month'].'/'.$validated['expiry_year'])->endOfMonth();
         if ($expiryDate->isPast()) {
             return back()->withErrors(['expiry_month' => __('La carte est expirée.')])->withInput();
         }
@@ -77,7 +79,7 @@ class PaymentMethodController extends Controller
      */
     public function setDefault($id)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $paymentMethod = $user->paymentMethods()->findOrFail($id);
@@ -94,7 +96,7 @@ class PaymentMethodController extends Controller
      */
     public function destroy($id)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $paymentMethod = $user->paymentMethods()->findOrFail($id);
