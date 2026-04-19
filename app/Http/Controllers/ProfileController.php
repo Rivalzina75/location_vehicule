@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 /**
- * @mixin \App\Models\User
+ * @mixin User
  */
 class ProfileController extends Controller
 {

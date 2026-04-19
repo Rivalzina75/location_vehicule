@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -56,7 +57,7 @@ class LoginController extends Controller
             session(['lockout_email' => $request->input($this->username())]);
 
             // Use translation key - countdown handled by JavaScript
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 $this->username() => [__('lockout_message')],
             ]);
         }

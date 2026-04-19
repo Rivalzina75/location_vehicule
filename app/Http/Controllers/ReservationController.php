@@ -7,6 +7,7 @@ use App\Models\Reservation;
 use App\Models\User;
 use App\Models\Vehicle;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -153,7 +154,21 @@ class ReservationController extends Controller
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            'end_date' => [
+                'required',
+                'date',
+                function (string $attribute, mixed $value, Closure $fail) use ($request): void {
+                    $startDateInput = $request->input('start_date');
+
+                    if (empty($startDateInput)) {
+                        return;
+                    }
+
+                    if (Carbon::parse($value)->lte(Carbon::parse($startDateInput))) {
+                        $fail(__('La date de fin doit être postérieure à la date de début.'));
+                    }
+                },
+            ],
             'child_seat' => 'boolean',
             'gps' => 'boolean',
             'additional_driver' => 'boolean',

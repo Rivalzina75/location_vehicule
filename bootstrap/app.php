@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,13 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware global pour toutes les routes web
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
-            \App\Http\Middleware\SetLocale::class,
+            SecurityHeaders::class,
+            SetLocale::class,
         ]);
 
         // Alias de middleware pour vérifier les rôles
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'role' => CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

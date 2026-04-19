@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Reservation;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -218,7 +220,7 @@ class ProfileTest extends TestCase
     public function test_delete_fails_with_active_reservations(): void
     {
         // Create an active reservation
-        $vehicle = \App\Models\Vehicle::create([
+        $vehicle = Vehicle::create([
             'brand' => 'Toyota',
             'model' => 'Yaris',
             'type' => 'citycar',
@@ -230,7 +232,7 @@ class ProfileTest extends TestCase
             'price_per_day' => 45,
             'status' => 'available',
         ]);
-        \App\Models\Reservation::create([
+        Reservation::create([
             'user_id' => $this->user->id,
             'vehicle_id' => $vehicle->id,
             'start_date' => today(),
