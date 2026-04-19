@@ -7,10 +7,10 @@ use App\Models\Reservation;
 use App\Models\User;
 use App\Models\Vehicle;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
 {
@@ -154,7 +154,21 @@ class ReservationController extends Controller
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date',
+            'end_date' => [
+                'required',
+                'date',
+                function (string $attribute, mixed $value, Closure $fail) use ($request): void {
+                    $startDateInput = $request->input('start_date');
+
+                    if (empty($startDateInput)) {
+                        return;
+                    }
+
+                    if (Carbon::parse($value)->lte(Carbon::parse($startDateInput))) {
+                        $fail(__('La date de fin doit être postérieure à la date de début.'));
+                    }
+                },
+            ],
             'child_seat' => 'boolean',
             'gps' => 'boolean',
             'additional_driver' => 'boolean',
@@ -197,11 +211,6 @@ class ReservationController extends Controller
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
-            if ($endDate->lte($startDate)) {
-                throw ValidationException::withMessages([
-                    'end_date' => __('La date de fin doit être postérieure à la date de début.'),
-                ]);
-            }
             $days = max(1, $startDate->diffInDays($endDate));
 
             $childSeat = $request->boolean('child_seat');
@@ -270,8 +279,6 @@ class ReservationController extends Controller
 
             return redirect()->route('dashboard.reservation.show', $reservation->id)
                 ->with('success', __('Réservation créée avec succès ! Code :').' '.$reservation->confirmation_code);
-        } catch (ValidationException $e) {
-            throw $e;
         } catch (\Exception $e) {
             if (DB::transactionLevel() > 0) {
                 DB::rollBack();
